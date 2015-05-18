@@ -1,0 +1,11 @@
+{% import _self as exceptions %}
+
+<p class="lead">An invalid result was returned from the dispatch action.</p>
+
+<p>{{ result }}</p>
+
+<h2>Suggested Fix</h2>
+<p>
+    The most common reason for this is that your route maps to an invalid callable. Ensure your
+    route for <strong>{{ path }}</strong> has a correctly defined callable.
+</p>

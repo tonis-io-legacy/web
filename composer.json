@@ -1,0 +1,27 @@
+{
+    "name": "tonis/mvc",
+    "authors": [
+        {
+            "name": "Kyle Spraggs",
+            "email": "theman@spiffyjr.me"
+        }
+    ],
+    "description": "Tonis is a light-weight, PSR-7 compliant, MVC middleware layer.",
+    "license": "BSD-3-Clause",
+    "require": {
+        "php": ">=5.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Tonis\\Mvc\\": [
+                "src/",
+                "test/"
+            ]
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}
