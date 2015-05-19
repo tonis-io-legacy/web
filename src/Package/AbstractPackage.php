@@ -104,7 +104,10 @@ abstract class AbstractPackage implements PackageInterface
         }
 
         $refl = new \ReflectionObject($this);
-        $this->path = realpath(preg_replace('@/src/?$@', '', dirname($refl->getFileName())));
+        $pathParts = explode(DIRECTORY_SEPARATOR.'src', dirname($refl->getFileName()));
+        array_pop($pathParts);
+        $this->path = realpath(implode(DIRECTORY_SEPARATOR.'src', $pathParts));
+
         return $this->path;
     }
 }
