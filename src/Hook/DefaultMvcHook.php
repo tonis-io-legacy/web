@@ -18,7 +18,7 @@ use Tonis\View\ViewManager;
 use Tonis\View\ViewModel;
 use Tonis\View\ViewModelInterface;
 
-final class DefaultMvcHook implements AppHookInterface
+final class DefaultMvcHook extends AbstractAppHook
 {
     /**
      * {@inheritDoc}
@@ -57,8 +57,7 @@ final class DefaultMvcHook implements AppHookInterface
 
 
     /**
-     * @param App $app
-     * @param RouteMatch $match
+     * {@inheritDoc}
      */
     public function onDispatch(App $app, RouteMatch $match = null)
     {
@@ -92,9 +91,7 @@ final class DefaultMvcHook implements AppHookInterface
     }
 
     /**
-     * @param App $app
-     * @param InvalidDispatchResultException $ex
-     * @param RequestInterface $request
+     * {@inheritDoc}
      */
     public function onDispatchInvalidResult(App $app, InvalidDispatchResultException $ex, RequestInterface $request)
     {
@@ -108,8 +105,7 @@ final class DefaultMvcHook implements AppHookInterface
     }
 
     /**
-     * @param App $app
-     * @param Exception $ex
+     * {@inheritDoc}
      */
     public function onDispatchException(App $app, Exception $ex)
     {
@@ -122,9 +118,7 @@ final class DefaultMvcHook implements AppHookInterface
     }
 
     /**
-     * @param App $app
-     * @param ViewManager $vm
-     * @throws InvalidViewModelException
+     * {@inheritDoc}
      */
     public function onRender(App $app, ViewManager $vm)
     {
