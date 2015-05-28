@@ -1,7 +1,7 @@
 <?php
 namespace Tonis\Mvc\Package;
 
-use Interop\Container\ContainerInterface;
+use Tonis\Di\Container;
 use Tonis\PackageManager\Feature\ConfigProviderInterface;
 use Tonis\PackageManager\Feature\NameProviderInterface;
 use Tonis\PackageManager\Feature\NamespaceProviderInterface;
@@ -15,9 +15,9 @@ interface PackageInterface extends
     PathProviderInterface
 {
     /**
-     * @param ContainerInterface $di
+     * @param Container $di
      */
-    public function configureDi(ContainerInterface $di);
+    public function configureDi(Container $di);
 
     /**
      * @param RouteCollection $routes
