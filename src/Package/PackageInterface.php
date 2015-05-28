@@ -15,12 +15,12 @@ interface PackageInterface extends
     PathProviderInterface
 {
     /**
-     * @param RouteCollection $routes
-     */
-    public function configureRoutes(RouteCollection $routes);
-
-    /**
      * @param ContainerInterface $di
      */
     public function configureDi(ContainerInterface $di);
+
+    /**
+     * @param RouteCollection $routes
+     */
+    public function configureRoutes(RouteCollection $routes);
 }

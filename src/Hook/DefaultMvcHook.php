@@ -7,36 +7,37 @@ use Psr\Http\Message\RequestInterface;
 use Tonis\Di\Container;
 use Tonis\Di\ContainerUtil;
 use Tonis\Dispatcher\Dispatcher;
-use Tonis\Mvc\App;
 use Tonis\Mvc\Exception\InvalidDispatchResultException;
 use Tonis\Mvc\Exception\InvalidTemplateException;
 use Tonis\Mvc\Exception\InvalidViewModelException;
 use Tonis\Mvc\Exception\MissingRequiredEnvironmentException;
 use Tonis\Mvc\Package\PackageInterface;
+use Tonis\Mvc\Tonis;
 use Tonis\Router\RouteMatch;
 use Tonis\View\ViewManager;
 use Tonis\View\ViewModel;
 use Tonis\View\ViewModelInterface;
 
-final class DefaultMvcHook extends AbstractAppHook
+final class DefaultMvcHook extends AbstractTonisHook
 {
     /**
      * {@inheritDoc}
      */
-    public function onBootstrap(App $app, array $config)
+    public function onBootstrap(Tonis $app, array $config)
     {
-        $this->loadPackages($app, $config['packages']);
+        $this->loadPackages($app, isset($config['packages']) ? $config['packages'] : []);
         $this->configurePackages($app);
-        $this->validateEnvironment($app->getPackageManager()->getMergedConfig()['tonis']['required_environment']);
 
-        $packageConfig = $app->getPackageManager()->getMergedConfig();
-        $this->configureViewManager($app->getDi(), $app->getViewManager(), $packageConfig['tonis']['view_manager']);
+        $config = $app->getPackageManager()->getMergedConfig();
+
+        $this->validateEnvironment($config['tonis']['required_environment']);
+        $this->configureViewManager($app->getDi(), $app->getViewManager(), $config['tonis']['view_manager']);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function onRoute(App $app, RequestInterface $request)
+    public function onRoute(Tonis $app, RequestInterface $request)
     {
         $app->getRouteCollection()->match($request);
     }
@@ -44,7 +45,7 @@ final class DefaultMvcHook extends AbstractAppHook
     /**
      * {@inheritDoc}
      */
-    public function onRouteError(App $app, RequestInterface $request)
+    public function onRouteError(Tonis $app, RequestInterface $request)
     {
         $model = new ViewModel([
             'path' => $request->getUri()->getPath(),
@@ -59,7 +60,7 @@ final class DefaultMvcHook extends AbstractAppHook
     /**
      * {@inheritDoc}
      */
-    public function onDispatch(App $app, RouteMatch $match = null)
+    public function onDispatch(Tonis $app, RouteMatch $match = null)
     {
         if (null !== $app->getDispatchResult()) {
             return;
@@ -93,7 +94,7 @@ final class DefaultMvcHook extends AbstractAppHook
     /**
      * {@inheritDoc}
      */
-    public function onDispatchInvalidResult(App $app, InvalidDispatchResultException $ex, RequestInterface $request)
+    public function onDispatchInvalidResult(Tonis $app, InvalidDispatchResultException $ex, RequestInterface $request)
     {
         $model = new ViewModel([
             'exception' => $ex,
@@ -107,7 +108,7 @@ final class DefaultMvcHook extends AbstractAppHook
     /**
      * {@inheritDoc}
      */
-    public function onDispatchException(App $app, Exception $ex)
+    public function onDispatchException(Tonis $app, Exception $ex)
     {
         $model = new ViewModel([
             'exception' => $ex,
@@ -120,7 +121,7 @@ final class DefaultMvcHook extends AbstractAppHook
     /**
      * {@inheritDoc}
      */
-    public function onRender(App $app, ViewManager $vm)
+    public function onRender(Tonis $app, ViewManager $vm)
     {
         $model = $app->getDispatchResult();
 
@@ -169,10 +170,10 @@ final class DefaultMvcHook extends AbstractAppHook
     }
 
     /**
-     * @param App $app
+     * @param Tonis $app
      * @param array $packages
      */
-    private function loadPackages(App $app, array $packages)
+    private function loadPackages(Tonis $app, array $packages)
     {
         $pm = $app->getPackageManager();
 
@@ -195,21 +196,22 @@ final class DefaultMvcHook extends AbstractAppHook
     }
 
     /**
-     * @param App $app
+     * @param Tonis $app
      */
-    private function configurePackages(App $app)
+    private function configurePackages(Tonis $app)
     {
         $pm = $app->getPackageManager();
 
         foreach ($pm->getPackages() as $package) {
             if ($package instanceof PackageInterface) {
-                $package->configureRoutes($app->getRouteCollection());
                 $package->configureDi($app->getDi());
+                $package->configureRoutes($app->getRouteCollection());
             }
         }
     }
 
     /**
+     * @param Container $di
      * @param ViewManager $vm
      * @param array $config
      */

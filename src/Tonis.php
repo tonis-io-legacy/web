@@ -1,26 +1,29 @@
 <?php
 namespace Tonis\Mvc;
 
-use Interop\Container\ContainerInterface;
-use Phly\Conduit\MiddlewareInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Tonis\Di\Container;
 use Tonis\Hookline\Exception\InvalidHookException;
+use Tonis\Hookline\HookContainer;
 use Tonis\Hookline\HooksAwareInterface;
 use Tonis\Hookline\HooksAwareTrait;
 use Tonis\Mvc\Exception;
+use Tonis\Mvc\Hook\DefaultMvcHook;
+use Tonis\Mvc\Hook\TonisHookInterface;
 use Tonis\PackageManager\PackageManager;
 use Tonis\Router\RouteCollection;
 use Tonis\Router\RouteMatch;
 use Tonis\View\ViewManager;
+use Zend\Stratigility\MiddlewareInterface;
 
-final class App implements HooksAwareInterface, MiddlewareInterface
+final class Tonis implements HooksAwareInterface, MiddlewareInterface
 {
     use HooksAwareTrait;
 
     /** @var array */
     private $config;
-    /** @var ContainerInterface */
+    /** @var Container */
     private $di;
     /** @var PackageManager */
     private $packageManager;
@@ -38,23 +41,29 @@ final class App implements HooksAwareInterface, MiddlewareInterface
     private $response;
 
     /**
-     * @param ContainerInterface $di
      * @param array $config
      */
-    public function __construct(ContainerInterface $di, array $config)
+    public function __construct(array $config)
     {
         $this->config = $config;
-        $this->di = $di;
+        $this->di = new Container();
         $this->packageManager = new PackageManager();
         $this->routes = new RouteCollection();
         $this->viewManager = new ViewManager();
+
+        $this->di->set(self::class, $this);
 
         $this->prepareEnvironment(isset($config['environment']) ? $config['environment'] : []);
         $this->initHooks(isset($config['hooks']) ? $config['hooks'] : []);
     }
 
     /**
-     * {@inheritDoc}
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @param callable $next
+     * @return ResponseInterface
+     * @throws \Exception if render result is not renderable and $next is null
+     * @throws string
      */
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response, callable $next = null)
     {
@@ -76,10 +85,15 @@ final class App implements HooksAwareInterface, MiddlewareInterface
 
         $this->hooks()->run('onRender', $this, $this->getViewManager());
         if ($this->renderResult instanceof \Exception) {
-            return $next($request, $response, $this->renderResult);
+            if (is_callable($next)) {
+                return $next($request, $response, $this->renderResult);
+            } else {
+                throw $this->renderResult;
+            }
         }
 
-        return $this->getResponse()->getBody()->write($this->getRenderResult());
+        $this->getResponse()->getBody()->write($this->getRenderResult());
+        return $response;
     }
 
     /**
@@ -91,7 +105,7 @@ final class App implements HooksAwareInterface, MiddlewareInterface
     }
 
     /**
-     * @return ContainerInterface
+     * @return Container
      */
     public function getDi()
     {
@@ -189,6 +203,12 @@ final class App implements HooksAwareInterface, MiddlewareInterface
      */
     private function initHooks(array $hooks)
     {
+        $this->hooks = new HookContainer(TonisHookInterface::class);
+
+        if (empty($hooks)) {
+            $hooks[] = DefaultMvcHook::class;
+        }
+
         foreach ($hooks as $hook) {
             if (is_string($hook)) {
                 if (!class_exists($hook)) {

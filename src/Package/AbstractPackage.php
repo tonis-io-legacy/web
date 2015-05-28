@@ -88,10 +88,10 @@ abstract class AbstractPackage implements PackageInterface
     public function getConfig()
     {
         $path = $this->getPath();
-        if (!file_exists($path . '/config/package.config.php')) {
+        if (!file_exists($path . '/config/package.php')) {
             return [];
         }
-        return include $path . '/config/package.config.php';
+        return include $path . '/config/package.php';
     }
 
     /**
@@ -104,7 +104,7 @@ abstract class AbstractPackage implements PackageInterface
         }
 
         $refl = new \ReflectionObject($this);
-        $this->path = realpath(preg_replace('@/src/?$@', '', dirname($refl->getFileName())));
+        $this->path = realpath(dirname($refl->getFileName()) . '/../');
         return $this->path;
     }
 }

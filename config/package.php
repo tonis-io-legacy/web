@@ -5,7 +5,6 @@ return [
             'TONIS_DEBUG'
         ],
         'twig' => [
-            'loader_paths' => [__DIR__ . '/../view'],
             'options' => [
                 'cache' => getenv('TONIS_DEBUG') ? null : 'cache/twig'
             ],
