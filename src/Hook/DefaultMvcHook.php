@@ -52,7 +52,7 @@ final class DefaultMvcHook extends AbstractTonisHook
             'type' => 'route'
         ]);
 
-        $model->setTemplate('error/404');
+        $model->setTemplate($app->getViewManager()->getNotFoundTemplate());
         $app->setDispatchResult($model);
     }
 
@@ -81,6 +81,8 @@ final class DefaultMvcHook extends AbstractTonisHook
                 $result = new ViewModel();
             } elseif (is_array($result)) {
                 $result = new ViewModel($result);
+            } elseif (is_string($result)) {
+                $result = new ViewModel(['content' => $result]);
             } elseif (!$result instanceof ViewModelInterface) {
                 $result = new InvalidDispatchResultException('Failed to dispatch; invalid dispatch result');
             }
@@ -98,7 +100,7 @@ final class DefaultMvcHook extends AbstractTonisHook
     {
         $model = new ViewModel([
             'exception' => $ex,
-            'type' => 'invalid-result',
+            'type' => 'invalid-dispatch-result',
             'path' => $request->getUri()->getPath()
         ]);
         $model->setTemplate('error/error');

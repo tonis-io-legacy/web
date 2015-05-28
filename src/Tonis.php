@@ -1,6 +1,7 @@
 <?php
 namespace Tonis\Mvc;
 
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Tonis\Di\Container;
@@ -15,6 +16,8 @@ use Tonis\PackageManager\PackageManager;
 use Tonis\Router\RouteCollection;
 use Tonis\Router\RouteMatch;
 use Tonis\View\ViewManager;
+use Zend\Diactoros\Response;
+use Zend\Diactoros\ServerRequestFactory;
 use Zend\Stratigility\MiddlewareInterface;
 
 final class Tonis implements HooksAwareInterface, MiddlewareInterface
@@ -43,7 +46,7 @@ final class Tonis implements HooksAwareInterface, MiddlewareInterface
     /**
      * @param array $config
      */
-    public function __construct(array $config)
+    public function __construct(array $config = [])
     {
         $this->config = $config;
         $this->di = new Container();
@@ -83,7 +86,7 @@ final class Tonis implements HooksAwareInterface, MiddlewareInterface
             $this->hooks()->run('onDispatchException', $this, $this->dispatchResult);
         }
 
-        $this->hooks()->run('onRender', $this, $this->getViewManager());
+        $this->hooks()->run('onRender', $this, $this->viewManager);
         if ($this->renderResult instanceof \Exception) {
             if (is_callable($next)) {
                 return $next($request, $response, $this->renderResult);
@@ -92,8 +95,23 @@ final class Tonis implements HooksAwareInterface, MiddlewareInterface
             }
         }
 
-        $this->getResponse()->getBody()->write($this->getRenderResult());
+        $this->getResponse()->getBody()->write($this->renderResult);
         return $response;
+    }
+
+    /**
+     * @param RequestInterface|null $request
+     * @param ResponseInterface|null $response
+     */
+    public function run(RequestInterface $request = null, ResponseInterface $response = null)
+    {
+        if (null === $request) {
+            $request = ServerRequestFactory::fromGlobals();
+        }
+        if (null === $response) {
+            $response = new Response();
+        }
+        echo $this->__invoke($request, $response)->getBody();
     }
 
     /**
