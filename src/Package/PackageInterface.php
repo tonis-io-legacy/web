@@ -2,18 +2,26 @@
 namespace Tonis\Mvc\Package;
 
 use Tonis\Di\Container;
-use Tonis\PackageManager\Feature\ConfigProviderInterface;
-use Tonis\PackageManager\Feature\NameProviderInterface;
-use Tonis\PackageManager\Feature\NamespaceProviderInterface;
-use Tonis\PackageManager\Feature\PathProviderInterface;
+use Tonis\Mvc;
+use Tonis\PackageManager\Feature;
 use Tonis\Router\RouteCollection;
 
 interface PackageInterface extends
-    ConfigProviderInterface,
-    NameProviderInterface,
-    NamespaceProviderInterface,
-    PathProviderInterface
+    Feature\ConfigProviderInterface,
+    Feature\NameProviderInterface,
+    Feature\NamespaceProviderInterface,
+    Feature\PathProviderInterface
 {
+    /**
+     * @param Mvc\Tonis $tonis
+     */
+    public function bootstrap(Mvc\Tonis $tonis);
+
+    /**
+     * @param Mvc\TonisConsole $console
+     */
+    public function bootstrapConsole(Mvc\TonisConsole $console);
+
     /**
      * @param Container $di
      */

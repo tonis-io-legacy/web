@@ -11,6 +11,7 @@ use Tonis\Hookline\HooksAwareInterface;
 use Tonis\Hookline\HooksAwareTrait;
 use Tonis\Mvc\Exception;
 use Tonis\Mvc\Hook\DefaultMvcHook;
+use Tonis\Mvc\Hook\DefaultTonisHook;
 use Tonis\Mvc\Hook\TonisHookInterface;
 use Tonis\PackageManager\PackageManager;
 use Tonis\Router\RouteCollection;
@@ -24,6 +25,8 @@ final class Tonis implements HooksAwareInterface, MiddlewareInterface
 {
     use HooksAwareTrait;
 
+    /** @var bool */
+    private $loaded = false;
     /** @var array */
     private $config;
     /** @var Container */
@@ -70,32 +73,6 @@ final class Tonis implements HooksAwareInterface, MiddlewareInterface
      */
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response, callable $next = null)
     {
-        $this->request = $request;
-        $this->response = $response;
-
-        $this->hooks()->run('onBootstrap', $this, $this->config);
-        $this->hooks()->run('onRoute', $this, $request);
-        if (!$this->routes->getLastMatch() instanceof RouteMatch) {
-            $this->hooks()->run('onRouteError', $this, $request);
-        }
-
-        $this->hooks()->run('onDispatch', $this, $this->routes->getLastMatch());
-        if ($this->dispatchResult instanceof Exception\InvalidDispatchResultException) {
-            $this->hooks()->run('onDispatchInvalidResult', $this, $this->dispatchResult, $request);
-        } elseif ($this->dispatchResult instanceof \Exception) {
-            $this->hooks()->run('onDispatchException', $this, $this->dispatchResult);
-        }
-
-        $this->hooks()->run('onRender', $this, $this->viewManager);
-        if ($this->renderResult instanceof \Exception) {
-            if (is_callable($next)) {
-                return $next($request, $response, $this->renderResult);
-            } else {
-                throw $this->renderResult;
-            }
-        }
-
-        $this->getResponse()->getBody()->write($this->renderResult);
         return $response;
     }
 
@@ -105,13 +82,62 @@ final class Tonis implements HooksAwareInterface, MiddlewareInterface
      */
     public function run(RequestInterface $request = null, ResponseInterface $response = null)
     {
-        if (null === $request) {
-            $request = ServerRequestFactory::fromGlobals();
+        $this->bootstrap($request, $response);
+        $this->route($this->request);
+        $this->dispatch($this->request);
+        $this->render($this->request, $this->response);
+        $this->respond($this->response);
+    }
+
+    /**
+     * @param RequestInterface $request
+     * @param ResponseInterface $response
+     */
+    public function bootstrap(RequestInterface $request = null, ResponseInterface $response = null)
+    {
+        if ($this->loaded) {
+            return;
         }
-        if (null === $response) {
-            $response = new Response();
+
+        $this->request = $request ? $request : ServerRequestFactory::fromGlobals();
+        $this->response = $response ? $response : new Response();
+
+        $this->hooks()->run('onBootstrap', $this, $this->config);
+        $this->loaded = true;
+    }
+
+    public function route(RequestInterface $request)
+    {
+        $this->hooks()->run('onRoute', $this, $request);
+
+        if (!$this->routes->getLastMatch() instanceof RouteMatch) {
+            $this->hooks()->run('onRouteError', $this, $request);
         }
-        echo $this->__invoke($request, $response)->getBody();
+    }
+
+    public function dispatch(RequestInterface $request)
+    {
+        $this->hooks()->run('onDispatch', $this, $this->routes->getLastMatch());
+
+        if ($this->dispatchResult instanceof Exception\InvalidDispatchResultException) {
+            $this->hooks()->run('onDispatchInvalidResult', $this, $this->dispatchResult, $request);
+        } elseif ($this->dispatchResult instanceof \Exception) {
+            $this->hooks()->run('onDispatchException', $this, $this->dispatchResult);
+        }
+    }
+
+    public function render()
+    {
+        $this->hooks()->run('onRender', $this, $this->viewManager);
+        if ($this->renderResult instanceof \Exception) {
+            $this->hooks()->run('onRenderException', $this, $this->renderResult);
+        }
+    }
+
+    public function respond(ResponseInterface $response)
+    {
+        $response->getBody()->write($this->renderResult);
+        echo $response->getBody();
     }
 
     /**
@@ -224,7 +250,7 @@ final class Tonis implements HooksAwareInterface, MiddlewareInterface
         $this->hooks = new HookContainer(TonisHookInterface::class);
 
         if (empty($hooks)) {
-            $hooks[] = DefaultMvcHook::class;
+            $hooks[] = new DefaultTonisHook();
         }
 
         foreach ($hooks as $hook) {

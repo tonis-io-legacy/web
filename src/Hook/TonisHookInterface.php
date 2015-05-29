@@ -52,4 +52,10 @@ interface TonisHookInterface extends HookInterface
      * @param ViewManager $vm
      */
     public function onRender(Tonis $tonis, ViewManager $vm);
+
+    /**
+     * @param Tonis $tonis
+     * @param \Exception $ex
+     */
+    public function onRenderException(Tonis $tonis, \Exception $ex);
 }

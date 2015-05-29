@@ -11,6 +11,9 @@
     "require": {
         "php": ">=5.4"
     },
+    "suggest": {
+        "symfony/console": "To add Console integration"
+    },
     "autoload": {
         "psr-4": {
             "Tonis\\Mvc\\": [

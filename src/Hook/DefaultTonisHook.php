@@ -18,7 +18,7 @@ use Tonis\View\ViewManager;
 use Tonis\View\ViewModel;
 use Tonis\View\ViewModelInterface;
 
-final class DefaultMvcHook extends AbstractTonisHook
+final class DefaultTonisHook extends AbstractTonisHook
 {
     /**
      * {@inheritDoc}
@@ -103,7 +103,7 @@ final class DefaultMvcHook extends AbstractTonisHook
             'type' => 'invalid-dispatch-result',
             'path' => $request->getUri()->getPath()
         ]);
-        $model->setTemplate('error/error');
+        $model->setTemplate('@error/error');
         $app->setDispatchResult($model);
     }
 
@@ -116,7 +116,7 @@ final class DefaultMvcHook extends AbstractTonisHook
             'exception' => $ex,
             'type' => 'exception'
         ]);
-        $model->setTemplate('error/error');
+        $model->setTemplate('@error/error');
         $app->setDispatchResult($model);
     }
 
@@ -208,6 +208,7 @@ final class DefaultMvcHook extends AbstractTonisHook
             if ($package instanceof PackageInterface) {
                 $package->configureDi($app->getDi());
                 $package->configureRoutes($app->getRouteCollection());
+                $package->bootstrap($app);
             }
         }
     }

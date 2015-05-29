@@ -57,4 +57,11 @@ abstract class AbstractTonisHook implements TonisHookInterface
     public function onRender(Tonis $app, ViewManager $vm)
     {
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function onRenderException(Tonis $app, \Exception $ex)
+    {
+    }
 }
