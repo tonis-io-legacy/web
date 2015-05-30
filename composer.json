@@ -9,10 +9,20 @@
     "description": "Tonis is a light-weight, PSR-7 compliant, MVC middleware layer.",
     "license": "BSD-3-Clause",
     "require": {
-        "php": ">=5.4"
+        "php": ">=5.4",
+        "tonis/di": "dev-master",
+        "tonis/dispatcher": "dev-master",
+        "tonis/hookline": "dev-master",
+        "tonis/mvc": "dev-master",
+        "tonis/package-manager": "dev-master",
+        "tonis/router": "dev-master",
+        "tonis/view": "dev-master"
     },
     "suggest": {
-        "symfony/console": "To add Console integration"
+        "symfony/console": "To add Console integration",
+        "twig/twig": "To use the Twig templating engine",
+        "league/plates": "To use the PlatesPHP templating engine",
+        "zendframework/zend-diactoros": "Or another PSR-7 implementation"
     },
     "autoload": {
         "psr-4": {
