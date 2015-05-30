@@ -6,6 +6,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\RequestInterface;
 use Tonis\Di\Container;
 use Tonis\Di\ContainerUtil;
+use Tonis\Di\ServiceFactoryInterface;
 use Tonis\Dispatcher\Dispatcher;
 use Tonis\Mvc\Exception\InvalidDispatchResultException;
 use Tonis\Mvc\Exception\InvalidTemplateException;
@@ -70,10 +71,19 @@ final class DefaultTonisHook extends AbstractTonisHook
         }
 
         $handler = $match->getRoute()->getHandler();
+        $di = $app->getDi();
         $dispatcher = new Dispatcher();
+
+        if (is_string($handler) && $di->has($handler)) {
+            $handler = $di->get($handler);
+        }
 
         try {
             $result = $dispatcher->dispatch($handler, $match->getParams());
+
+            if ($result instanceof ServiceFactoryInterface) {
+                $result = $dispatcher->dispatch($result->createService($di), $match->getParams());
+            }
 
             if ($result === $handler) {
                 $result = new InvalidDispatchResultException();

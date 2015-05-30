@@ -2,7 +2,7 @@
 use Tonis\Router\RouteCollection;
 
 return function(RouteCollection $routes) {
-    $routes->get('home', '/', function() {
-        return 'Tonis MVC Landing Page';
+    $routes->get('/', function() {
+        return 'Tonis Landing Page';
     });
 };
