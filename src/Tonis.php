@@ -10,7 +10,6 @@ use Tonis\Hookline\HookContainer;
 use Tonis\Hookline\HooksAwareInterface;
 use Tonis\Hookline\HooksAwareTrait;
 use Tonis\Mvc\Exception;
-use Tonis\Mvc\Hook\DefaultMvcHook;
 use Tonis\Mvc\Hook\DefaultTonisHook;
 use Tonis\Mvc\Hook\TonisHookInterface;
 use Tonis\PackageManager\PackageManager;
