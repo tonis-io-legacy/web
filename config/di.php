@@ -4,8 +4,8 @@ use Tonis\Di\Container;
 use Tonis\Di\ContainerUtil;
 use Tonis\Mvc\Package\PackageInterface;
 use Tonis\Mvc\Tonis;
-use Tonis\View\Plates\PlatesStrategy;
-use Tonis\View\Twig\TwigStrategy;
+use Tonis\View\Strategy\PlatesStrategy;
+use Tonis\View\Strategy\TwigStrategy;
 
 return function(Container $di) {
     $di->set(Twig_Environment::class, function(Container $di) {

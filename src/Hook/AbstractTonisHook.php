@@ -4,8 +4,8 @@ namespace Tonis\Mvc\Hook;
 use Psr\Http\Message\RequestInterface;
 use Tonis\Mvc\Exception\InvalidDispatchResultException;
 use Tonis\Mvc\Tonis;
-use Tonis\Router\RouteMatch;
-use Tonis\View\ViewManager;
+use Tonis\Router\Match as RouteMatch;
+use Tonis\View\Manager as ViewManager;
 
 abstract class AbstractTonisHook implements TonisHookInterface
 {

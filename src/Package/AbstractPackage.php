@@ -4,7 +4,7 @@ namespace Tonis\Mvc\Package;
 use Tonis\Di\Container;
 use Tonis\Mvc\Tonis;
 use Tonis\Mvc\TonisConsole;
-use Tonis\Router\RouteCollection;
+use Tonis\Router\Collection;
 
 abstract class AbstractPackage implements PackageInterface
 {
@@ -30,7 +30,7 @@ abstract class AbstractPackage implements PackageInterface
     /**
      * {@inheritDoc}
      */
-    public function configureRoutes(RouteCollection $routes)
+    public function configureRoutes(Collection $routes)
     {
         $path = $this->getPath();
         if (file_exists($path . '/config/routes.php')) {

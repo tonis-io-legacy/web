@@ -1,7 +1,7 @@
 <?php
-use Tonis\Router\RouteCollection;
+use Tonis\Router\Collection;
 
-return function(RouteCollection $routes) {
+return function(Collection $routes) {
     $routes->get('/', function() {
         return 'Tonis Landing Page';
     });

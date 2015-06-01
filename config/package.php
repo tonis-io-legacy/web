@@ -1,4 +1,8 @@
 <?php
+use Tonis\View\Strategy\JsonStrategy;
+use Tonis\View\Strategy\PlatesStrategy;
+use Tonis\View\Strategy\StringStrategy;
+
 return [
     'tonis' => [
         'required_environment' => [
@@ -21,11 +25,12 @@ return [
             ]
         ],
         'view_manager' => [
-            'fallback_strategy' => \Tonis\View\Plates\PlatesStrategy::class,
             'not_found_template' => '@error/404',
             'error_template' => '@error/error',
             'strategies' => [
-                \Tonis\View\String\StringStrategy::class,
+                StringStrategy::class,
+                JsonStrategy::class,
+                PlatesStrategy::class
             ],
         ]
     ]

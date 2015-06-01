@@ -14,10 +14,11 @@ use Tonis\Mvc\Exception\InvalidViewModelException;
 use Tonis\Mvc\Exception\MissingRequiredEnvironmentException;
 use Tonis\Mvc\Package\PackageInterface;
 use Tonis\Mvc\Tonis;
-use Tonis\Router\RouteMatch;
-use Tonis\View\ViewManager;
-use Tonis\View\ViewModel;
-use Tonis\View\ViewModelInterface;
+use Tonis\Router\Match as RouteMatch;
+use Tonis\View\Manager as ViewManager;
+use Tonis\View\Model\StringModel;
+use Tonis\View\Model\ViewModel;
+use Tonis\View\ModelInterface as ViewModelInterface;
 
 final class DefaultTonisHook extends AbstractTonisHook
 {
@@ -48,12 +49,14 @@ final class DefaultTonisHook extends AbstractTonisHook
      */
     public function onRouteError(Tonis $app, RequestInterface $request)
     {
-        $model = new ViewModel([
-            'path' => $request->getUri()->getPath(),
-            'type' => 'route'
-        ]);
+        $model = new ViewModel(
+            $app->getViewManager()->getNotFoundTemplate(),
+            [
+                'path' => $request->getUri()->getPath(),
+                'type' => 'route'
+            ]
+        );
 
-        $model->setTemplate($app->getViewManager()->getNotFoundTemplate());
         $app->setDispatchResult($model);
     }
 
@@ -87,12 +90,10 @@ final class DefaultTonisHook extends AbstractTonisHook
 
             if ($result === $handler) {
                 $result = new InvalidDispatchResultException();
-            } elseif ($result === null) {
-                $result = new ViewModel();
             } elseif (is_array($result)) {
                 $result = new ViewModel($result);
             } elseif (is_string($result)) {
-                $result = new ViewModel(['content' => $result]);
+                $result = new StringModel($result);
             } elseif (!$result instanceof ViewModelInterface) {
                 $result = new InvalidDispatchResultException('Failed to dispatch; invalid dispatch result');
             }
@@ -108,12 +109,14 @@ final class DefaultTonisHook extends AbstractTonisHook
      */
     public function onDispatchInvalidResult(Tonis $app, InvalidDispatchResultException $ex, RequestInterface $request)
     {
-        $model = new ViewModel([
-            'exception' => $ex,
-            'type' => 'invalid-dispatch-result',
-            'path' => $request->getUri()->getPath()
-        ]);
-        $model->setTemplate('@error/error');
+        $model = new ViewModel(
+            '@error/error',
+            [
+                'exception' => $ex,
+                'type' => 'invalid-dispatch-result',
+                'path' => $request->getUri()->getPath()
+            ]
+        );
         $app->setDispatchResult($model);
     }
 
@@ -122,11 +125,13 @@ final class DefaultTonisHook extends AbstractTonisHook
      */
     public function onDispatchException(Tonis $app, Exception $ex)
     {
-        $model = new ViewModel([
-            'exception' => $ex,
-            'type' => 'exception'
-        ]);
-        $model->setTemplate('@error/error');
+        $model = new ViewModel(
+            '@error/error',
+            [
+                'exception' => $ex,
+                'type' => 'exception'
+            ]
+        );
         $app->setDispatchResult($model);
     }
 
@@ -146,7 +151,7 @@ final class DefaultTonisHook extends AbstractTonisHook
             return;
         }
 
-        if (!$model->getTemplate()) {
+        if ($model instanceof ViewModel && !$model->getTemplate()) {
             $match = $app->getRouteCollection()->getLastMatch();
             $handler = $match->getRoute()->getHandler();
 
@@ -167,7 +172,7 @@ final class DefaultTonisHook extends AbstractTonisHook
                 $template = strtolower($template);
                 $template = str_replace('\\', '/', $template);
 
-                $model->setTemplate($template);
+                $model = new ViewModel($template, $model->getVariables());
             } else {
                 $app->setRenderResult(new InvalidTemplateException('No template was available for rendering'));
                 return;
@@ -230,8 +235,6 @@ final class DefaultTonisHook extends AbstractTonisHook
      */
     private function configureViewManager(Container $di, ViewManager $vm, array $config)
     {
-        $vm->setFallbackStrategy(ContainerUtil::get($di, $config['fallback_strategy']));
-
         foreach ($config['strategies'] as $strategy) {
             if (empty($strategy)) {
                 continue;

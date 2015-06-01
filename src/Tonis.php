@@ -6,21 +6,20 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Tonis\Di\Container;
 use Tonis\Hookline\Exception\InvalidHookException;
-use Tonis\Hookline\HookContainer;
+use Tonis\Hookline\Container as HookContainer;
 use Tonis\Hookline\HooksAwareInterface;
 use Tonis\Hookline\HooksAwareTrait;
 use Tonis\Mvc\Exception;
 use Tonis\Mvc\Hook\DefaultTonisHook;
 use Tonis\Mvc\Hook\TonisHookInterface;
 use Tonis\PackageManager\PackageManager;
-use Tonis\Router\RouteCollection;
-use Tonis\Router\RouteMatch;
-use Tonis\View\ViewManager;
+use Tonis\Router\Collection as RouteCollection;
+use Tonis\Router\Match as RouteMatch;
+use Tonis\View\Manager;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\ServerRequestFactory;
-use Zend\Stratigility\MiddlewareInterface;
 
-final class Tonis implements HooksAwareInterface, MiddlewareInterface
+final class Tonis implements HooksAwareInterface
 {
     use HooksAwareTrait;
 
@@ -34,7 +33,7 @@ final class Tonis implements HooksAwareInterface, MiddlewareInterface
     private $packageManager;
     /** @var RouteCollection */
     private $routes;
-    /** @var ViewManager */
+    /** @var Manager */
     private $viewManager;
     /** @var mixed */
     private $dispatchResult;
@@ -54,25 +53,12 @@ final class Tonis implements HooksAwareInterface, MiddlewareInterface
         $this->di = new Container();
         $this->packageManager = new PackageManager();
         $this->routes = new RouteCollection();
-        $this->viewManager = new ViewManager();
+        $this->viewManager = new Manager();
 
         $this->di->set(self::class, $this);
 
         $this->prepareEnvironment(isset($config['environment']) ? $config['environment'] : []);
         $this->initHooks(isset($config['hooks']) ? $config['hooks'] : []);
-    }
-
-    /**
-     * @param ServerRequestInterface $request
-     * @param ResponseInterface $response
-     * @param callable $next
-     * @return ResponseInterface
-     * @throws \Exception if render result is not renderable and $next is null
-     * @throws string
-     */
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, callable $next = null)
-    {
-        return $response;
     }
 
     /**
@@ -156,7 +142,7 @@ final class Tonis implements HooksAwareInterface, MiddlewareInterface
     }
 
     /**
-     * @return ViewManager
+     * @return Manager
      */
     public function getViewManager()
     {
