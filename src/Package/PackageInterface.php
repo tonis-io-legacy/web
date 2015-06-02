@@ -8,6 +8,8 @@ use Tonis\Router\Collection;
 
 interface PackageInterface extends
     Feature\ConfigProviderInterface,
+    Feature\NameProviderInterface,
+    Feature\NamespaceProviderInterface,
     Feature\PathProviderInterface
 {
     /**

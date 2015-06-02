@@ -1,47 +1,38 @@
 <?php
 namespace Tonis\Mvc;
 
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Tonis\Di\Container;
-use Tonis\Hookline\Exception\InvalidHookException;
-use Tonis\Hookline\Container as HookContainer;
-use Tonis\Hookline\HooksAwareInterface;
-use Tonis\Hookline\HooksAwareTrait;
-use Tonis\Mvc\Exception;
-use Tonis\Mvc\Hook\DefaultTonisHook;
-use Tonis\Mvc\Hook\TonisHookInterface;
-use Tonis\PackageManager\PackageManager;
-use Tonis\Router\Collection as RouteCollection;
-use Tonis\Router\Match as RouteMatch;
-use Tonis\View\Manager;
-use Zend\Diactoros\Response;
-use Zend\Diactoros\ServerRequestFactory;
+use Psr\Http\Message;
+use Tonis\Di;
+use Tonis\Hookline;
+use Tonis\Mvc;
+use Tonis\PackageManager;
+use Tonis\Router;
+use Tonis\View;
+use Zend\Diactoros;
 
-final class Tonis implements HooksAwareInterface
+final class Tonis implements Hookline\HooksAwareInterface
 {
-    use HooksAwareTrait;
+    use Hookline\HooksAwareTrait;
 
     /** @var bool */
+    private $debug = true;
+    /** @var bool */
     private $loaded = false;
-    /** @var array */
-    private $config;
-    /** @var Container */
+    /** @var Di\Container */
     private $di;
-    /** @var PackageManager */
+    /** @var PackageManager\Manager */
     private $packageManager;
-    /** @var RouteCollection */
+    /** @var Router\Collection */
     private $routes;
-    /** @var Manager */
+    /** @var View\Manager */
     private $viewManager;
     /** @var mixed */
     private $dispatchResult;
     /** @var string */
     private $renderResult;
-    /** @var ServerRequestInterface */
+    /** @var Message\RequestInterface */
     private $request;
-    /** @var ResponseInterface */
+    /** @var Message\ResponseInterface */
     private $response;
 
     /**
@@ -49,23 +40,14 @@ final class Tonis implements HooksAwareInterface
      */
     public function __construct(array $config = [])
     {
-        $this->config = $config;
-        $this->di = new Container();
-        $this->packageManager = new PackageManager();
-        $this->routes = new RouteCollection();
-        $this->viewManager = new Manager();
-
-        $this->di->set(self::class, $this);
-
-        $this->prepareEnvironment(isset($config['environment']) ? $config['environment'] : []);
-        $this->initHooks(isset($config['hooks']) ? $config['hooks'] : []);
+        $this->init($config);
     }
 
     /**
-     * @param RequestInterface|null $request
-     * @param ResponseInterface|null $response
+     * @param Message\RequestInterface|null $request
+     * @param Message\ResponseInterface|null $response
      */
-    public function run(RequestInterface $request = null, ResponseInterface $response = null)
+    public function run(Message\RequestInterface $request = null, Message\ResponseInterface $response = null)
     {
         $this->bootstrap($request, $response);
         $this->route($this->request);
@@ -75,51 +57,70 @@ final class Tonis implements HooksAwareInterface
     }
 
     /**
-     * @param RequestInterface $request
-     * @param ResponseInterface $response
+     * @param Message\RequestInterface $request
+     * @param Message\ResponseInterface $response
      */
-    public function bootstrap(RequestInterface $request = null, ResponseInterface $response = null)
+    public function bootstrap(Message\RequestInterface $request = null, Message\ResponseInterface $response = null)
     {
         if ($this->loaded) {
             return;
         }
 
-        $this->request = $request ? $request : ServerRequestFactory::fromGlobals();
-        $this->response = $response ? $response : new Response();
+        $this->request = $request ? $request : Diactoros\ServerRequestFactory::fromGlobals();
+        $this->response = $response ? $response : new Diactoros\Response();
 
-        $this->hooks()->run('onBootstrap', $this, $this->config);
+        $this->hooks()->run('onBootstrap');
         $this->loaded = true;
     }
 
-    public function route(RequestInterface $request)
+    /**
+     * @param Message\RequestInterface $request
+     */
+    public function route(Message\RequestInterface $request)
     {
-        $this->hooks()->run('onRoute', $this, $request);
+        $this->hooks()->run('onRoute', $request);
+        $match = $this->getRouteCollection()->match($request);
 
-        if (!$this->routes->getLastMatch() instanceof RouteMatch) {
-            $this->hooks()->run('onRouteError', $this, $request);
+        if (!$match instanceof Router\Match) {
+            $this->hooks()->run('onRouteError', $request);
+            $model = new View\Model\ViewModel(
+                $this->viewManager->getNotFoundTemplate(),
+                [
+                    'path' => $request->getUri()->getPath(),
+                    'type' => 'route'
+                ]
+            );
+
+            $this->setDispatchResult($model);
         }
     }
 
-    public function dispatch(RequestInterface $request)
+    /**
+     * @param Message\RequestInterface $request
+     */
+    public function dispatch(Message\RequestInterface $request)
     {
-        $this->hooks()->run('onDispatch', $this, $this->routes->getLastMatch());
+        $this->hooks()->run('onDispatch', $this->routes->getLastMatch());
 
         if ($this->dispatchResult instanceof Exception\InvalidDispatchResultException) {
-            $this->hooks()->run('onDispatchInvalidResult', $this, $this->dispatchResult, $request);
+            $this->hooks()->run('onDispatchInvalidResult', $this->dispatchResult, $request);
         } elseif ($this->dispatchResult instanceof \Exception) {
-            $this->hooks()->run('onDispatchException', $this, $this->dispatchResult);
+            $this->hooks()->run('onDispatchException', $this->dispatchResult);
         }
     }
 
     public function render()
     {
-        $this->hooks()->run('onRender', $this, $this->viewManager);
+        $this->hooks()->run('onRender', $this->viewManager);
         if ($this->renderResult instanceof \Exception) {
-            $this->hooks()->run('onRenderException', $this, $this->renderResult);
+            $this->hooks()->run('onRenderException', $this->renderResult);
         }
     }
 
-    public function respond(ResponseInterface $response)
+    /**
+     * @param Message\ResponseInterface $response
+     */
+    public function respond(Message\ResponseInterface $response)
     {
         $response->getBody()->write($this->renderResult);
         echo $response->getBody();
@@ -130,11 +131,11 @@ final class Tonis implements HooksAwareInterface
      */
     public function isDebugEnabled()
     {
-        return getenv('TONIS_DEBUG');
+        return $this->debug;
     }
 
     /**
-     * @return Container
+     * @return Di\Container
      */
     public function getDi()
     {
@@ -142,7 +143,7 @@ final class Tonis implements HooksAwareInterface
     }
 
     /**
-     * @return Manager
+     * @return View\Manager
      */
     public function getViewManager()
     {
@@ -150,7 +151,7 @@ final class Tonis implements HooksAwareInterface
     }
 
     /**
-     * @return PackageManager
+     * @return PackageManager\Manager
      */
     public function getPackageManager()
     {
@@ -158,7 +159,7 @@ final class Tonis implements HooksAwareInterface
     }
 
     /**
-     * @return RouteCollection
+     * @return Router\Collection
      */
     public function getRouteCollection()
     {
@@ -198,7 +199,7 @@ final class Tonis implements HooksAwareInterface
     }
 
     /**
-     * @return ServerRequestInterface
+     * @return Message\RequestInterface
      */
     public function getRequest()
     {
@@ -206,7 +207,7 @@ final class Tonis implements HooksAwareInterface
     }
 
     /**
-     * @return ResponseInterface
+     * @return Message\ResponseInterface
      */
     public function getResponse()
     {
@@ -214,38 +215,127 @@ final class Tonis implements HooksAwareInterface
     }
 
     /**
-     * @param array $environment
+     * @param array $config
      */
-    private function prepareEnvironment(array $environment)
+    private function init(array $config)
     {
+        if (isset($config['debug'])) {
+            $this->debug = (bool) $config['debug'];
+        }
+        if (!isset($config['environment'])) {
+            $config['environment'] = [];
+        }
+        if (!isset($config['required_environment'])) {
+            $config['required_environment'] = [];
+        }
+        if (!isset($config['hooks'])) {
+            $config['hooks'] = [new Hook\DefaultTonisHook($this)];
+        }
+        if (!isset($config['packages'])) {
+            $config['packages'] = [];
+        }
+
+        $this->initHooks($config['hooks']);
+        $this->initDi();
+        $this->initPackages($config['packages']);
+        $this->initEnvironment($config['environment'], $config['required_environment']);
+        $this->initViewManager();
+    }
+
+    /**
+     * @param array $environment
+     * @param array $required
+     * @throws Exception\MissingRequiredEnvironmentException
+     */
+    private function initEnvironment(array $environment, array $required)
+    {
+        foreach ($required as $key) {
+            if (!isset($environment[$key])) {
+                throw new Exception\MissingRequiredEnvironmentException(
+                    sprintf(
+                        'Environment variable "%s" is required and missing',
+                        $key
+                    )
+                );
+            }
+        }
+
         foreach ($environment as $key => $value) {
             putenv($key . '=' . $value);
         }
 
-        if (false === getenv('TONIS_DEBUG')) {
-            putenv('TONIS_DEBUG=false');
-        }
+        putenv('TONIS_DEBUG=' . $this->isDebugEnabled());
     }
 
     /**
      * @param array $hooks
+     * @throws Hookline\Exception\InvalidHookException
      */
     private function initHooks(array $hooks)
     {
-        $this->hooks = new HookContainer(TonisHookInterface::class);
-
-        if (empty($hooks)) {
-            $hooks[] = new DefaultTonisHook();
-        }
+        $this->hooks = new Hookline\Container(Hook\TonisHookInterface::class);
 
         foreach ($hooks as $hook) {
             if (is_string($hook)) {
                 if (!class_exists($hook)) {
-                    throw new InvalidHookException();
+                    throw new Hookline\Exception\InvalidHookException();
                 }
                 $hook = new $hook;
             }
             $this->hooks()->add($hook);
         }
+    }
+
+    private function initDi()
+    {
+        $this->di = new Di\Container();
+    }
+
+    private function initPackages(array $packages)
+    {
+        $pm = $this->packageManager = new PackageManager\Manager();
+        $pm->add(__NAMESPACE__);
+
+        foreach ($packages as $package) {
+            if ($package[0] == '?') {
+                if (!$this->debug) {
+                    continue;
+                }
+                $package = substr($package, 1);
+            }
+            $pm->add($package);
+        }
+        $pm->load();
+
+        $config = $pm->getMergedConfig();
+        foreach ($config as $key => $value) {
+            $this->getDi()[$key] = $value;
+        }
+
+        foreach ($this->packageManager->getPackages() as $package) {
+            if ($package instanceof Package\PackageInterface) {
+                $package->configureDi($this->getDi());
+                $package->configureRoutes($this->getRouteCollection());
+                $package->bootstrap($this);
+            }
+        }
+    }
+
+    private function initViewManager()
+    {
+        $vm = $this->viewManager;
+        $config = $this->packageManager->getMergedConfig();
+        $config = $config['tonis']['view_manager'];
+
+        foreach ($config['strategies'] as $strategy) {
+            if (empty($strategy)) {
+                continue;
+            }
+
+            $vm->addStrategy(Di\ContainerUtil::get($this->getDi(), $strategy));
+        }
+
+        $vm->setErrorTemplate($config['error_template']);
+        $vm->setNotFoundTemplate($config['not_found_template']);
     }
 }
