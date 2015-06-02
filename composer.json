@@ -27,7 +27,13 @@
     "autoload": {
         "psr-4": {
             "Tonis\\Mvc\\": [
-                "src/",
+                "src/"
+            ]
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tonis\\Mvc\\": [
                 "test/"
             ]
         }
