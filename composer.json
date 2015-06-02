@@ -14,7 +14,7 @@
         "tonis/dispatcher": "dev-master",
         "tonis/hookline": "dev-master",
         "tonis/mvc": "dev-master",
-        "tonis/package-manager": "dev-master",
+        "tonis/package": "dev-master",
         "tonis/router": "dev-master",
         "tonis/view": "dev-master"
     },
