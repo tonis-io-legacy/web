@@ -2,7 +2,6 @@
 namespace Tonis\Mvc\Hook;
 
 use Tonis\Mvc\Package\PackageInterface;
-use Tonis\Mvc\Tonis;
 use Tonis\Mvc\TonisConsole;
 
 final class DefaultConsoleHook extends AbstractTonisHook
@@ -21,10 +20,9 @@ final class DefaultConsoleHook extends AbstractTonisHook
     /**
      * {@inheritDoc}
      */
-    public function onBootstrap(Tonis $app, array $config)
+    public function onBootstrap()
     {
-        $pm = $app->getPackageManager();
-        foreach ($pm->getPackages() as $package) {
+        foreach ($this->console->getTonis()->getPackageManager()->getPackages() as $package) {
             if ($package instanceof PackageInterface) {
                 $package->bootstrapConsole($this->console);
             }
