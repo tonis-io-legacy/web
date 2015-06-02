@@ -10,10 +10,6 @@ abstract class AbstractPackage implements PackageInterface
 {
     /** @var string */
     private $path;
-    /** @var string */
-    private $name;
-    /** @var string */
-    private $namespace;
 
     /**
      * {@inheritDoc}
@@ -85,40 +81,5 @@ abstract class AbstractPackage implements PackageInterface
         $refl = new \ReflectionObject($this);
         $this->path = realpath(dirname($refl->getFileName()) . '/../');
         return $this->path;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    final public function getName()
-    {
-        if ($this->name) {
-            return $this->name;
-        }
-        $replace = function ($match) {
-            return $match[1] . '-' . $match[2];
-        };
-        $name = preg_replace('@Package$@', '', $this->getNamespace());
-        $name = str_replace('\\', '.', $name);
-        $name = preg_replace_callback('@([a-z])([A-Z])@', $replace, $name);
-        $name = strtolower($name);
-        if (strstr($name, '.')) {
-            $this->name = substr($name, strpos($name, '.') + 1);
-        } else {
-            $this->name = $name;
-        }
-        return $this->name;
-    }
-    /**
-     * {@inheritDoc}
-     */
-    final public function getNamespace()
-    {
-        if ($this->namespace) {
-            return $this->namespace;
-        }
-        $class = get_class($this);
-        $this->namespace = substr($class, 0, strrpos($class, '\\'));
-        return $this->namespace;
     }
 }

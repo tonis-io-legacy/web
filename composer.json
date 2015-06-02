@@ -18,6 +18,14 @@
         "tonis/router": "dev-master",
         "tonis/view": "dev-master"
     },
+    "require-dev": {
+        "phpunit/phpunit": "^4.0",
+        "scrutinizer/ocular": "^1.1.1",
+        "squizlabs/php_codesniffer": "^1.0",
+        "league/plates": "^3.1",
+        "twig/twig": "^1.18",
+        "zendframework/zend-diactoros": "^1.0"
+    },
     "suggest": {
         "symfony/console": "To add Console integration",
         "twig/twig": "To use the Twig templating engine",
