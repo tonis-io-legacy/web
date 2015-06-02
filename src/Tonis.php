@@ -112,13 +112,7 @@ final class Tonis implements Hookline\HooksAwareInterface
             return;
         }
 
-        $handler = $routeMatch->getRoute()->getHandler();
-
-        if (is_string($handler) && $this->di->has($handler)) {
-            $handler = $this->di->get($handler);
-        }
-
-        $this->dispatchResult = $this->doDispatch($handler, $routeMatch);
+        $this->dispatchResult = $this->doDispatch($routeMatch);
     }
 
     public function render()
@@ -288,12 +282,17 @@ final class Tonis implements Hookline\HooksAwareInterface
     }
 
     /**
-     * @param mixed $handler
      * @param Router\Match $routeMatch
      * @return mixed
      */
-    private function doDispatch($handler, Router\Match $routeMatch)
+    private function doDispatch(Router\Match $routeMatch)
     {
+        $handler = $routeMatch->getRoute()->getHandler();
+
+        if (is_string($handler) && $this->di->has($handler)) {
+            $handler = $this->di->get($handler);
+        }
+
         $dispatcher = new Dispatcher\Dispatcher;
 
         try {
@@ -315,6 +314,58 @@ final class Tonis implements Hookline\HooksAwareInterface
             return $ex;
         }
         return null;
+    }
+
+    private function doRender()
+    {
+        $dispatchResult = $this->dispatchResult;
+
+        if (!$dispatchResult instanceof View\ModelInterface) {
+            return $this->getRenderExceptionModel(new Mvc\Exception\InvalidViewModelException());
+        }
+
+        if ($dispatchResult instanceof View\Model\ViewModel && !$dispatchResult->getTemplate()) {
+            $match = $this->getRouteCollection()->getLastMatch();
+            $handler = $match->getRoute()->getHandler();
+
+            if (is_array($handler)) {
+                $handler = $handler[0];
+            }
+
+            if (is_object($handler)) {
+                $handler = get_class($handler);
+            }
+
+            if (is_string($handler)) {
+                $replace = function ($match) {
+                    return $match[1] . '-' . $match[2];
+                };
+                $template = preg_replace('@Action$@', '', $handler);
+                $template = preg_replace_callback('@([a-z])([A-Z])@', $replace, $template);
+                $template = strtolower($template);
+                $template = str_replace('\\', '/', $template);
+
+                $dispatchResult = new View\Model\ViewModel($template, $dispatchResult->getVariables());
+            } else {
+                return $this->getRenderExceptionModel(
+                    new Exception\InvalidTemplateException('No template was available for rendering')
+                );
+            }
+        }
+
+        return $this->viewManager->render($dispatchResult);
+    }
+
+    private function getRenderExceptionModel(\Exception $ex)
+    {
+        return new View\Model\ViewModel(
+            $this->viewManager->getErrorTemplate(),
+            [
+                'exception' => $ex,
+                'type' => 'invalid-dispatch-result',
+                'path' => $this->request->getUri()->getPath()
+            ]
+        );
     }
 
     private function getInvalidDispatchResultModel()
