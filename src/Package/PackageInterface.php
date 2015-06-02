@@ -3,7 +3,7 @@ namespace Tonis\Mvc\Package;
 
 use Tonis\Di\Container;
 use Tonis\Mvc;
-use Tonis\PackageManager\Feature;
+use Tonis\Package\Feature;
 use Tonis\Router\Collection;
 
 interface PackageInterface extends

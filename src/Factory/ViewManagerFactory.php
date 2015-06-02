@@ -1,19 +1,33 @@
 <?php
 namespace Tonis\Mvc\Factory;
 
-use Tonis\Di\Container;
-use Tonis\Di\ServiceFactoryInterface;
-use Tonis\View\Manager;
+use Tonis\Di;
+use Tonis\View;
+use Tonis\Package;
 
-class ViewManagerFactory implements ServiceFactoryInterface
+class ViewManagerFactory implements Di\ServiceFactoryInterface
 {
     /**
-     * @param Container $di
-     * @return Manager
+     * @param Di\Container $di
+     * @return View\Manager
      */
-    public function createService(Container $di)
+    public function createService(Di\Container $di)
     {
-        $manager = new Manager();
+        $pm = $di->get(Package\Manager::class);
+
+        $manager = new View\Manager();
+        $config = $pm->getMergedConfig()['tonis']['view_manager'];
+
+        foreach ($config['strategies'] as $strategy) {
+            if (empty($strategy)) {
+                continue;
+            }
+
+            $manager->addStrategy(Di\ContainerUtil::get($di, $strategy));
+        }
+
+        $manager->setErrorTemplate($config['error_template']);
+        $manager->setNotFoundTemplate($config['not_found_template']);
 
         return $manager;
     }

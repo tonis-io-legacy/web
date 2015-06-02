@@ -3,9 +3,10 @@ namespace Tonis\Mvc;
 
 use Psr\Http\Message;
 use Tonis\Di;
+use Tonis\Dispatcher;
 use Tonis\Hookline;
 use Tonis\Mvc;
-use Tonis\PackageManager;
+use Tonis\Package;
 use Tonis\Router;
 use Tonis\View;
 use Zend\Diactoros;
@@ -20,7 +21,7 @@ final class Tonis implements Hookline\HooksAwareInterface
     private $loaded = false;
     /** @var Di\Container */
     private $di;
-    /** @var PackageManager\Manager */
+    /** @var Package\Manager */
     private $packageManager;
     /** @var Router\Collection */
     private $routes;
@@ -102,19 +103,33 @@ final class Tonis implements Hookline\HooksAwareInterface
     {
         $this->hooks()->run('onDispatch', $this->routes->getLastMatch());
 
-        if ($this->dispatchResult instanceof Exception\InvalidDispatchResultException) {
-            $this->hooks()->run('onDispatchInvalidResult', $this->dispatchResult, $request);
-        } elseif ($this->dispatchResult instanceof \Exception) {
-            $this->hooks()->run('onDispatchException', $this->dispatchResult);
+        if (null !== $this->dispatchResult) {
+            return;
         }
+
+        $routeMatch = $this->routes->getLastMatch();
+        if (!$routeMatch instanceof Router\Match) {
+            return;
+        }
+
+        $handler = $routeMatch->getRoute()->getHandler();
+
+        if (is_string($handler) && $this->di->has($handler)) {
+            $handler = $this->di->get($handler);
+        }
+
+        $this->dispatchResult = $this->doDispatch($handler, $routeMatch);
     }
 
     public function render()
     {
         $this->hooks()->run('onRender', $this->viewManager);
-        if ($this->renderResult instanceof \Exception) {
-            $this->hooks()->run('onRenderException', $this->renderResult);
+
+        if ($this->dispatchResult instanceof Message\ResponseInterface) {
+            return;
         }
+
+        $this->renderResult = $this->doRender($this->dispatchResult);
     }
 
     /**
@@ -151,7 +166,7 @@ final class Tonis implements Hookline\HooksAwareInterface
     }
 
     /**
-     * @return PackageManager\Manager
+     * @return Package\Manager
      */
     public function getPackageManager()
     {
@@ -216,30 +231,35 @@ final class Tonis implements Hookline\HooksAwareInterface
 
     /**
      * @param array $config
+     * @todo Make the services customizable for replacement options
      */
     private function init(array $config)
     {
-        if (isset($config['debug'])) {
-            $this->debug = (bool) $config['debug'];
-        }
+        $this->debug = isset($config['debug']) ? (bool) $config['debug'] : true;
+
         if (!isset($config['environment'])) {
             $config['environment'] = [];
         }
         if (!isset($config['required_environment'])) {
             $config['required_environment'] = [];
         }
-        if (!isset($config['hooks'])) {
-            $config['hooks'] = [new Hook\DefaultTonisHook($this)];
-        }
         if (!isset($config['packages'])) {
             $config['packages'] = [];
         }
 
-        $this->initHooks($config['hooks']);
-        $this->initDi();
-        $this->initPackages($config['packages']);
+        $this->di = new Di\Container;
+        $this->di->set(self::class, $this);
+        $this->di->set(Router\Collection::class, new Router\Collection);
+        $this->di->set(Package\Manager::class, new Factory\PackageManagerFactory($this, $config['packages']));
+        $this->di->set(Hookline\Container::class, new Factory\HooklineContainerFactory(isset($config['hooks']) ? $config['hooks'] : []));
+        $this->di->set(View\Manager::class, Mvc\Factory\ViewManagerFactory::class);
+
+        $this->routes = $this->di->get(Router\Collection::class);
+        $this->packageManager = $this->di->get(Package\Manager::class);
+        $this->hooks = $this->di->get(Hookline\Container::class);
+        $this->viewManager = $this->di->get(View\Manager::class);
+
         $this->initEnvironment($config['environment'], $config['required_environment']);
-        $this->initViewManager();
     }
 
     /**
@@ -268,74 +288,46 @@ final class Tonis implements Hookline\HooksAwareInterface
     }
 
     /**
-     * @param array $hooks
-     * @throws Hookline\Exception\InvalidHookException
+     * @param mixed $handler
+     * @param Router\Match $routeMatch
+     * @return mixed
      */
-    private function initHooks(array $hooks)
+    private function doDispatch($handler, Router\Match $routeMatch)
     {
-        $this->hooks = new Hookline\Container(Hook\TonisHookInterface::class);
+        $dispatcher = new Dispatcher\Dispatcher;
 
-        foreach ($hooks as $hook) {
-            if (is_string($hook)) {
-                if (!class_exists($hook)) {
-                    throw new Hookline\Exception\InvalidHookException();
-                }
-                $hook = new $hook;
+        try {
+            $result = $dispatcher->dispatch($handler, $routeMatch->getParams());
+
+            if ($result instanceof Di\ServiceFactoryInterface) {
+                $result = $dispatcher->dispatch($result->createService($this->di), $routeMatch->getParams());
             }
-            $this->hooks()->add($hook);
+
+            if (is_array($result)) {
+                return new View\Model\ViewModel($result);
+            } elseif (is_string($result)) {
+                return new View\Model\StringModel($result);
+            } elseif (!$result instanceof View\ModelInterface) {
+                return $this->getInvalidDispatchResultModel();
+            }
+        } catch (\Exception $ex) {
+            $this->hooks()->run('onDispatchException', $this->dispatchResult);
+            return $ex;
         }
+        return null;
     }
 
-    private function initDi()
+    private function getInvalidDispatchResultModel()
     {
-        $this->di = new Di\Container();
-    }
-
-    private function initPackages(array $packages)
-    {
-        $pm = $this->packageManager = new PackageManager\Manager();
-        $pm->add(__NAMESPACE__);
-
-        foreach ($packages as $package) {
-            if ($package[0] == '?') {
-                if (!$this->debug) {
-                    continue;
-                }
-                $package = substr($package, 1);
-            }
-            $pm->add($package);
-        }
-        $pm->load();
-
-        $config = $pm->getMergedConfig();
-        foreach ($config as $key => $value) {
-            $this->getDi()[$key] = $value;
-        }
-
-        foreach ($this->packageManager->getPackages() as $package) {
-            if ($package instanceof Package\PackageInterface) {
-                $package->configureDi($this->getDi());
-                $package->configureRoutes($this->getRouteCollection());
-                $package->bootstrap($this);
-            }
-        }
-    }
-
-    private function initViewManager()
-    {
-        $vm = $this->viewManager;
-        $config = $this->packageManager->getMergedConfig();
-        $config = $config['tonis']['view_manager'];
-
-        foreach ($config['strategies'] as $strategy) {
-            if (empty($strategy)) {
-                continue;
-            }
-
-            $vm->addStrategy(Di\ContainerUtil::get($this->getDi(), $strategy));
-        }
-
-        $vm->setErrorTemplate($config['error_template']);
-        $vm->setNotFoundTemplate($config['not_found_template']);
+        return new View\Model\ViewModel(
+            $this->viewManager->getErrorTemplate(),
+            [
+                'exception' => new Exception\InvalidDispatchResultException(
+                    'Failed to dispatch; invalid dispatch result'
+                ),
+                'type' => 'invalid-dispatch-result',
+                'path' => $this->request->getUri()->getPath()
+            ]
+        );
     }
 }

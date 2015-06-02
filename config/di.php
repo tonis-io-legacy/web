@@ -1,13 +1,25 @@
 <?php
-use League\Plates\Engine as PlatesEngine;
-use Tonis\Di\Container;
-use Tonis\Di\ContainerUtil;
-use Tonis\Mvc\Package\PackageInterface;
-use Tonis\Mvc\Tonis;
-use Tonis\View\Strategy\PlatesStrategy;
-use Tonis\View\Strategy\TwigStrategy;
+use Tonis\Di;
+use Tonis\Hookline;
+use Tonis\Mvc;
+use Tonis\View;
 
-return function(Container $di) {
+return function(Di\Container $di) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     $di->set(Twig_Environment::class, function(Container $di) {
         /** @var Tonis $tonis */
         $tonis = $di->get(Tonis::class);
