@@ -13,7 +13,6 @@
         "tonis/di": "~1.0-dev",
         "tonis/dispatcher": "~1.0-dev",
         "tonis/event": "~1.0-dev",
-        "tonis/mvc": "~1.0-dev",
         "tonis/package": "~1.0-dev",
         "tonis/router": "~1.0-dev",
         "tonis/view": "~1.0-dev"

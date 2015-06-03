@@ -4,17 +4,17 @@ namespace Tonis\Mvc;
 use Psr\Http\Message;
 use Tonis\Di;
 use Tonis\Dispatcher;
-use Tonis\Hookline;
+use Tonis\Event;
 use Tonis\Mvc;
 use Tonis\Package;
 use Tonis\Router;
 use Tonis\View;
 use Zend\Diactoros;
 
-final class Tonis implements Hookline\HooksAwareInterface
+final class Tonis
 {
-    use Hookline\HooksAwareTrait;
-
+    use Event\EventsAwareTrait;
+    
     /** @var array */
     private $config = [];
     /** @var bool */
@@ -74,7 +74,7 @@ final class Tonis implements Hookline\HooksAwareInterface
         $this->request = $request ? $request : Diactoros\ServerRequestFactory::fromGlobals();
         $this->response = $response ? $response : new Diactoros\Response();
 
-        $this->hooks()->run('onBootstrap');
+        $this->events()->fire('onBootstrap');
         $this->loaded = true;
     }
 
@@ -83,11 +83,11 @@ final class Tonis implements Hookline\HooksAwareInterface
      */
     public function route(Message\RequestInterface $request)
     {
-        $this->hooks()->run('onRoute', $request);
+        $this->events()->fire('onRoute', $request);
         $match = $this->getRouteCollection()->match($request);
 
         if (!$match instanceof Router\Match) {
-            $this->hooks()->run('onRouteError', $request);
+            $this->events()->fire('onRouteError', $request);
             $model = new View\Model\ViewModel(
                 $this->viewManager->getNotFoundTemplate(),
                 [
@@ -105,7 +105,7 @@ final class Tonis implements Hookline\HooksAwareInterface
      */
     public function dispatch(Message\RequestInterface $request)
     {
-        $this->hooks()->run('onDispatch', $this->routes->getLastMatch());
+        $this->events()->fire('onDispatch', $this->routes->getLastMatch());
 
         if (null !== $this->dispatchResult) {
             return;
@@ -121,7 +121,7 @@ final class Tonis implements Hookline\HooksAwareInterface
 
     public function render()
     {
-        $this->hooks()->run('onRender', $this->viewManager);
+        $this->events()->fire('onRender', $this->viewManager);
 
         if ($this->dispatchResult instanceof Message\ResponseInterface) {
             return;
@@ -246,7 +246,7 @@ final class Tonis implements Hookline\HooksAwareInterface
 
         $this->routes = $this->di->get(Router\Collection::class);
         $this->packageManager = $this->di->get(Package\Manager::class);
-        $this->hooks = $this->di->get(Hookline\Container::class);
+        $this->events = $this->di->get(Event\Manager::class);
         $this->viewManager = $this->di->get(View\Manager::class);
 
         $this->initEnvironment(
@@ -314,7 +314,7 @@ final class Tonis implements Hookline\HooksAwareInterface
                 );
             }
         } catch (\Exception $ex) {
-            $this->hooks()->run('onDispatchException', $this->dispatchResult);
+            $this->events()->fire('onDispatchException', $this->dispatchResult);
             return $ex;
         }
         return null;

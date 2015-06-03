@@ -6,7 +6,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Tonis\Di\ContainerAwareInterface;
-use Tonis\Mvc\Hook\DefaultConsoleHook;
 
 class TonisConsole extends Application
 {
@@ -18,9 +17,9 @@ class TonisConsole extends Application
      */
     public function __construct(array $config = [])
     {
-        if (!isset($config['hooks'])) {
-            $config['hooks'] = [
-                new DefaultConsoleHook($this),
+        if (!isset($config['subscribers'])) {
+            $config['subscribers'] = [
+                new Subscriber\ConsoleSubscriber($this),
             ];
         }
         $this->tonis = new Tonis($config);
