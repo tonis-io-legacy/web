@@ -10,13 +10,13 @@
     "license": "BSD-3-Clause",
     "require": {
         "php": ">=5.5",
-        "tonis/di": "dev-master",
-        "tonis/dispatcher": "dev-master",
-        "tonis/hookline": "dev-master",
-        "tonis/mvc": "dev-master",
-        "tonis/package": "dev-master",
-        "tonis/router": "dev-master",
-        "tonis/view": "dev-master"
+        "tonis/di": "~1.0-dev",
+        "tonis/dispatcher": "~1.0-dev",
+        "tonis/event": "~1.0-dev",
+        "tonis/mvc": "~1.0-dev",
+        "tonis/package": "~1.0-dev",
+        "tonis/router": "~1.0-dev",
+        "tonis/view": "~1.0-dev"
     },
     "require-dev": {
         "phpunit/phpunit": "^4.0",
@@ -48,7 +48,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.0-dev"
+            "~1.0-dev": "1.0-dev"
         }
     }
 }
