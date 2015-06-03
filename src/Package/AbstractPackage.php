@@ -102,7 +102,9 @@ abstract class AbstractPackage implements PackageInterface
 
         $parts = explode('\\', $this->getNamespace());
         $name = preg_replace_callback('@([a-z])([A-Z])@', $replace, $parts[count($parts) -1]);
-        return strtolower($name);
+        $this->name = strtolower($name);
+
+        return $this->name;
     }
 
     /**

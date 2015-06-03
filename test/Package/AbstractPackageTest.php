@@ -94,12 +94,12 @@ class AbstractPackageTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers ::getNamespace
+     * @covers ::getName
      */
     public function testGetName()
     {
-        $this->assertSame('Mvc\TestPackage', $this->package->getName());
-        $this->assertSame('Mvc\TestPackage', $this->package->getName());
+        $this->assertSame('test-package', $this->package->getName());
+        $this->assertSame('test-package', $this->package->getName());
     }
 
     /**
