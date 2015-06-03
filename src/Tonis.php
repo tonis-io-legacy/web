@@ -231,12 +231,6 @@ final class Tonis implements Hookline\HooksAwareInterface
     {
         $this->debug = isset($config['debug']) ? (bool) $config['debug'] : true;
 
-        if (!isset($config['environment'])) {
-            $config['environment'] = [];
-        }
-        if (!isset($config['required_environment'])) {
-            $config['required_environment'] = [];
-        }
         if (!isset($config['packages'])) {
             $config['packages'] = [];
         }
@@ -245,15 +239,16 @@ final class Tonis implements Hookline\HooksAwareInterface
         $this->di->set(self::class, $this);
         $this->di->set(Router\Collection::class, new Router\Collection);
         $this->di->set(Package\Manager::class, new Factory\PackageManagerFactory($this, $config['packages']));
-        $this->di->set(Hookline\Container::class, new Factory\HooklineContainerFactory(isset($config['hooks']) ? $config['hooks'] : []));
-        $this->di->set(View\Manager::class, Mvc\Factory\ViewManagerFactory::class);
 
         $this->routes = $this->di->get(Router\Collection::class);
         $this->packageManager = $this->di->get(Package\Manager::class);
         $this->hooks = $this->di->get(Hookline\Container::class);
         $this->viewManager = $this->di->get(View\Manager::class);
 
-        $this->initEnvironment($config['environment'], $config['required_environment']);
+        $this->initEnvironment(
+            isset($config['environment']) ? $config['environment'] : [],
+            isset($config['required_environment']) ? $config['required_environment'] : []
+        );
     }
 
     /**
