@@ -15,6 +15,8 @@ final class Tonis implements Hookline\HooksAwareInterface
 {
     use Hookline\HooksAwareTrait;
 
+    /** @var array */
+    private $config = [];
     /** @var bool */
     private $debug = true;
     /** @var bool */
@@ -41,7 +43,7 @@ final class Tonis implements Hookline\HooksAwareInterface
      */
     public function __construct(array $config = [])
     {
-        $this->init($config);
+        $this->config = $config;
     }
 
     /**
@@ -66,6 +68,8 @@ final class Tonis implements Hookline\HooksAwareInterface
         if ($this->loaded) {
             return;
         }
+
+        $this->init($this->config);
 
         $this->request = $request ? $request : Diactoros\ServerRequestFactory::fromGlobals();
         $this->response = $response ? $response : new Diactoros\Response();
@@ -353,6 +357,11 @@ final class Tonis implements Hookline\HooksAwareInterface
         return $this->viewManager->render($dispatchResult);
     }
 
+    /**
+     * @param string $type
+     * @param \Exception $ex
+     * @return View\Model\ViewModel
+     */
     private function getExceptionViewModel($type, \Exception $ex)
     {
         return new View\Model\ViewModel(

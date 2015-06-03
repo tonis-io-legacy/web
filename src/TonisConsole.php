@@ -6,7 +6,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Tonis\Di\ContainerAwareInterface;
-use Tonis\Mvc\Hook;
+use Tonis\Mvc\Hook\DefaultConsoleHook;
 
 class TonisConsole extends Application
 {
@@ -20,8 +20,7 @@ class TonisConsole extends Application
     {
         if (!isset($config['hooks'])) {
             $config['hooks'] = [
-                Hook\DefaultTonisHook::class,
-                new Hook\DefaultConsoleHook($this),
+                new DefaultConsoleHook($this),
             ];
         }
         $this->tonis = new Tonis($config);

@@ -2,20 +2,20 @@
 namespace Tonis\Mvc\Package;
 
 use Tonis\Di\Container;
-use Tonis\Mvc\Package;
-use Tonis\Mvc\TestAsset\TestPackageWithInvalidConfigs;
+use Tonis\Mvc\TestAsset\InvalidTestPackage\InvalidTestPackage;
+use Tonis\Mvc\TestAsset\PlainPackage;
+use Tonis\Mvc\TestAsset\TestPackage\TestPackage;
 use Tonis\Mvc\TestAsset\TestPackageWithNoConfigs;
 use Tonis\Mvc\Tonis;
 use Tonis\Mvc\TonisConsole;
 use Tonis\Router\Collection;
-use Tonis\View\Strategy\PlatesStrategy;
 
 /**
  * @coversDefaultClass \Tonis\Mvc\Package\AbstractPackage
  */
 class AbstractPackageTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var Package */
+    /** @var TestPackage */
     private $package;
 
     /**
@@ -36,7 +36,7 @@ class AbstractPackageTest extends \PHPUnit_Framework_TestCase
     public function testConfigureRoutesInvalidCallableThrowsException()
     {
         $routes = new Collection();
-        $package = new TestPackageWithInvalidConfigs();
+        $package = new InvalidTestPackage();
         $package->configureRoutes($routes);
     }
 
@@ -46,10 +46,8 @@ class AbstractPackageTest extends \PHPUnit_Framework_TestCase
     public function testConfigureDi()
     {
         $di = new Container();
-        $di['tonis'] = ['plates' => ['folders' => []]];
-        $di->set(Tonis::class, new Tonis());
         $this->package->configureDi($di);
-        $this->assertInstanceOf(PlatesStrategy::class, $di->get(PlatesStrategy::class));
+        $this->assertSame('bar', $di->get('foo'));
     }
 
     /**
@@ -60,7 +58,7 @@ class AbstractPackageTest extends \PHPUnit_Framework_TestCase
     public function testConfigureDiInvalidCallableThrowsException()
     {
         $di = new Container();
-        $package = new TestPackageWithInvalidConfigs();
+        $package = new InvalidTestPackage();
         $package->configureDi($di);
     }
 
@@ -72,8 +70,8 @@ class AbstractPackageTest extends \PHPUnit_Framework_TestCase
         $package = new TestPackageWithNoConfigs();
         $this->assertSame([], $package->getConfig());
 
-        $package = new Package();
-        $this->assertSame(include __DIR__ . '/../../config/package.php', $package->getConfig());
+        $package = new TestPackage();
+        $this->assertSame(include __DIR__ . '/../TestAsset/TestPackage/config/package.php', $package->getConfig());
     }
 
     /**
@@ -81,9 +79,27 @@ class AbstractPackageTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetPath()
     {
-        $package = new Package();
-        $this->assertSame(realpath(__DIR__ . '/../../'), $package->getPath());
-        $this->assertSame(realpath(__DIR__ . '/../../'), $package->getPath());
+        $package = new PlainPackage();
+        $this->assertSame(realpath(__DIR__ . '/../'), $package->getPath());
+        $this->assertSame(realpath(__DIR__ . '/../'), $package->getPath());
+    }
+
+    /**
+     * @covers ::getNamespace
+     */
+    public function testGetNamespace()
+    {
+        $this->assertSame('Tonis\Mvc\TestAsset\TestPackage', $this->package->getNamespace());
+        $this->assertSame('Tonis\Mvc\TestAsset\TestPackage', $this->package->getNamespace());
+    }
+
+    /**
+     * @covers ::getNamespace
+     */
+    public function testGetName()
+    {
+        $this->assertSame('Mvc\TestPackage', $this->package->getName());
+        $this->assertSame('Mvc\TestPackage', $this->package->getName());
     }
 
     /**
@@ -104,6 +120,6 @@ class AbstractPackageTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->package = new Package();
+        $this->package = new TestPackage();
     }
 }
