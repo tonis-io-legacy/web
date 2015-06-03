@@ -6,10 +6,14 @@ use Tonis\Event;
 use Tonis\Mvc\TestAsset\TestSubscriber;
 
 /**
- * @coversDefaultClass \Tonis\Mvc\Factory\EventManager
+ * @coversDefaultClass \Tonis\Mvc\Factory\EventManagerFactory
  */
 class EventManagerFactoryTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @covers ::__construct
+     * @covers ::createService
+     */
     public function testCreateService()
     {
         $di = new Di\Container;

@@ -43,7 +43,7 @@ final class Tonis
      */
     public function __construct(array $config = [])
     {
-        $this->config = $config;
+        $this->init($config);
     }
 
     /**
@@ -62,6 +62,7 @@ final class Tonis
     /**
      * @param Message\RequestInterface $request
      * @param Message\ResponseInterface $response
+     * @todo Make the services customizable for replacement options
      */
     public function bootstrap(Message\RequestInterface $request = null, Message\ResponseInterface $response = null)
     {
@@ -69,10 +70,35 @@ final class Tonis
             return;
         }
 
-        $this->init($this->config);
+        $this->di = new Di\Container;
+        $this->di->set(self::class, $this);
+        $this->di->set(Router\Collection::class, new Router\Collection);
+        $this->di->set(Event\Manager::class, new Factory\EventManagerFactory);
+        $this->di->set(Package\Manager::class, new Factory\PackageManagerFactory($this, $this->config['packages']));
+        $this->di->set(View\Manager::class, new Factory\ViewManagerFactory);
+
+        $this->routes = $this->di->get(Router\Collection::class);
+        $this->packageManager = $this->di->get(Package\Manager::class);
+        $this->events = $this->di->get(Event\Manager::class);
+        $this->viewManager = $this->di->get(View\Manager::class);
+
+        $this->initEnvironment($this->config['environment'], $this->config['required_environment']);
 
         $this->request = $request ? $request : Diactoros\ServerRequestFactory::fromGlobals();
         $this->response = $response ? $response : new Diactoros\Response();
+
+        $config = $this->packageManager->getMergedConfig();
+        foreach ($config as $key => $value) {
+            $di[$key] = $value;
+        }
+
+        foreach ($this->packageManager->getPackages() as $package) {
+            if ($package instanceof Mvc\Package\PackageInterface) {
+                $package->configureDi($this->di);
+                $package->configureRoutes($this->routes);
+                $package->bootstrap($this);
+            }
+        }
 
         $this->events()->fire('onBootstrap');
         $this->loaded = true;
@@ -229,30 +255,18 @@ final class Tonis
 
     /**
      * @param array $config
-     * @todo Make the services customizable for replacement options
      */
     private function init(array $config)
     {
         $this->debug = isset($config['debug']) ? (bool) $config['debug'] : true;
 
-        if (!isset($config['packages'])) {
-            $config['packages'] = [];
+        foreach(['environment', 'packages', 'required_environment'] as $key) {
+            if (!isset($config[$key])) {
+                $config[$key] = [];
+            }
         }
 
-        $this->di = new Di\Container;
-        $this->di->set(self::class, $this);
-        $this->di->set(Router\Collection::class, new Router\Collection);
-        $this->di->set(Package\Manager::class, new Factory\PackageManagerFactory($this, $config['packages']));
-
-        $this->routes = $this->di->get(Router\Collection::class);
-        $this->packageManager = $this->di->get(Package\Manager::class);
-        $this->events = $this->di->get(Event\Manager::class);
-        $this->viewManager = $this->di->get(View\Manager::class);
-
-        $this->initEnvironment(
-            isset($config['environment']) ? $config['environment'] : [],
-            isset($config['required_environment']) ? $config['required_environment'] : []
-        );
+        $this->config = $config;
     }
 
     /**

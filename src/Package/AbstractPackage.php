@@ -19,13 +19,15 @@ abstract class AbstractPackage implements PackageInterface
      * {@inheritDoc}
      */
     public function bootstrap(Tonis $tonis)
-    {}
+    {
+    }
 
     /**
      * {@inheritDoc}
      */
     public function bootstrapConsole(TonisConsole $console)
-    {}
+    {
+    }
 
     /**
      * {@inheritDoc}

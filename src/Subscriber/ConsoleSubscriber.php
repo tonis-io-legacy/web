@@ -23,7 +23,7 @@ final class ConsoleSubscriber implements Event\SubscriberInterface
      */
     public function subscribe(Event\Manager $events)
     {
-        $events->on('bootstrap', function() {
+        $events->on('bootstrap', function () {
             foreach ($this->console->getTonis()->getPackageManager()->getPackages() as $package) {
                 if ($package instanceof PackageInterface) {
                     $package->bootstrapConsole($this->console);

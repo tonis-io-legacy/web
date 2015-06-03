@@ -2,24 +2,22 @@
 namespace Tonis\Mvc\Factory;
 
 use Tonis\Di;
-use Tonis\Mvc\Package\PackageInterface as TonisPackageInterface;
-use Tonis\Mvc\Tonis;
 use Tonis\Package;
 
 final class PackageManagerFactory implements Di\ServiceFactoryInterface
 {
     /** @var array */
     private $packages;
-    /** @var Tonis */
-    private $tonis;
+    /** @var bool */
+    private $debug;
 
     /**
-     * @param Tonis $tonis
+     * @param bool $debug
      * @param array $packages
      */
-    public function __construct(Tonis $tonis, array $packages)
+    public function __construct($debug, array $packages)
     {
-        $this->tonis = $tonis;
+        $this->debug = $debug;
         $this->packages = $packages;
     }
 
@@ -34,28 +32,15 @@ final class PackageManagerFactory implements Di\ServiceFactoryInterface
 
         foreach ($this->packages as $package) {
             if ($package[0] == '?') {
-                if (!$this->tonis->isDebugEnabled()) {
+                if (!$this->debug) {
                     continue;
                 }
                 $package = substr($package, 1);
             }
             $pm->add($package);
         }
+
         $pm->load();
-
-        $config = $pm->getMergedConfig();
-        foreach ($config as $key => $value) {
-            $di[$key] = $value;
-        }
-
-        foreach ($pm->getPackages() as $package) {
-            if ($package instanceof TonisPackageInterface) {
-                $package->configureDi($di);
-                $package->configureRoutes($this->tonis->getRouteCollection());
-                $package->bootstrap($this->tonis);
-            }
-        }
-
         return $pm;
     }
 }
