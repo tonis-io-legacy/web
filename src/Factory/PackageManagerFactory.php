@@ -6,7 +6,7 @@ use Tonis\Mvc\Package\PackageInterface as TonisPackageInterface;
 use Tonis\Mvc\Tonis;
 use Tonis\Package;
 
-class PackageManagerFactory implements Di\ServiceFactoryInterface
+final class PackageManagerFactory implements Di\ServiceFactoryInterface
 {
     /** @var array */
     private $packages;

@@ -1,26 +1,9 @@
 <?php
 use Tonis\Di;
-use Tonis\Hookline;
-use Tonis\Mvc;
-use Tonis\View;
+use Tonis\View\Strategy;
 
 return function(Di\Container $di) {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    $di->set(Twig_Environment::class, function(Container $di) {
+$di->set(Twig_Environment::class, function(Container $di) {
         /** @var Tonis $tonis */
         $tonis = $di->get(Tonis::class);
         $pm = $tonis->getPackageManager();
@@ -82,7 +65,7 @@ return function(Di\Container $di) {
         return $engine;
     });
 
-    $di->set(PlatesStrategy::class, function(Container $di) {
+    $di->set(Strategy\PlatesStrategy::class, function(Container $di) {
         return new PlatesStrategy($di->get(PlatesEngine::class));
     });
 };

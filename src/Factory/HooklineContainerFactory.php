@@ -5,7 +5,7 @@ use Tonis\Di;
 use Tonis\Hookline;
 use Tonis\Mvc\Hook\TonisHookInterface;
 
-class HooklineContainerFactory implements Di\ServiceFactoryInterface
+final class HooklineContainerFactory implements Di\ServiceFactoryInterface
 {
     /** @var array */
     private $hooks;

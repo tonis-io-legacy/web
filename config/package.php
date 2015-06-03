@@ -30,7 +30,7 @@ return [
             'strategies' => [
                 StringStrategy::class,
                 JsonStrategy::class,
-                //PlatesStrategy::class
+                PlatesStrategy::class
             ],
         ]
     ]

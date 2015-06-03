@@ -307,7 +307,12 @@ final class Tonis implements Hookline\HooksAwareInterface
             } elseif (is_string($result)) {
                 return new View\Model\StringModel($result);
             } elseif (!$result instanceof View\ModelInterface) {
-                return $this->getInvalidDispatchResultModel();
+                return $this->getExceptionViewModel(
+                    'invalid-dispatch-result',
+                    new Exception\InvalidDispatchResultException(
+                        'Failed to dispatch; invalid dispatch result'
+                    )
+                );
             }
         } catch (\Exception $ex) {
             $this->hooks()->run('onDispatchException', $this->dispatchResult);
@@ -319,10 +324,6 @@ final class Tonis implements Hookline\HooksAwareInterface
     private function doRender()
     {
         $dispatchResult = $this->dispatchResult;
-
-        if (!$dispatchResult instanceof View\ModelInterface) {
-            return $this->getRenderExceptionModel(new Mvc\Exception\InvalidViewModelException());
-        }
 
         if ($dispatchResult instanceof View\Model\ViewModel && !$dispatchResult->getTemplate()) {
             $match = $this->getRouteCollection()->getLastMatch();
@@ -347,7 +348,8 @@ final class Tonis implements Hookline\HooksAwareInterface
 
                 $dispatchResult = new View\Model\ViewModel($template, $dispatchResult->getVariables());
             } else {
-                return $this->getRenderExceptionModel(
+                return $this->getExceptionViewModel(
+                    'no-template-available',
                     new Exception\InvalidTemplateException('No template was available for rendering')
                 );
             }
@@ -356,27 +358,13 @@ final class Tonis implements Hookline\HooksAwareInterface
         return $this->viewManager->render($dispatchResult);
     }
 
-    private function getRenderExceptionModel(\Exception $ex)
+    private function getExceptionViewModel($type, \Exception $ex)
     {
         return new View\Model\ViewModel(
             $this->viewManager->getErrorTemplate(),
             [
                 'exception' => $ex,
-                'type' => 'invalid-dispatch-result',
-                'path' => $this->request->getUri()->getPath()
-            ]
-        );
-    }
-
-    private function getInvalidDispatchResultModel()
-    {
-        return new View\Model\ViewModel(
-            $this->viewManager->getErrorTemplate(),
-            [
-                'exception' => new Exception\InvalidDispatchResultException(
-                    'Failed to dispatch; invalid dispatch result'
-                ),
-                'type' => 'invalid-dispatch-result',
+                'type' => $type,
                 'path' => $this->request->getUri()->getPath()
             ]
         );

@@ -5,7 +5,7 @@ use Tonis\Di;
 use Tonis\View;
 use Tonis\Package;
 
-class ViewManagerFactory implements Di\ServiceFactoryInterface
+final class ViewManagerFactory implements Di\ServiceFactoryInterface
 {
     /**
      * @param Di\Container $di
