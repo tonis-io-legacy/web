@@ -16,11 +16,11 @@ use Zend\Diactoros;
 final class Tonis
 {
     use EventsAwareTrait;
+
+    const EVENT_BOOTSTRAP = 'bootstrap';
     
     /** @var bool */
     private $debug = true;
-    /** @var bool */
-    private $loaded = false;
     /** @var Container */
     private $di;
     /** @var PackageManager */
@@ -43,16 +43,7 @@ final class Tonis
      */
     public function __construct(array $config = [])
     {
-        $this->debug = isset($config['debug']) ? (bool) $config['debug'] : true;
-
-        foreach(['environment', 'packages', 'required_environment'] as $key) {
-            if (!isset($config[$key])) {
-                $config[$key] = [];
-            }
-        }
-
-        $this->initServices($config);
-        $this->initEnvironment($config['environment'], $config['required_environment']);
+        $this->bootstrap($config);
     }
 
     /**
@@ -61,42 +52,13 @@ final class Tonis
      */
     public function run(Message\RequestInterface $request = null, Message\ResponseInterface $response = null)
     {
-        $this->bootstrap($request, $response);
-        $this->route($this->request);
-        $this->dispatch($this->request);
-        $this->render($this->request, $this->response);
-        $this->respond($this->response);
-    }
-
-    /**
-     * @param Message\RequestInterface $request
-     * @param Message\ResponseInterface $response
-     * @todo Make the services customizable for replacement options
-     */
-    public function bootstrap(Message\RequestInterface $request = null, Message\ResponseInterface $response = null)
-    {
-        if ($this->loaded) {
-            return;
-        }
-
         $this->request = $request ? $request : Diactoros\ServerRequestFactory::fromGlobals();
         $this->response = $response ? $response : new Diactoros\Response();
 
-        $config = $this->packageManager->getMergedConfig();
-        foreach ($config as $key => $value) {
-            $di[$key] = $value;
-        }
-
-        foreach ($this->packageManager->getPackages() as $package) {
-            if ($package instanceof Mvc\Package\PackageInterface) {
-                $package->configureDi($this->di);
-                $package->configureRoutes($this->routes);
-                $package->bootstrap($this);
-            }
-        }
-
-        $this->events()->fire('onBootstrap');
-        $this->loaded = true;
+        $this->route($request);
+        $this->dispatch($request);
+        $this->render($request, $response);
+        $this->respond($response);
     }
 
     /**
@@ -249,43 +211,6 @@ final class Tonis
     }
 
     /**
-     * @param array $config
-     */
-    private function initServices(array $config)
-    {
-        $this->di = new Container;
-        $this->routes = new Router\Collection;
-        $this->events = (new Factory\EventManagerFactory)->createService($this->di);
-        $this->packageManager = (new Factory\PackageManagerFactory($this->isDebugEnabled(), $config['packages']))->createService($this->di);
-        $this->viewManager = (new Factory\ViewManagerFactory)->createService($this->di);
-    }
-
-    /**
-     * @param array $environment
-     * @param array $required
-     * @throws Exception\MissingRequiredEnvironmentException
-     */
-    private function initEnvironment(array $environment, array $required)
-    {
-        foreach ($required as $key) {
-            if (!isset($environment[$key])) {
-                throw new Exception\MissingRequiredEnvironmentException(
-                    sprintf(
-                        'Environment variable "%s" is required and missing',
-                        $key
-                    )
-                );
-            }
-        }
-
-        foreach ($environment as $key => $value) {
-            putenv($key . '=' . $value);
-        }
-
-        putenv('TONIS_DEBUG=' . $this->isDebugEnabled());
-    }
-
-    /**
      * @param Router\Match $routeMatch
      * @return mixed
      */
@@ -377,5 +302,55 @@ final class Tonis
                 'path' => $this->request->getUri()->getPath()
             ]
         );
+    }
+
+    /**
+     * @param array $config
+     */
+    private function bootstrap(array $config)
+    {
+        foreach(['environment', 'packages', 'required_environment'] as $key) {
+            if (!isset($config[$key])) {
+                $config[$key] = [];
+            }
+        }
+
+        foreach ($config['required_environment'] as $key) {
+            if (!isset($config['environment'][$key])) {
+                throw new Exception\MissingRequiredEnvironmentException(
+                    sprintf(
+                        'Environment variable "%s" is required and missing',
+                        $key
+                    )
+                );
+            }
+        }
+
+        foreach ($config['environment'] as $key => $value) {
+            putenv($key . '=' . $value);
+        }
+
+        putenv('TONIS_DEBUG=' . $this->isDebugEnabled());
+
+        $debug = $this->debug = isset($config['debug']) ? (bool) $config['debug'] : true;
+        $di = $this->di = new Container;
+
+        $this->routes = new Router\Collection;
+        $this->events = (new Factory\EventManagerFactory)->createService($di);
+        $this->packageManager = (new Factory\PackageManagerFactory($debug, $config['packages']))->createService($di);
+
+        foreach ($this->packageManager->getPackages() as $package) {
+            if ($package instanceof Mvc\Package\PackageInterface) {
+                $package->configureDi($di);
+                $package->configureRoutes($this->routes);
+                $package->bootstrap($this);
+
+                $di[$package->getName()] = $package->getConfig();
+            }
+        }
+
+        $this->events()->fire(self::EVENT_BOOTSTRAP);
+
+        $this->viewManager = (new Factory\ViewManagerFactory)->createService($di);
     }
 }

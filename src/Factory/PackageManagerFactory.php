@@ -42,6 +42,9 @@ final class PackageManagerFactory implements ServiceFactoryInterface
         }
 
         $pm->load();
+
+        $di->set(PackageManager::class, $pm);
+
         return $pm;
     }
 }

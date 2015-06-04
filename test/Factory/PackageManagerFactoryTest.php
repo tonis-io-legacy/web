@@ -1,7 +1,7 @@
 <?php
 namespace Tonis\Mvc\Factory;
 
-use Tonis\Di;
+use Tonis\Di\Container;
 use Tonis\Mvc\TestAsset\TestPackage\TestPackage;
 use Tonis\Package\PackageManager;
 
@@ -16,7 +16,7 @@ class PackageManagerFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateService()
     {
-        $di = new Di\Container;
+        $di = new Container;
         $factory = new PackageManagerFactory(true, [TestPackage::class]);
         $pm = $factory->createService($di);
 
@@ -29,13 +29,14 @@ class PackageManagerFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateServiceSkipsDebugPackages()
     {
-        $di = new Di\Container;
+        $di = new Container;
         $factory = new PackageManagerFactory(false, ['?doNotLoad']);
         $pm = $factory->createService($di);
 
         $this->assertInstanceOf(PackageManager::class, $pm);
         $this->assertCount(1, $pm->getPackages());
 
+        $di = new Container();
         $factory = new PackageManagerFactory(true, ['?' . TestPackage::class]);
         $pm = $factory->createService($di);
 

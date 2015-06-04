@@ -18,7 +18,7 @@ class ViewStrategyFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $di = new Container;
         $di->set(PackageManager::class, new PackageManager());
-        $di['tonis'] = [
+        $di['mvc'] = [
             'view_manager' => [
                 'strategies' => [
                     StringStrategy::class,

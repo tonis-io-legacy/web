@@ -50,7 +50,6 @@ class TonisConsole extends Application
      */
     public function run(InputInterface $input = null, OutputInterface $output = null)
     {
-        $this->tonis->bootstrap();
         return parent::run($input, $output);
     }
 }

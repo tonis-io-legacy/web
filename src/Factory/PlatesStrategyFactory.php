@@ -20,7 +20,7 @@ final class PlatesStrategyFactory extends AbstractViewStrategyFactory
             $engine->addFolder($name, $path);
         }
 
-        foreach ($di['tonis']['plates']['folders'] as $name => $path) {
+        foreach ($di['mvc']['plates']['folders'] as $name => $path) {
             $engine->addFolder($name, $path);
         }
 

@@ -22,7 +22,7 @@ class PlatesStrategyFactoryTest extends \PHPUnit_Framework_TestCase
         $pm->load();
 
         $di = new Container;
-        $di['tonis'] = [
+        $di['mvc'] = [
             'plates' => [
                 'folders' => [
                     'foo' => __DIR__
