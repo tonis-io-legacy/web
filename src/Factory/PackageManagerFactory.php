@@ -1,10 +1,11 @@
 <?php
 namespace Tonis\Mvc\Factory;
 
-use Tonis\Di;
-use Tonis\Package;
+use Tonis\Di\Container;
+use Tonis\Di\ServiceFactoryInterface;
+use Tonis\Package\PackageManager;
 
-final class PackageManagerFactory implements Di\ServiceFactoryInterface
+final class PackageManagerFactory implements ServiceFactoryInterface
 {
     /** @var array */
     private $packages;
@@ -22,12 +23,12 @@ final class PackageManagerFactory implements Di\ServiceFactoryInterface
     }
 
     /**
-     * @param Di\Container $di
+     * @param Container $di
      * @return mixed
      */
-    public function createService(Di\Container $di)
+    public function createService(Container $di)
     {
-        $pm = new Package\Manager();
+        $pm = new PackageManager();
         $pm->add('Tonis\\Mvc');
 
         foreach ($this->packages as $package) {

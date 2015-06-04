@@ -1,37 +1,24 @@
 <?php
 namespace Tonis\Mvc\Factory;
 
-use Tonis\Di;
-use Tonis\Mvc;
-use Tonis\Package;
-use Tonis\View;
+use Tonis\Di\Container;
+use Tonis\Di\ContainerUtil;
+use Tonis\Package\PackageManager;
+use Tonis\View\Strategy\TwigStrategy;
 
-final class TwigStrategyFactory implements Di\ServiceFactoryInterface
+final class TwigStrategyFactory extends AbstractViewStrategyFactory
 {
     /**
-     * @param Di\Container $di
-     * @return View\Strategy\TwigStrategy
+     * @param Container $di
+     * @return TwigStrategy
      */
-    public function createService(Di\Container $di)
+    public function createService(Container $di)
     {
-        $pm = $di->get(Package\Manager::class);
-
-        $paths = [];
-        foreach ($pm->getPackages() as $package) {
-            if ($package instanceof Mvc\Package\PackageInterface) {
-                $path = realpath($package->getPath() . '/view');
-                if ($path) {
-                    $paths[$package->getName()] = $path;
-                }
-            }
-        }
-
         $loader = new \Twig_Loader_Filesystem();
 
-        foreach ($paths as $namespace => $path) {
-            $loader->addPath($path, $namespace);
+        foreach ($this->getViewPaths($di->get(PackageManager::class)) as $name => $path) {
+            $loader->addPath($path, $name);
         }
-
 
         foreach ($di['tonis']['twig']['namespaces'] as $namespace => $path) {
             $loader->addPath($path, $namespace);
@@ -40,9 +27,9 @@ final class TwigStrategyFactory implements Di\ServiceFactoryInterface
         $twig = new \Twig_Environment($loader, $di['tonis']['twig']['options']);
 
         foreach ($di['tonis']['twig']['extensions'] as $extension) {
-            $twig->addExtension(Di\ContainerUtil::get($di, $extension));
+            $twig->addExtension(ContainerUtil::get($di, $extension));
         }
 
-        return new View\Strategy\TwigStrategy($twig);
+        return new TwigStrategy($twig);
     }
 }

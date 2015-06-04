@@ -1,16 +1,16 @@
 <?php
 namespace Tonis\Mvc\TestAsset;
 
-use Tonis\Event\Manager;
+use Tonis\Event\EventManager;
 use Tonis\Event\SubscriberInterface;
 
 class TestSubscriber implements SubscriberInterface
 {
     /**
-     * @param Manager $events
+     * @param EventManager $events
      * @return void
      */
-    public function subscribe(Manager $events)
+    public function subscribe(EventManager $events)
     {
         $events->on('foo', function() {
             return 'bar';

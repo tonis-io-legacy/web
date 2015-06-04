@@ -1,8 +1,8 @@
 <?php
 namespace Tonis\Mvc\Factory;
 
-use Tonis\Di;
-use Tonis\Event;
+use Tonis\Di\Container;
+use Tonis\Event\EventManager;
 use Tonis\Mvc\TestAsset\TestSubscriber;
 
 /**
@@ -16,11 +16,11 @@ class EventManagerFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateService()
     {
-        $di = new Di\Container;
+        $di = new Container;
         $factory = new EventManagerFactory([new TestSubscriber()]);
         $events = $factory->createService($di);
 
-        $this->assertInstanceOf(Event\Manager::class, $events);
+        $this->assertInstanceOf(EventManager::class, $events);
         $this->assertCount(1, $events->getListeners('foo'));
         $this->assertCount(1, $events->getListeners());
     }

@@ -2,35 +2,28 @@
 namespace Tonis\Mvc\Factory;
 
 use League\Plates;
-use Tonis\Di;
-use Tonis\Mvc;
-use Tonis\Package;
-use Tonis\View;
+use Tonis\Di\Container;
+use Tonis\Package\PackageManager;
+use Tonis\View\Strategy\PlatesStrategy;
 
-final class PlatesStrategyFactory implements Di\ServiceFactoryInterface
+final class PlatesStrategyFactory extends AbstractViewStrategyFactory
 {
     /**
-     * @param Di\Container $di
-     * @return View\Strategy\PlatesStrategy
+     * @param Container $di
+     * @return PlatesStrategy
      */
-    public function createService(Di\Container $di)
+    public function createService(Container $di)
     {
-        $pm = $di->get(Package\Manager::class);
         $engine = new Plates\Engine();
 
-        foreach ($pm->getPackages() as $package) {
-            if ($package instanceof Mvc\Package\PackageInterface) {
-                $path = realpath($package->getPath() . '/view');
-                if ($path) {
-                    $engine->addFolder($package->getName(), $path);
-                }
-            }
+        foreach ($this->getViewPaths($di->get(PackageManager::class)) as $name => $path) {
+            $engine->addFolder($name, $path);
         }
 
         foreach ($di['tonis']['plates']['folders'] as $name => $path) {
             $engine->addFolder($name, $path);
         }
 
-        return new View\Strategy\PlatesStrategy($engine);
+        return new PlatesStrategy($engine);
     }
 }

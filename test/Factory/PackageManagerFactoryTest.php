@@ -3,8 +3,7 @@ namespace Tonis\Mvc\Factory;
 
 use Tonis\Di;
 use Tonis\Mvc\TestAsset\TestPackage\TestPackage;
-use Tonis\Package;
-use Tonis\Mvc;
+use Tonis\Package\PackageManager;
 
 /**
  * @coversDefaultClass \Tonis\Mvc\Factory\PackageManagerFactory
@@ -21,7 +20,7 @@ class PackageManagerFactoryTest extends \PHPUnit_Framework_TestCase
         $factory = new PackageManagerFactory(true, [TestPackage::class]);
         $pm = $factory->createService($di);
 
-        $this->assertInstanceOf(Package\Manager::class, $pm);
+        $this->assertInstanceOf(PackageManager::class, $pm);
         $this->assertCount(2, $pm->getPackages());
     }
 
@@ -34,13 +33,13 @@ class PackageManagerFactoryTest extends \PHPUnit_Framework_TestCase
         $factory = new PackageManagerFactory(false, ['?doNotLoad']);
         $pm = $factory->createService($di);
 
-        $this->assertInstanceOf(Package\Manager::class, $pm);
+        $this->assertInstanceOf(PackageManager::class, $pm);
         $this->assertCount(1, $pm->getPackages());
 
         $factory = new PackageManagerFactory(true, ['?' . TestPackage::class]);
         $pm = $factory->createService($di);
 
-        $this->assertInstanceOf(Package\Manager::class, $pm);
+        $this->assertInstanceOf(PackageManager::class, $pm);
         $this->assertCount(2, $pm->getPackages());
     }
 }

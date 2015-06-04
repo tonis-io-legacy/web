@@ -2,32 +2,32 @@
 namespace Tonis\Mvc;
 
 use Psr\Http\Message;
-use Tonis\Di;
+use Tonis\Di\Container;
+use Tonis\Di\ServiceFactoryInterface;
 use Tonis\Dispatcher;
-use Tonis\Event;
+use Tonis\Event\EventsAwareTrait;
 use Tonis\Mvc;
-use Tonis\Package;
+use Tonis\Package\PackageManager;
 use Tonis\Router;
 use Tonis\View;
+use Tonis\View\ViewManager;
 use Zend\Diactoros;
 
 final class Tonis
 {
-    use Event\EventsAwareTrait;
+    use EventsAwareTrait;
     
-    /** @var array */
-    private $config = [];
     /** @var bool */
     private $debug = true;
     /** @var bool */
     private $loaded = false;
-    /** @var Di\Container */
+    /** @var Container */
     private $di;
-    /** @var Package\Manager */
+    /** @var PackageManager */
     private $packageManager;
     /** @var Router\Collection */
     private $routes;
-    /** @var View\Manager */
+    /** @var ViewManager */
     private $viewManager;
     /** @var mixed */
     private $dispatchResult;
@@ -43,7 +43,16 @@ final class Tonis
      */
     public function __construct(array $config = [])
     {
-        $this->init($config);
+        $this->debug = isset($config['debug']) ? (bool) $config['debug'] : true;
+
+        foreach(['environment', 'packages', 'required_environment'] as $key) {
+            if (!isset($config[$key])) {
+                $config[$key] = [];
+            }
+        }
+
+        $this->initServices($config);
+        $this->initEnvironment($config['environment'], $config['required_environment']);
     }
 
     /**
@@ -69,20 +78,6 @@ final class Tonis
         if ($this->loaded) {
             return;
         }
-
-        $this->di = new Di\Container;
-        $this->di->set(self::class, $this);
-        $this->di->set(Router\Collection::class, new Router\Collection);
-        $this->di->set(Event\Manager::class, new Factory\EventManagerFactory);
-        $this->di->set(Package\Manager::class, new Factory\PackageManagerFactory($this, $this->config['packages']));
-        $this->di->set(View\Manager::class, new Factory\ViewManagerFactory);
-
-        $this->routes = $this->di->get(Router\Collection::class);
-        $this->packageManager = $this->di->get(Package\Manager::class);
-        $this->events = $this->di->get(Event\Manager::class);
-        $this->viewManager = $this->di->get(View\Manager::class);
-
-        $this->initEnvironment($this->config['environment'], $this->config['required_environment']);
 
         $this->request = $request ? $request : Diactoros\ServerRequestFactory::fromGlobals();
         $this->response = $response ? $response : new Diactoros\Response();
@@ -174,7 +169,7 @@ final class Tonis
     }
 
     /**
-     * @return Di\Container
+     * @return Container
      */
     public function getDi()
     {
@@ -182,7 +177,7 @@ final class Tonis
     }
 
     /**
-     * @return View\Manager
+     * @return ViewManager
      */
     public function getViewManager()
     {
@@ -190,7 +185,7 @@ final class Tonis
     }
 
     /**
-     * @return Package\Manager
+     * @return PackageManager
      */
     public function getPackageManager()
     {
@@ -256,17 +251,13 @@ final class Tonis
     /**
      * @param array $config
      */
-    private function init(array $config)
+    private function initServices(array $config)
     {
-        $this->debug = isset($config['debug']) ? (bool) $config['debug'] : true;
-
-        foreach(['environment', 'packages', 'required_environment'] as $key) {
-            if (!isset($config[$key])) {
-                $config[$key] = [];
-            }
-        }
-
-        $this->config = $config;
+        $this->di = new Container;
+        $this->routes = new Router\Collection;
+        $this->events = (new Factory\EventManagerFactory)->createService($this->di);
+        $this->packageManager = (new Factory\PackageManagerFactory($this->isDebugEnabled(), $config['packages']))->createService($this->di);
+        $this->viewManager = (new Factory\ViewManagerFactory)->createService($this->di);
     }
 
     /**
@@ -311,7 +302,7 @@ final class Tonis
         try {
             $result = $dispatcher->dispatch($handler, $routeMatch->getParams());
 
-            if ($result instanceof Di\ServiceFactoryInterface) {
+            if ($result instanceof ServiceFactoryInterface) {
                 $result = $dispatcher->dispatch($result->createService($this->di), $routeMatch->getParams());
             }
 
