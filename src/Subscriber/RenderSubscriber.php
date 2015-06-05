@@ -55,7 +55,7 @@ final class RenderSubscriber implements SubscriberInterface
         }
 
         if (is_string($handler)) {
-            $replace = function($match) {
+            $replace = function ($match) {
                 return $match[1] . '-' . $match[2];
             };
 

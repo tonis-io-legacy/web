@@ -13,11 +13,10 @@ final class BootstrapSubscriber implements SubscriberInterface
      */
     public function subscribe(EventManager $events)
     {
-        $events->on(Tonis::EVENT_DISPATCH, [$this, 'bootstrapPackageManager']);
+        $events->on(Tonis::EVENT_BOOTSTRAP, [$this, 'bootstrapPackageManager']);
     }
 
     public function bootstrapPackageManager(LifecycleEvent $lifecycle)
     {
-
     }
 }
