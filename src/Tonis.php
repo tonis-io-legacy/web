@@ -2,10 +2,12 @@
 namespace Tonis\Mvc;
 
 use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
 use Tonis\Di\Container;
+use Tonis\Di\ContainerUtil;
 use Tonis\Dispatcher\Dispatcher;
 use Tonis\Event\EventManager;
+use Tonis\Mvc\Factory\PackageManagerFactory;
+use Tonis\Mvc\Factory\ViewManagerFactory;
 use Tonis\Mvc\Subscriber\BootstrapSubscriber;
 use Tonis\Mvc\Subscriber\DispatchSubscriber;
 use Tonis\Mvc\Subscriber\RenderSubscriber;
@@ -14,6 +16,7 @@ use Tonis\Package\PackageManager;
 use Tonis\Router\RouteCollection;
 use Tonis\Router\RouteMatch;
 use Tonis\View\ViewManager;
+use Zend\Diactoros\Response;
 use Zend\Diactoros\ServerRequestFactory;
 
 final class Tonis
@@ -32,30 +35,10 @@ final class Tonis
     private $di;
     /** @var LifecycleEvent */
     private $lifecycleEvent;
-    /** @var RequestInterface */
-    private $request;
-
-    /**
-     * @param array $config
-     * @return Tonis
-     */
-    public static function createWithDefaults(array $config = [])
-    {
-        $tonis = new self($config);
-
-        $di = $tonis->di();
-
-        $di->set(Dispatcher::class, new Dispatcher);
-        $di->set(PackageManager::class, new PackageManager);
-        $di->set(ViewManager::class, new ViewManager);
-
-        $di->set(BootstrapSubscriber::class, new BootstrapSubscriber($di->get(PackageManager::class)));
-        $di->set(DispatchSubscriber::class, new DispatchSubscriber($di->get(Dispatcher::class)));
-        $di->set(RenderSubscriber::class, new RenderSubscriber($di->get(ViewManager::class)));
-        $di->set(RouteSubscriber::class, new RouteSubscriber($tonis->routes()));
-
-        return $tonis;
-    }
+    /** @var RouteCollection */
+    private $routes;
+    /** @var ViewManager */
+    private $viewManager;
 
     /**
      * @param array $config
@@ -65,8 +48,13 @@ final class Tonis
         $this->config = new TonisConfig($config);
 
         $this->di = new Container;
+        $this->dispatcher = new Dispatcher;
         $this->events = new EventManager;
         $this->routes = new RouteCollection;
+        $this->packageManager = new PackageManager(['cache_dir' => $this->config->getPackageCacheDir()]);
+        $this->viewManager = new ViewManager;
+
+        $this->di->set(PackageManager::class, $this->packageManager);
     }
 
     /**
@@ -74,8 +62,11 @@ final class Tonis
      */
     public function bootstrap(RequestInterface $request = null)
     {
-        $this->request = $request ?: ServerRequestFactory::fromGlobals();
-        $this->lifecycleEvent = new LifecycleEvent($this->request);
+        $this->lifecycleEvent = new LifecycleEvent($this, $request ?: ServerRequestFactory::fromGlobals());
+
+        foreach ($this->config->getSubscribers() as $subscriber) {
+            $this->events()->subscribe(ContainerUtil::get($this->di, $subscriber));
+        }
 
         $this->events()->fire(self::EVENT_BOOTSTRAP, $this->lifecycleEvent);
     }
@@ -118,6 +109,14 @@ final class Tonis
         }
     }
 
+    public function respond()
+    {
+        $response = $this->lifecycleEvent->getResponse() ? $this->lifecycleEvent->getResponse() : new Response;
+        $response->getBody()->write($this->lifecycleEvent->getRenderResult());
+
+        echo $response->getBody();
+    }
+
     /**
      * @return bool
      */
@@ -151,56 +150,42 @@ final class Tonis
     }
 
     /**
+     * @return ViewManager
+     */
+    public function getViewManager()
+    {
+        return $this->viewManager;
+    }
+
+    /**
+     * @return PackageManager
+     */
+    public function getPackageManager()
+    {
+        return $this->packageManager;
+    }
+
+    /**
+     * @return Dispatcher
+     */
+    public function getDispatcher()
+    {
+        return $this->dispatcher;
+    }
+
+    /**
+     * @return TonisConfig
+     */
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
+    /**
      * @return LifecycleEvent
      */
     public function getLifecycleEvent()
     {
         return $this->lifecycleEvent;
     }
-
-//    /**
-//     * @param array $config
-//     */
-//    private function bootstrap2(array $config)
-//    {
-//        foreach (['environment', 'packages', 'required_environment'] as $key) {
-//            if (!isset($config[$key])) {
-//                $config[$key] = [];
-//            }
-//        }
-//
-//        foreach ($config['required_environment'] as $key) {
-//            if (!isset($config['environment'][$key])) {
-//                throw new Exception\MissingRequiredEnvironmentException(
-//                    sprintf(
-//                        'Environment variable "%s" is required and missing',
-//                        $key
-//                    )
-//                );
-//            }
-//        }
-//
-//        foreach ($config['environment'] as $key => $value) {
-//            putenv($key . '=' . $value);
-//        }
-//
-//        putenv('TONIS_DEBUG=' . $this->isDebugEnabled());
-//
-//        $this->events = (new Factory\EventManagerFactory)->createService($di);
-//        $this->packageManager = (new Factory\PackageManagerFactory($debug, $config['packages']))->createService($di);
-//
-//        foreach ($this->packageManager->getPackages() as $package) {
-//            if ($package instanceof Mvc\Package\PackageInterface) {
-//                $package->configureDi($di);
-//                $package->configureRoutes($this->routes);
-//                $package->bootstrap($this);
-//
-//                $di[$package->getName()] = $package->getConfig();
-//            }
-//        }
-//
-//        $this->events()->fire(self::EVENT_BOOTSTRAP);
-//
-//        $this->viewManager = (new Factory\ViewManagerFactory)->createService($di);
-//    }
 }

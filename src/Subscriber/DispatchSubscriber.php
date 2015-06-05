@@ -7,23 +7,13 @@ use Tonis\Event\SubscriberInterface;
 use Tonis\Mvc\Exception\InvalidDispatchResultException;
 use Tonis\Mvc\LifecycleEvent;
 use Tonis\Mvc\Tonis;
+use Tonis\Router\RouteMatch;
 use Tonis\View\Model\StringModel;
 use Tonis\View\Model\ViewModel;
 use Tonis\View\ModelInterface;
 
 final class DispatchSubscriber implements SubscriberInterface
 {
-    /** @var Dispatcher */
-    private $dispatcher;
-
-    /**
-     * @param Dispatcher $dispatcher
-     */
-    public function __construct(Dispatcher $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -42,8 +32,12 @@ final class DispatchSubscriber implements SubscriberInterface
         }
 
         $routeMatch = $lifecycle->getRouteMatch();
+        if (!$routeMatch instanceof RouteMatch) {
+            return;
+        }
+
         $handler = $routeMatch->getRoute()->getHandler();
-        $result = $this->dispatcher->dispatch($handler, $routeMatch->getParams());
+        $result = $lifecycle->getTonis()->getDispatcher()->dispatch($handler, $routeMatch->getParams());
 
         if (is_array($result)) {
             $result = new ViewModel(null, $result);

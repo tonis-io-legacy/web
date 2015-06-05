@@ -9,6 +9,8 @@ use Tonis\Router\RouteMatch;
 
 final class LifecycleEvent extends Event
 {
+    /** @var Tonis */
+    private $tonis;
     /** @var RequestInterface */
     private $request;
     /** @var ResponseInterface */
@@ -25,9 +27,18 @@ final class LifecycleEvent extends Event
     /**
      * @param RequestInterface $request
      */
-    public function __construct(RequestInterface $request)
+    public function __construct(Tonis $tonis, RequestInterface $request)
     {
+        $this->tonis = $tonis;
         $this->request = $request;
+    }
+
+    /**
+     * @return Tonis
+     */
+    public function getTonis()
+    {
+        return $this->tonis;
     }
 
     /**

@@ -1,49 +1,77 @@
 <?php
 namespace Tonis\Mvc\Subscriber;
 
+use Tonis\Di\ContainerUtil;
 use Tonis\Event\EventManager;
 use Tonis\Event\SubscriberInterface;
 use Tonis\Mvc\Exception\InvalidTemplateException;
 use Tonis\Mvc\LifecycleEvent;
 use Tonis\Mvc\Tonis;
 use Tonis\View\Model\ViewModel;
+use Tonis\View\ModelInterface;
 use Tonis\View\ViewManager;
 
 final class RenderSubscriber implements SubscriberInterface
 {
-    /** @var ViewManager */
-    private $viewManager;
-
-    /**
-     * @param ViewManager $viewManager
-     */
-    public function __construct(ViewManager $viewManager)
-    {
-        $this->viewManager = $viewManager;
-    }
-
     /**
      * {@inheritDoc}
      */
     public function subscribe(EventManager $events)
     {
+        $events->on(Tonis::EVENT_RENDER, [$this, 'prepareViewManager']);
         $events->on(Tonis::EVENT_RENDER, [$this, 'onRender']);
     }
 
+    /**
+     * @param LifecycleEvent $event
+     */
+    public function prepareViewManager(LifecycleEvent $event)
+    {
+        $tonis = $event->getTonis();
+        $di = $tonis->di();
+        $vm = $tonis->getViewManager();
+
+        $config = $di['mvc']['view_manager'];
+
+        foreach ($config['strategies'] as $strategy) {
+            if (empty($strategy)) {
+                continue;
+            }
+            $vm->addStrategy(ContainerUtil::get($di, $strategy));
+        }
+
+        $vm->setErrorTemplate($config['error_template']);
+        $vm->setNotFoundTemplate($config['not_found_template']);
+    }
+
+    /**
+     * @param LifecycleEvent $lifecycle
+     */
     public function onRender(LifecycleEvent $lifecycle)
     {
+        $viewManager = $lifecycle->getTonis()->getViewManager();
         $dispatchResult = $lifecycle->getDispatchResult();
 
         if ($dispatchResult instanceof ViewModel && !$dispatchResult->getTemplate()) {
             $match = $lifecycle->getRouteMatch();
             $handler = $match->getRoute()->getHandler();
-            $dispatchResult = $this->createTemplateModel($dispatchResult, $handler);
+            $dispatchResult = $this->createTemplateModel($viewManager, $dispatchResult, $handler);
         }
 
-        $lifecycle->setRenderResult($this->viewManager->render($dispatchResult));
+        if (!$dispatchResult instanceof ModelInterface) {
+            $dispatchResult = new ViewModel($viewManager->getErrorTemplate());
+        }
+
+        $lifecycle->setRenderResult($viewManager->render($dispatchResult));
     }
 
-    private function createTemplateModel(ViewModel $model, $handler)
+    /**
+     * @param ViewManager $viewManager
+     * @param ViewModel $model
+     * @param mixed $handler
+     * @return ViewModel
+     */
+    private function createTemplateModel(ViewManager $viewManager, ViewModel $model, $handler)
     {
         if (is_array($handler)) {
             $handler = $handler[0];
@@ -67,7 +95,7 @@ final class RenderSubscriber implements SubscriberInterface
         }
 
         return new ViewModel(
-            $this->viewManager->getErrorTemplate(),
+            $viewManager->getErrorTemplate(),
             [
                 'type' => 'no-template-available',
                 'exception' => new InvalidTemplateException()

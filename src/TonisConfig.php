@@ -2,6 +2,7 @@
 
 namespace Tonis\Mvc;
 
+use Tonis\Mvc\Subscriber\BootstrapSubscriber;
 use Tonis\Mvc\Subscriber\DispatchSubscriber;
 use Tonis\Mvc\Subscriber\RenderSubscriber;
 use Tonis\Mvc\Subscriber\RouteSubscriber;
@@ -18,9 +19,11 @@ final class TonisConfig
     {
         $defaults = [
             'debug' => false,
+            'cache_dir' => null,
             'environment' => [],
             'packages' => [],
             'subscribers' => [
+                BootstrapSubscriber::class,
                 RouteSubscriber::class,
                 DispatchSubscriber::class,
                 RenderSubscriber::class
@@ -36,6 +39,14 @@ final class TonisConfig
     public function isDebugEnabled()
     {
         return $this->config['debug'];
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPackageCacheDir()
+    {
+        return $this->config['cache_dir'];
     }
 
     /**
