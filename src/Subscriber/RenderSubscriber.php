@@ -7,7 +7,6 @@ use Tonis\Mvc\Exception\InvalidTemplateException;
 use Tonis\Mvc\LifecycleEvent;
 use Tonis\Mvc\Tonis;
 use Tonis\View\Model\ViewModel;
-use Tonis\View\ModelInterface;
 use Tonis\View\ViewManager;
 
 final class RenderSubscriber implements SubscriberInterface
@@ -44,7 +43,7 @@ final class RenderSubscriber implements SubscriberInterface
         $lifecycle->setRenderResult($this->viewManager->render($dispatchResult));
     }
 
-    private function createTemplateModel(ModelInterface $model, $handler)
+    private function createTemplateModel(ViewModel $model, $handler)
     {
         if (is_array($handler)) {
             $handler = $handler[0];
