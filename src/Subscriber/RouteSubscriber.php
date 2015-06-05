@@ -10,7 +10,7 @@ use Tonis\Router\RouteMatch;
 
 final class RouteSubscriber implements SubscriberInterface
 {
-    /** @var Tonis */
+    /** @var RouteCollection */
     private $routes;
 
     /**
