@@ -2,6 +2,10 @@
 
 namespace Tonis\Mvc;
 
+use Tonis\Mvc\Subscriber\DispatchSubscriber;
+use Tonis\Mvc\Subscriber\RenderSubscriber;
+use Tonis\Mvc\Subscriber\RouteSubscriber;
+
 final class TonisConfig
 {
     /** @var array */
@@ -16,6 +20,11 @@ final class TonisConfig
             'debug' => false,
             'environment' => [],
             'packages' => [],
+            'subscribers' => [
+                RouteSubscriber::class,
+                DispatchSubscriber::class,
+                RenderSubscriber::class
+            ]
         ];
 
         $this->config = array_replace_recursive($defaults, $config);
@@ -43,5 +52,13 @@ final class TonisConfig
     public function getPackages()
     {
         return $this->config['packages'];
+    }
+
+    /**
+     * @return array
+     */
+    public function getSubscribers()
+    {
+        return $this->config['subscribers'];
     }
 }

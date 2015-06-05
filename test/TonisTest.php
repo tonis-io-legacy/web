@@ -2,20 +2,53 @@
 namespace Tonis\Mvc;
 
 use Tonis\Di\Container;
+use Tonis\Dispatcher\Dispatcher;
+use Tonis\Event\EventManager;
+use Tonis\Mvc\Subscriber\BootstrapSubscriber;
+use Tonis\Mvc\Subscriber\DispatchSubscriber;
+use Tonis\Mvc\Subscriber\RenderSubscriber;
+use Tonis\Mvc\Subscriber\RouteSubscriber;
+use Tonis\Mvc\TestAsset\NewRequestTrait;
 use Tonis\Package\PackageManager;
 use Tonis\Router\Route;
 use Tonis\Router\RouteCollection;
 use Tonis\Router\RouteMatch;
 use Zend\Diactoros\Response;
-use Zend\Diactoros\ServerRequestFactory;
 
 /**
  * @coversDefaultClass \Tonis\Mvc\Tonis
  */
 class TonisTest extends \PHPUnit_Framework_TestCase
 {
+    use NewRequestTrait;
+
     /** @var Tonis */
     private $tonis;
+
+    /**
+     * @covers ::createWithDefaults
+     */
+    public function testCreateWithDefaults()
+    {
+        $tonis = Tonis::createWithDefaults([]);
+        $this->assertInstanceOf(Tonis::class, $tonis);
+
+        $di = $tonis->di();
+        $this->assertTrue($di->has(Dispatcher::class));
+        $this->assertTrue($di->has(PackageManager::class));
+        $this->assertTrue($di->has(BootstrapSubscriber::class));
+        $this->assertTrue($di->has(DispatchSubscriber::class));
+        $this->assertTrue($di->has(RenderSubscriber::class));
+        $this->assertTrue($di->has(RouteSubscriber::class));
+    }
+
+    /**
+     * @covers ::events
+     */
+    public function testEvents()
+    {
+        $this->assertInstanceOf(EventManager::class, $this->tonis->events());
+    }
 
     /**
      * @covers ::__construct
@@ -73,7 +106,7 @@ class TonisTest extends \PHPUnit_Framework_TestCase
 
         $this->tonis->dispatch();
 
-        $this->assertTrue($this->tonis->getLifecycleEvent()->hasException());
+        $this->assertNotNull($this->tonis->getLifecycleEvent()->getException());
     }
 
     /**
@@ -118,7 +151,7 @@ class TonisTest extends \PHPUnit_Framework_TestCase
 
         $this->tonis->render();
 
-        $this->assertTrue($this->tonis->getLifecycleEvent()->hasException());
+        $this->assertNotNull($this->tonis->getLifecycleEvent()->getException());
     }
 
     /**
@@ -192,19 +225,11 @@ class TonisTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers ::getPackageManager
+     * @covers ::routes
      */
-    public function testGetPackageManager()
+    public function testRoutes()
     {
-        $this->assertInstanceOf(PackageManager::class, $this->tonis->getPackageManager());
-    }
-
-    /**
-     * @covers ::getRouteCollection
-     */
-    public function testGetRouteCollection()
-    {
-        $this->assertInstanceOf(RouteCollection::class, $this->tonis->getRouteCollection());
+        $this->assertInstanceOf(RouteCollection::class, $this->tonis->routes());
     }
 
     /**
@@ -219,18 +244,5 @@ class TonisTest extends \PHPUnit_Framework_TestCase
     {
         $this->tonis = new Tonis();
         $this->tonis->bootstrap();
-    }
-
-    /**
-     * @param string $path
-     * @param array $server
-     * @return \Zend\Diactoros\ServerRequest
-     */
-    protected function newRequest($path, array $server = [])
-    {
-        $server['REQUEST_URI'] = $path;
-        $server = array_merge($_SERVER, $server);
-
-        return ServerRequestFactory::fromGlobals($server);
     }
 }

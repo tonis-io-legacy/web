@@ -1,9 +1,13 @@
 <?php
-namespace Tonis\Mvc;
+namespace Tonis\Mvc\Subscriber;
 
 use Tonis\Event\EventManager;
 use Tonis\Event\SubscriberInterface;
+use Tonis\Mvc\Exception\InvalidTemplateException;
+use Tonis\Mvc\LifecycleEvent;
+use Tonis\Mvc\Tonis;
 use Tonis\View\Model\ViewModel;
+use Tonis\View\ModelInterface;
 use Tonis\View\ViewManager;
 
 final class RenderSubscriber implements SubscriberInterface
@@ -32,35 +36,43 @@ final class RenderSubscriber implements SubscriberInterface
         $dispatchResult = $lifecycle->getDispatchResult();
 
         if ($dispatchResult instanceof ViewModel && !$dispatchResult->getTemplate()) {
-            $match = $this->getRouteCollection()->getLastMatch();
+            $match = $lifecycle->getRouteMatch();
             $handler = $match->getRoute()->getHandler();
-
-            if (is_array($handler)) {
-                $handler = $handler[0];
-            }
-
-            if (is_object($handler)) {
-                $handler = get_class($handler);
-            }
-
-            if (is_string($handler)) {
-                $replace = function($match) {
-                    return $match[1] . '-' . $match[2];
-                };
-                $template = preg_replace('@Action$@', '', $handler);
-                $template = preg_replace_callback('@([a-z])([A-Z])@', $replace, $template);
-                $template = strtolower($template);
-                $template = str_replace('\\', '/', $template);
-
-                $dispatchResult = new View\Model\ViewModel($template, $dispatchResult->getVariables());
-            } else {
-                return $this->getExceptionViewModel(
-                    'no-template-available',
-                    new Exception\InvalidTemplateException('No template was available for rendering')
-                );
-            }
+            $dispatchResult = $this->createTemplateModel($dispatchResult, $handler);
         }
 
-        return $this->viewManager->render($dispatchResult);
+        $lifecycle->setRenderResult($this->viewManager->render($dispatchResult));
+    }
+
+    private function createTemplateModel(ModelInterface $model, $handler)
+    {
+        if (is_array($handler)) {
+            $handler = $handler[0];
+        }
+
+        if (is_object($handler)) {
+            $handler = get_class($handler);
+        }
+
+        if (is_string($handler)) {
+            $replace = function($match) {
+                return $match[1] . '-' . $match[2];
+            };
+
+            $template = preg_replace('@Action$@', '', $handler);
+            $template = preg_replace_callback('@([a-z])([A-Z])@', $replace, $template);
+            $template = strtolower($template);
+            $template = str_replace('\\', '/', $template);
+
+            return new ViewModel($template, $model->getVariables());
+        }
+
+        return new ViewModel(
+            $this->viewManager->getErrorTemplate(),
+            [
+                'type' => 'no-template-available',
+                'exception' => new InvalidTemplateException()
+            ]
+        );
     }
 }

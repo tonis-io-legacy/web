@@ -1,20 +1,23 @@
 <?php
 namespace Tonis\Mvc;
 
-use Psr\Http\Message;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Tonis\Di\Container;
-use Tonis\Event\EventsAwareTrait;
+use Tonis\Dispatcher\Dispatcher;
+use Tonis\Event\EventManager;
+use Tonis\Mvc\Subscriber\BootstrapSubscriber;
+use Tonis\Mvc\Subscriber\DispatchSubscriber;
+use Tonis\Mvc\Subscriber\RenderSubscriber;
+use Tonis\Mvc\Subscriber\RouteSubscriber;
 use Tonis\Package\PackageManager;
 use Tonis\Router\RouteCollection;
 use Tonis\Router\RouteMatch;
-use Zend\Diactoros;
+use Tonis\View\ViewManager;
+use Zend\Diactoros\ServerRequestFactory;
 
 final class Tonis
 {
-    use EventsAwareTrait;
-
     const EVENT_BOOTSTRAP = 'bootstrap';
     const EVENT_DISPATCH = 'dispatch';
     const EVENT_DISPATCH_EXCEPTION = 'dispatch.exception';
@@ -29,12 +32,30 @@ final class Tonis
     private $di;
     /** @var LifecycleEvent */
     private $lifecycleEvent;
-    /** @var PackageManager */
-    private $packageManager;
-    /** @var RouteCollection */
-    private $routes;
-    /** @var Message\RequestInterface */
+    /** @var RequestInterface */
     private $request;
+
+    /**
+     * @param array $config
+     * @return Tonis
+     */
+    public static function createWithDefaults(array $config = [])
+    {
+        $tonis = new self($config);
+
+        $di = $tonis->di();
+
+        $di->set(Dispatcher::class, new Dispatcher);
+        $di->set(PackageManager::class, new PackageManager);
+        $di->set(ViewManager::class, new ViewManager);
+
+        $di->set(BootstrapSubscriber::class, new BootstrapSubscriber($di->get(PackageManager::class)));
+        $di->set(DispatchSubscriber::class, new DispatchSubscriber($di->get(Dispatcher::class)));
+        $di->set(RenderSubscriber::class, new RenderSubscriber($di->get(ViewManager::class)));
+        $di->set(RouteSubscriber::class, new RouteSubscriber($tonis->routes()));
+
+        return $tonis;
+    }
 
     /**
      * @param array $config
@@ -44,7 +65,7 @@ final class Tonis
         $this->config = new TonisConfig($config);
 
         $this->di = new Container;
-        $this->packageManager = new PackageManager;
+        $this->events = new EventManager;
         $this->routes = new RouteCollection;
     }
 
@@ -53,10 +74,10 @@ final class Tonis
      */
     public function bootstrap(RequestInterface $request = null)
     {
-        $this->request = $request?: Diactoros\ServerRequestFactory::fromGlobals();
+        $this->request = $request ?: ServerRequestFactory::fromGlobals();
         $this->lifecycleEvent = new LifecycleEvent($this->request);
 
-        $this->events()->fire(self::EVENT_BOOTSTRAP, new BootstrapEvent());
+        $this->events()->fire(self::EVENT_BOOTSTRAP, $this->lifecycleEvent);
     }
 
     public function route()
@@ -98,20 +119,19 @@ final class Tonis
     }
 
     /**
-     * @param ResponseInterface $response
-     */
-    public function respond(ResponseInterface $response)
-    {
-        $response->getBody()->write($this->renderResult);
-        echo $response->getBody();
-    }
-
-    /**
      * @return bool
      */
     public function isDebugEnabled()
     {
         return $this->config->isDebugEnabled();
+    }
+
+    /**
+     * @return EventManager
+     */
+    public function events()
+    {
+        return $this->events;
     }
 
     /**
@@ -123,17 +143,9 @@ final class Tonis
     }
 
     /**
-     * @return PackageManager
-     */
-    public function getPackageManager()
-    {
-        return $this->packageManager;
-    }
-
-    /**
      * @return RouteCollection
      */
-    public function getRouteCollection()
+    public function routes()
     {
         return $this->routes;
     }
@@ -174,10 +186,6 @@ final class Tonis
 //
 //        putenv('TONIS_DEBUG=' . $this->isDebugEnabled());
 //
-//        $debug = $this->debug = isset($config['debug']) ? (bool) $config['debug'] : true;
-//        $di = $this->di = new Container;
-//
-//        $this->routes = new Router\Collection;
 //        $this->events = (new Factory\EventManagerFactory)->createService($di);
 //        $this->packageManager = (new Factory\PackageManagerFactory($debug, $config['packages']))->createService($di);
 //

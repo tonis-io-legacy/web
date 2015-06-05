@@ -2,6 +2,7 @@
 namespace Tonis\Mvc\Factory;
 
 use Tonis\Di\Container;
+use Tonis\Di\ContainerUtil;
 use Tonis\Di\ServiceFactoryInterface;
 use Tonis\Event\EventManager;
 use Tonis\Event\SubscriberInterface;
@@ -28,7 +29,7 @@ final class EventManagerFactory implements ServiceFactoryInterface
         $events = new EventManager(EventManager::class);
 
         foreach ($this->subscribers as $subscriber) {
-            $events->subscribe($subscriber);
+            $events->subscribe(ContainerUtil::get($di, $subscriber));
         }
 
         return $events;

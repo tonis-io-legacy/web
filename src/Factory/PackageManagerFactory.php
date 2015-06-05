@@ -3,6 +3,7 @@ namespace Tonis\Mvc\Factory;
 
 use Tonis\Di\Container;
 use Tonis\Di\ServiceFactoryInterface;
+use Tonis\Mvc\Package;
 use Tonis\Package\PackageManager;
 
 final class PackageManagerFactory implements ServiceFactoryInterface
@@ -29,7 +30,7 @@ final class PackageManagerFactory implements ServiceFactoryInterface
     public function createService(Container $di)
     {
         $pm = new PackageManager();
-        $pm->add('Tonis\\Mvc');
+        $pm->add(Package::class);
 
         foreach ($this->packages as $package) {
             if ($package[0] == '?') {
@@ -42,9 +43,6 @@ final class PackageManagerFactory implements ServiceFactoryInterface
         }
 
         $pm->load();
-
-        $di->set(PackageManager::class, $pm);
-
         return $pm;
     }
 }

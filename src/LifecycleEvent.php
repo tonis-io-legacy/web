@@ -31,11 +31,11 @@ final class LifecycleEvent extends Event
     }
 
     /**
-     * @return bool
+     * @return Exception
      */
-    public function hasException()
+    public function getException()
     {
-        return null !== $this->exception;
+        return $this->exception;
     }
 
     /**

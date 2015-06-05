@@ -1,9 +1,12 @@
 <?php
-namespace Tonis\Mvc;
+namespace Tonis\Mvc\Subscriber;
 
 use Tonis\Event\EventManager;
 use Tonis\Event\SubscriberInterface;
+use Tonis\Mvc\LifecycleEvent;
+use Tonis\Mvc\Tonis;
 use Tonis\Router\RouteCollection;
+use Tonis\Router\RouteMatch;
 
 final class RouteSubscriber implements SubscriberInterface
 {
@@ -31,6 +34,9 @@ final class RouteSubscriber implements SubscriberInterface
      */
     public function onRoute(LifecycleEvent $lifecycle)
     {
-        $lifecycle->setRouteMatch($this->routes->match($lifecycle->getRequest()));
+        $match = $this->routes->match($lifecycle->getRequest());
+        if ($match instanceof RouteMatch) {
+            $lifecycle->setRouteMatch($match);
+        }
     }
 }
