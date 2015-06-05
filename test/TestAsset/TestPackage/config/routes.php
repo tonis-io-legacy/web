@@ -1,7 +1,7 @@
 <?php
 
-use Tonis\Router\Collection;
+use Tonis\Router\RouteCollection;
 
-return function (Collection $routes) {
+return function (RouteCollection $routes) {
     $routes->get('/foo', 'handler');
 };

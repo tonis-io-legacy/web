@@ -3,8 +3,6 @@ namespace Tonis\Mvc;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Tonis\Di\ContainerAwareInterface;
 
 class TonisConsole extends Application
@@ -18,9 +16,7 @@ class TonisConsole extends Application
     public function __construct(array $config = [])
     {
         if (!isset($config['subscribers'])) {
-            $config['subscribers'] = [
-                new Subscriber\ConsoleSubscriber($this),
-            ];
+            $config['subscribers'] = [new Subscriber\ConsoleSubscriber($this)];
         }
         $this->tonis = new Tonis($config);
         parent::__construct();
@@ -40,16 +36,8 @@ class TonisConsole extends Application
     public function add(Command $command)
     {
         if ($command instanceof ContainerAwareInterface) {
-            $command->setDi($this->tonis->getDi());
+            $command->setDi($this->tonis->di());
         }
         return parent::add($command);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function run(InputInterface $input = null, OutputInterface $output = null)
-    {
-        return parent::run($input, $output);
     }
 }

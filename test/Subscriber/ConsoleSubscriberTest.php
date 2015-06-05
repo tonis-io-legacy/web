@@ -18,8 +18,10 @@ class ConsoleSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         $console = new TonisConsole;
 
-        $di = $console->getTonis()->getDi();
-        $di->set(PackageManager::class, new PackageManager());
+        $console
+            ->getTonis()
+            ->di()
+            ->set(PackageManager::class, new PackageManager());
 
         $subscriber = new ConsoleSubscriber($console);
 

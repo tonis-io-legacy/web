@@ -8,7 +8,7 @@ use Tonis\Mvc\TestAsset\TestPackage\TestPackage;
 use Tonis\Mvc\TestAsset\TestPackageWithNoConfigs;
 use Tonis\Mvc\Tonis;
 use Tonis\Mvc\TonisConsole;
-use Tonis\Router\Collection;
+use Tonis\Router\RouteCollection;
 
 /**
  * @coversDefaultClass \Tonis\Mvc\Package\AbstractPackage
@@ -23,7 +23,7 @@ class AbstractPackageTest extends \PHPUnit_Framework_TestCase
      */
     public function testConfigureRoutes()
     {
-        $routes = new Collection();
+        $routes = new RouteCollection();
         $this->package->configureRoutes($routes);
         $this->assertCount(1, $routes->getRoutes());
     }
@@ -35,23 +35,23 @@ class AbstractPackageTest extends \PHPUnit_Framework_TestCase
      */
     public function testConfigureRoutesInvalidCallableThrowsException()
     {
-        $routes = new Collection();
+        $routes = new RouteCollection();
         $package = new InvalidTestPackage();
         $package->configureRoutes($routes);
     }
 
     /**
-     * @covers ::configureDi
+     * @covers ::configureServices
      */
-    public function testConfigureDi()
+    public function testConfigureServices()
     {
         $di = new Container();
-        $this->package->configureDi($di);
+        $this->package->configureServices($di);
         $this->assertSame('bar', $di->get('foo'));
     }
 
     /**
-     * @covers ::configureDi
+     * @covers ::configureServices
      * @expectedException \RuntimeException
      * @expectedExceptionMessage Default MVC package expects di config to return a callable
      */
@@ -59,7 +59,7 @@ class AbstractPackageTest extends \PHPUnit_Framework_TestCase
     {
         $di = new Container();
         $package = new InvalidTestPackage();
-        $package->configureDi($di);
+        $package->configureServices($di);
     }
 
     /**

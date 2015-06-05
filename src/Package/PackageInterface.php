@@ -4,7 +4,7 @@ namespace Tonis\Mvc\Package;
 use Tonis\Di\Container;
 use Tonis\Mvc;
 use Tonis\Package\Feature;
-use Tonis\Router\Collection;
+use Tonis\Router\RouteCollection;
 
 interface PackageInterface extends
     Feature\ConfigProviderInterface,
@@ -25,10 +25,10 @@ interface PackageInterface extends
     /**
      * @param Container $di
      */
-    public function configureDi(Container $di);
+    public function configureServices(Container $di);
 
     /**
-     * @param Collection $routes
+     * @param RouteCollection $routes
      */
-    public function configureRoutes(Collection $routes);
+    public function configureRoutes(RouteCollection $routes);
 }

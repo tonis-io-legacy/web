@@ -4,7 +4,7 @@ namespace Tonis\Mvc\Package;
 use Tonis\Di\Container;
 use Tonis\Mvc\Tonis;
 use Tonis\Mvc\TonisConsole;
-use Tonis\Router\Collection;
+use Tonis\Router\RouteCollection;
 
 abstract class AbstractPackage implements PackageInterface
 {
@@ -32,7 +32,7 @@ abstract class AbstractPackage implements PackageInterface
     /**
      * {@inheritDoc}
      */
-    public function configureRoutes(Collection $routes)
+    public function configureRoutes(RouteCollection $routes)
     {
         $path = $this->getPath();
         if (file_exists($path . '/config/routes.php')) {
@@ -49,11 +49,11 @@ abstract class AbstractPackage implements PackageInterface
     /**
      * {@inheritDoc}
      */
-    public function configureDi(Container $di)
+    public function configureServices(Container $di)
     {
         $path = $this->getPath();
-        if (file_exists($path . '/config/di.php')) {
-            $callable = include $path . '/config/di.php';
+        if (file_exists($path . '/config/services.php')) {
+            $callable = include $path . '/config/services.php';
 
             if (!is_callable($callable)) {
                 throw new \RuntimeException('Default MVC package expects di config to return a callable');

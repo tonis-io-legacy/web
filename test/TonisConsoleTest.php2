@@ -1,0 +1,46 @@
+<?php
+namespace Tonis\Mvc;
+
+use Tonis\Di\Container;
+use Tonis\Mvc\TestAsset\TestCommand;
+
+/**
+ * @coversDefaultClass \Tonis\Mvc\TonisConsole
+ */
+class TonisConsoleTest extends \PHPUnit_Framework_TestCase
+{
+    /** @var TonisConsole */
+    private $console;
+
+    /**
+     * @covers ::__construct
+     */
+    public function testConstruct()
+    {
+        $this->assertCount(1, $this->console->getTonis()->events()->getListeners());
+    }
+
+    /**
+     * @covers ::getTonis
+     */
+    public function testGetTonis()
+    {
+        $this->assertInstanceOf(Tonis::class, $this->console->getTonis());
+    }
+
+    /**
+     * @covers ::add
+     */
+    public function testAddInjectsDiIfAvailable()
+    {
+        $command = new TestCommand('test');
+        $this->console->add($command);
+
+        $this->assertInstanceOf(Container::class, $command->di());
+    }
+
+    protected function setUp()
+    {
+        $this->console = new TonisConsole();
+    }
+}
