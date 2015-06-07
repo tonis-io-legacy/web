@@ -13,7 +13,7 @@ abstract class TonisConsoleFactory
     public static function fromDefaults(array $config = [])
     {
         $tonis = TonisFactory::fromDefaults($config);
-        $tonis->events()->subscribe(new ConsoleSubscriber($tonis->di));
+        $tonis->events()->subscribe(new ConsoleSubscriber($tonis->di()));
 
         $console = new TonisConsole($tonis);
 
