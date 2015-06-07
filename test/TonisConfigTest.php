@@ -35,11 +35,11 @@ class TonisConfigTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers ::getPackageCacheDir
+     * @covers ::getCacheDir
      */
-    public function testGetPackageCacheDir()
+    public function testGetCacheDir()
     {
-
+        $this->assertSame(null, $this->config->getCacheDir());
     }
 
     /**

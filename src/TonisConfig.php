@@ -47,7 +47,7 @@ final class TonisConfig
     /**
      * @return string|null
      */
-    public function getPackageCacheDir()
+    public function getCacheDir()
     {
         return $this->config['cache_dir'];
     }
