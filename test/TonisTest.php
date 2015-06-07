@@ -45,6 +45,7 @@ class TonisTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers ::dispatch
+     * @covers ::tryFire
      */
     public function testDispatch()
     {
@@ -59,6 +60,7 @@ class TonisTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers ::dispatch
+     * @covers ::tryFire
      */
     public function testDispatchCatchesExceptions()
     {
@@ -73,6 +75,7 @@ class TonisTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers ::render
+     * @covers ::tryFire
      */
     public function testRender()
     {
@@ -88,6 +91,7 @@ class TonisTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers ::render
+     * @covers ::tryFire
      */
     public function testRenderCatchesExceptions()
     {

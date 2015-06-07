@@ -2,6 +2,7 @@
 namespace Tonis\Mvc\Subscriber;
 
 use Interop\Container\ContainerInterface;
+use Psr\Http\Message\RequestInterface;
 use Tonis\Dispatcher\Dispatcher;
 use Tonis\Event\EventManager;
 use Tonis\Event\SubscriberInterface;
@@ -88,6 +89,7 @@ final class HttpSubscriber implements SubscriberInterface
         if (!$dispatchResult instanceof ModelInterface) {
             $dispatchResult = $this->createExceptionModel(
                 $vm,
+                $event->getRequest(),
                 new InvalidDispatchResultException(),
                 'invalid-dispatch-result'
             );
@@ -109,17 +111,19 @@ final class HttpSubscriber implements SubscriberInterface
 
     /**
      * @param ViewManager $vm
+     * @param RequestInterface $request
      * @param \Exception $ex
      * @param string $type
      * @return ViewModel
      */
-    private function createExceptionModel(ViewManager $vm, \Exception $ex, $type)
+    private function createExceptionModel(ViewManager $vm, RequestInterface $request, \Exception $ex, $type)
     {
         return new ViewModel(
             $vm->getErrorTemplate(),
             [
                 'exception' => $ex,
-                'type' => $type
+                'type' => $type,
+                'path' => $request->getUri()->getPath()
             ]
         );
     }

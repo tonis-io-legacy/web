@@ -21,6 +21,7 @@ class AbstractPackageTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers ::configureRoutes
+     * @covers ::loadCallable
      */
     public function testConfigureRoutes()
     {
@@ -31,6 +32,7 @@ class AbstractPackageTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers ::configureRoutes
+     * @covers ::loadCallable
      * @expectedException \RuntimeException
      * @expectedExceptionMessage routes.php should return a callable
      */
@@ -43,6 +45,7 @@ class AbstractPackageTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers ::configureServices
+     * @covers ::loadCallable
      */
     public function testConfigureServices()
     {
@@ -53,6 +56,7 @@ class AbstractPackageTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers ::configureServices
+     * @covers ::loadCallable
      * @expectedException \RuntimeException
      * @expectedExceptionMessage services.php should return a callable
      */
