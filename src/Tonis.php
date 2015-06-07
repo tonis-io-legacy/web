@@ -69,10 +69,6 @@ final class Tonis
 
     public function route()
     {
-        if ($this->lifecycleEvent->getResponse()) {
-            return;
-        }
-
         $this->events()->fire(self::EVENT_ROUTE, $this->lifecycleEvent);
 
         if (!$this->lifecycleEvent->getRouteMatch() instanceof RouteMatch) {
@@ -82,10 +78,6 @@ final class Tonis
 
     public function dispatch()
     {
-        if ($this->lifecycleEvent->getResponse()) {
-            return;
-        }
-
         try {
             $this->events()->fire(self::EVENT_DISPATCH, $this->lifecycleEvent);
         } catch (\Exception $ex) {
@@ -96,10 +88,6 @@ final class Tonis
 
     public function render()
     {
-        if ($this->lifecycleEvent->getResponse()) {
-            return;
-        }
-
         try {
             $this->events()->fire(self::EVENT_RENDER, $this->lifecycleEvent);
         } catch (\Exception $ex) {

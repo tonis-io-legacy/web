@@ -60,22 +60,6 @@ class TonisTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers ::dispatch
      */
-    public function testDispatchReturnsEarlyWithResponse()
-    {
-        $this->tonis->getLifecycleEvent()->setResponse(new Response);
-
-        $dispatch = false;
-        $this->tonis->events()->on(Tonis::EVENT_DISPATCH, function () use (&$dispatch) {
-            $dispatch = true;
-        });
-
-        $this->tonis->dispatch();
-        $this->assertFalse($dispatch);
-    }
-
-    /**
-     * @covers ::dispatch
-     */
     public function testDispatchCatchesExceptions()
     {
         $this->tonis->events()->on(Tonis::EVENT_DISPATCH, function () {
@@ -100,22 +84,6 @@ class TonisTest extends \PHPUnit_Framework_TestCase
         $this->tonis->render();
 
         $this->assertTrue($render);
-    }
-
-    /**
-     * @covers ::render
-     */
-    public function testRenderReturnsEarlyWithResponse()
-    {
-        $this->tonis->getLifecycleEvent()->setResponse(new Response);
-
-        $render = false;
-        $this->tonis->events()->on(Tonis::EVENT_RENDER, function () use (&$render) {
-            $render = true;
-        });
-
-        $this->tonis->render();
-        $this->assertFalse($render);
     }
 
     /**
@@ -150,22 +118,6 @@ class TonisTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($error);
         $this->assertInstanceOf(RouteMatch::class, $this->tonis->getLifecycleEvent()->getRouteMatch());
-    }
-
-    /**
-     * @covers ::route
-     */
-    public function testRouteReturnsEarlyWithResponse()
-    {
-        $this->tonis->getLifecycleEvent()->setResponse(new Response);
-
-        $route = false;
-        $this->tonis->events()->on(Tonis::EVENT_ROUTE, function () use (&$route) {
-            $route = true;
-        });
-
-        $this->tonis->route();
-        $this->assertFalse($route);
     }
 
     /**
