@@ -9,6 +9,7 @@ use Tonis\Router\Route;
 use Tonis\Router\RouteCollection;
 use Tonis\Router\RouteMatch;
 use Zend\Diactoros\Response;
+use Zend\Diactoros\ServerRequestFactory;
 
 /**
  * @coversDefaultClass \Tonis\Mvc\Tonis
@@ -19,6 +20,37 @@ class TonisTest extends \PHPUnit_Framework_TestCase
 
     /** @var Tonis */
     private $tonis;
+
+    /**
+     * @covers ::run
+     */
+    public function testRun()
+    {
+        $request = ServerRequestFactory::fromGlobals();
+        $this->tonis->run($request);
+
+        $event = $this->tonis->getLifecycleEvent();
+        $this->assertSame($request, $event->getRequest());
+    }
+
+    /**
+     * @covers ::respond
+     */
+    public function testRespond()
+    {
+        $response = new Response;
+
+        $this->tonis->events()->on(Tonis::EVENT_RESPOND, function (LifecycleEvent $event) use ($response) {
+            $response->getBody()->write('foobar');
+            $event->setResponse($response);
+        });
+
+        ob_start();
+        $this->tonis->respond();
+
+        $this->assertSame('foobar', ob_get_contents());
+        ob_end_clean();
+    }
 
     /**
      * @covers ::events
@@ -148,6 +180,14 @@ class TonisTest extends \PHPUnit_Framework_TestCase
 
         $tonis = TonisFactory::fromDefaults(['debug' => true]);
         $this->assertTrue($tonis->isDebugEnabled());
+    }
+
+    /**
+     * @covers ::getConfig
+     */
+    public function testGetConfig()
+    {
+        $this->assertInstanceOf(TonisConfig::class, $this->tonis->getConfig());
     }
 
     /**

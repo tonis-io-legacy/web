@@ -1,6 +1,7 @@
 <?php
 namespace Tonis\Mvc\Subscriber;
 
+use Interop\Container\ContainerInterface;
 use Tonis\Event\EventManager;
 use Tonis\Event\SubscriberInterface;
 use Tonis\Mvc\Package\PackageInterface;
@@ -10,18 +11,15 @@ use Tonis\Package\PackageManager;
 
 final class ConsoleSubscriber implements SubscriberInterface
 {
-    /** @var TonisConsole */
-    private $console;
-    /** @var PackageManager */
-    private $packageManager;
+    /** @var ContainerInterface */
+    private $di;
 
     /**
-     * @param TonisConsole $console
+     * @param ContainerInterface $di
      */
-    public function __construct(TonisConsole $console, PackageManager $packageManager)
+    public function __construct(ContainerInterface $di)
     {
-        $this->console = $console;
-        $this->packageManager = $packageManager;
+        $this->di = $di;
     }
 
     /**
@@ -30,9 +28,12 @@ final class ConsoleSubscriber implements SubscriberInterface
     public function subscribe(EventManager $events)
     {
         $events->on(Tonis::EVENT_BOOTSTRAP, function () {
-            foreach ($this->packageManager->getPackages() as $package) {
+            $pm = $this->di->get(PackageManager::class);
+            $console = $this->di->get(TonisConsole::class);
+
+            foreach ($pm->getPackages() as $package) {
                 if ($package instanceof PackageInterface) {
-                    $package->bootstrapConsole($this->console);
+                    $package->bootstrapConsole($console);
                 }
             }
         });

@@ -4,7 +4,6 @@ namespace Tonis\Mvc;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Tonis\Di\ContainerAwareInterface;
-use Tonis\Mvc\Subscriber\ConsoleSubscriber;
 use Tonis\Package\PackageManager;
 
 class TonisConsole extends Application
@@ -13,18 +12,12 @@ class TonisConsole extends Application
     private $tonis;
 
     /**
-     * @param array $config
-     * @return TonisConsole
+     * @param Tonis $tonis
      */
-    public static function createWithDefaults(array $config = [])
+    public function __construct(Tonis $tonis)
     {
-        $tonis = Tonis::createWithDefaults($config);
-        $di = $tonis->di();
-
-        $console = new self;
-        $di->set(ConsoleSubscriber::class, new ConsoleSubscriber($console, $di->get(PackageManager::class)));
-
-        return $console;
+        $this->tonis = $tonis;
+        parent::__construct();
     }
 
     /**
