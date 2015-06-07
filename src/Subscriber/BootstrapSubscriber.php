@@ -9,6 +9,9 @@ use Tonis\Mvc\Tonis;
 
 final class BootstrapSubscriber implements SubscriberInterface
 {
+    /** @var ContainerInterface */
+    private $di;
+
     /**
      * @param ContainerInterface $di
      */
