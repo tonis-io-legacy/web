@@ -2,6 +2,7 @@
 namespace Tonis\Mvc\Subscriber;
 
 use Tonis\Event\EventManager;
+use Tonis\Mvc\Factory\TonisFactory;
 use Tonis\Mvc\LifecycleEvent;
 use Tonis\Mvc\TestAsset\NewRequestTrait;
 use Tonis\Mvc\Tonis;
@@ -13,6 +14,8 @@ class BootstrapSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     use NewRequestTrait;
 
+    /** @var Tonis */
+    private $tonis;
     /** @var BootstrapSubscriber */
     private $s;
 
@@ -36,6 +39,7 @@ class BootstrapSubscriberTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->s = new BootstrapSubscriber();
+        $this->tonis = TonisFactory::fromDefaults();
+        $this->s = new BootstrapSubscriber($this->tonis->di());
     }
 }

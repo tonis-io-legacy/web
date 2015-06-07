@@ -3,32 +3,28 @@ namespace Tonis\Mvc\Factory;
 
 use Tonis\Di\Container;
 use Tonis\Di\ContainerUtil;
-use Tonis\Di\ServiceFactoryInterface;
 use Tonis\Event\EventManager;
-use Tonis\Event\SubscriberInterface;
+use Tonis\Mvc\TonisConfig;
 
-final class EventManagerFactory implements ServiceFactoryInterface
+final class EventManagerFactory
 {
-    /** @var SubscriberInterface[] */
-    private $subscribers;
-
-    /**
-     * @param SubscriberInterface[] $subscribers
-     */
-    public function __construct(array $subscribers = [])
-    {
-        $this->subscribers = $subscribers;
-    }
-
     /**
      * @param Container $di
      * @return EventManager
      */
-    public function createService(Container $di)
+    public function __invoke(Container $di)
     {
-        $events = new EventManager(EventManager::class);
+        /** @var TonisConfig $config */
+        $config = $di->get(TonisConfig::class);
+        $events = new EventManager;
 
-        foreach ($this->subscribers as $subscriber) {
+        foreach ($config->getSubscribers() as $subscriber => $factory) {
+            if (is_int($subscriber)) {
+                $subscriber = $factory;
+            } else {
+                $di->set($subscriber, $factory);
+            }
+
             $events->subscribe(ContainerUtil::get($di, $subscriber));
         }
 

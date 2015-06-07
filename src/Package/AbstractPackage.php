@@ -1,7 +1,7 @@
 <?php
 namespace Tonis\Mvc\Package;
 
-use Tonis\Di\Container;
+use Interop\Container\ContainerInterface;
 use Tonis\Mvc\Tonis;
 use Tonis\Mvc\TonisConsole;
 use Tonis\Router\RouteCollection;
@@ -49,7 +49,7 @@ abstract class AbstractPackage implements PackageInterface
     /**
      * {@inheritDoc}
      */
-    public function configureServices(Container $di)
+    public function configureServices(ContainerInterface $di)
     {
         $path = $this->getPath();
         if (file_exists($path . '/config/services.php')) {

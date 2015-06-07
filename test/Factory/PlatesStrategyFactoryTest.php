@@ -13,27 +13,20 @@ use Tonis\View\Strategy\PlatesStrategy;
 class PlatesStrategyFactoryTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @covers ::createService
+     * @covers ::__invoke
      */
-    public function testCreateService()
+    public function testInvoke()
     {
         $pm = new PackageManager;
         $pm->add(TestPackage::class);
         $pm->load();
 
         $di = new Container;
-        $di['mvc'] = [
-            'plates' => [
-                'folders' => [
-                    'foo' => __DIR__
-                ]
-            ]
-        ];
         $di->set(PackageManager::class, $pm);
 
         $factory = new PlatesStrategyFactory();
 
-        $plates = $factory->createService($di);
+        $plates = $factory->__invoke($di);
 
         $this->assertInstanceOf(PlatesStrategy::class, $plates);
         $this->assertInstanceOf(Engine::class, $plates->getEngine());

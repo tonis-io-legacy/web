@@ -2,6 +2,7 @@
 namespace Tonis\Mvc\Package;
 
 use Tonis\Di\Container;
+use Tonis\Mvc\Factory\TonisFactory;
 use Tonis\Mvc\TestAsset\InvalidTestPackage\InvalidTestPackage;
 use Tonis\Mvc\TestAsset\PlainPackage;
 use Tonis\Mvc\TestAsset\TestPackage\TestPackage;
@@ -107,7 +108,7 @@ class AbstractPackageTest extends \PHPUnit_Framework_TestCase
      */
     public function testBootstrap()
     {
-        $this->assertNull($this->package->bootstrap(new Tonis()));
+        $this->assertNull($this->package->bootstrap(TonisFactory::fromDefaults()));
     }
 
     /**

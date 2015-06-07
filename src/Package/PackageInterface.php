@@ -1,7 +1,7 @@
 <?php
 namespace Tonis\Mvc\Package;
 
-use Tonis\Di\Container;
+use Interop\Container\ContainerInterface;
 use Tonis\Mvc;
 use Tonis\Package\Feature;
 use Tonis\Router\RouteCollection;
@@ -23,9 +23,9 @@ interface PackageInterface extends
     public function bootstrapConsole(Mvc\TonisConsole $console);
 
     /**
-     * @param Container $di
+     * @param ContainerInterface $di
      */
-    public function configureServices(Container $di);
+    public function configureServices(ContainerInterface $di);
 
     /**
      * @param RouteCollection $routes

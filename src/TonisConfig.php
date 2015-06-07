@@ -3,9 +3,8 @@
 namespace Tonis\Mvc;
 
 use Tonis\Mvc\Subscriber\BootstrapSubscriber;
-use Tonis\Mvc\Subscriber\DispatchSubscriber;
-use Tonis\Mvc\Subscriber\RenderSubscriber;
-use Tonis\Mvc\Subscriber\RouteSubscriber;
+use Tonis\Mvc\Subscriber\HttpSubscriber;
+use Tonis\View\Strategy;
 
 final class TonisConfig
 {
@@ -21,16 +20,20 @@ final class TonisConfig
             'debug' => false,
             'cache_dir' => null,
             'environment' => [],
+            'required_environment' => ['TONIS_DEBUG'],
             'packages' => [],
+            'services' => [],
             'subscribers' => [
-                BootstrapSubscriber::class,
-                RouteSubscriber::class,
-                DispatchSubscriber::class,
-                RenderSubscriber::class
-            ]
+                BootstrapSubscriber::class => function ($di) {
+                    return new BootstrapSubscriber($di);
+                },
+                HttpSubscriber::class => function ($di) {
+                    return new HttpSubscriber($di);
+                }
+            ],
         ];
 
-        $this->config = array_replace_recursive($defaults, $config);
+        $this->config = array_replace($defaults, $config);
     }
 
     /**

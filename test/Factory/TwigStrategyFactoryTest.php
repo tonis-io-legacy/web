@@ -13,9 +13,9 @@ use Tonis\View\Strategy\TwigStrategy;
 class TwigStrategyFactoryTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @covers ::createService
+     * @covers ::__invoke
      */
-    public function testCreateService()
+    public function testInvoke()
     {
         $pm = new PackageManager;
         $pm->add(TestPackage::class);
@@ -37,7 +37,7 @@ class TwigStrategyFactoryTest extends \PHPUnit_Framework_TestCase
 
         $factory = new TwigStrategyFactory();
 
-        $twig = $factory->createService($di);
+        $twig = $factory->__invoke($di);
 
         $this->assertInstanceOf(TwigStrategy::class, $twig);
         $this->assertInstanceOf(\Twig_Environment::class, $twig->getTwig());

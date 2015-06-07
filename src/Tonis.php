@@ -1,21 +1,12 @@
 <?php
 namespace Tonis\Mvc;
 
+use Interop\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface;
-use Tonis\Di\Container;
-use Tonis\Di\ContainerUtil;
-use Tonis\Dispatcher\Dispatcher;
 use Tonis\Event\EventManager;
-use Tonis\Mvc\Factory\PackageManagerFactory;
-use Tonis\Mvc\Factory\ViewManagerFactory;
-use Tonis\Mvc\Subscriber\BootstrapSubscriber;
-use Tonis\Mvc\Subscriber\DispatchSubscriber;
-use Tonis\Mvc\Subscriber\RenderSubscriber;
-use Tonis\Mvc\Subscriber\RouteSubscriber;
 use Tonis\Package\PackageManager;
 use Tonis\Router\RouteCollection;
 use Tonis\Router\RouteMatch;
-use Tonis\View\ViewManager;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\ServerRequestFactory;
 
@@ -28,33 +19,43 @@ final class Tonis
     const EVENT_RENDER_EXCEPTION = 'render.exception';
     const EVENT_ROUTE = 'route';
     const EVENT_ROUTE_ERROR = 'route.error';
+    const EVENT_RESPOND = 'respond';
 
     /** @var TonisConfig */
     private $config;
-    /** @var Container */
-    private $di;
-    /** @var LifecycleEvent */
-    private $lifecycleEvent;
+    /** @var EventManager */
+    private $events;
+    /** @var PackageManager */
+    private $packageManager;
     /** @var RouteCollection */
     private $routes;
-    /** @var ViewManager */
-    private $viewManager;
+    /** @var LifecycleEvent */
+    private $lifecycleEvent;
+
+    public function __construct(
+        TonisConfig $config,
+        ContainerInterface $di,
+        EventManager $events,
+        PackageManager $packageManager,
+        RouteCollection $routes
+    ) {
+        $this->config = $config;
+        $this->di = $di;
+        $this->events = $events;
+        $this->packageManager = $packageManager;
+        $this->routes = $routes;
+    }
 
     /**
-     * @param array $config
+     * @param RequestInterface $request
      */
-    public function __construct(array $config = [])
+    public function run(RequestInterface $request = null)
     {
-        $this->config = new TonisConfig($config);
-
-        $this->di = new Container;
-        $this->dispatcher = new Dispatcher;
-        $this->events = new EventManager;
-        $this->routes = new RouteCollection;
-        $this->packageManager = new PackageManager(['cache_dir' => $this->config->getPackageCacheDir()]);
-        $this->viewManager = new ViewManager;
-
-        $this->di->set(PackageManager::class, $this->packageManager);
+        $this->bootstrap($request);
+        $this->route();
+        $this->dispatch();
+        $this->render();
+        $this->respond();
     }
 
     /**
@@ -62,12 +63,7 @@ final class Tonis
      */
     public function bootstrap(RequestInterface $request = null)
     {
-        $this->lifecycleEvent = new LifecycleEvent($this, $request ?: ServerRequestFactory::fromGlobals());
-
-        foreach ($this->config->getSubscribers() as $subscriber) {
-            $this->events()->subscribe(ContainerUtil::get($this->di, $subscriber));
-        }
-
+        $this->lifecycleEvent = new LifecycleEvent($request ?: ServerRequestFactory::fromGlobals());
         $this->events()->fire(self::EVENT_BOOTSTRAP, $this->lifecycleEvent);
     }
 
@@ -76,6 +72,7 @@ final class Tonis
         if ($this->lifecycleEvent->getResponse()) {
             return;
         }
+
         $this->events()->fire(self::EVENT_ROUTE, $this->lifecycleEvent);
 
         if (!$this->lifecycleEvent->getRouteMatch() instanceof RouteMatch) {
@@ -88,6 +85,7 @@ final class Tonis
         if ($this->lifecycleEvent->getResponse()) {
             return;
         }
+
         try {
             $this->events()->fire(self::EVENT_DISPATCH, $this->lifecycleEvent);
         } catch (\Exception $ex) {
@@ -101,6 +99,7 @@ final class Tonis
         if ($this->lifecycleEvent->getResponse()) {
             return;
         }
+
         try {
             $this->events()->fire(self::EVENT_RENDER, $this->lifecycleEvent);
         } catch (\Exception $ex) {
@@ -111,6 +110,8 @@ final class Tonis
 
     public function respond()
     {
+        $this->events()->fire(self::EVENT_RESPOND, $this->lifecycleEvent);
+
         $response = $this->lifecycleEvent->getResponse() ? $this->lifecycleEvent->getResponse() : new Response;
         $response->getBody()->write($this->lifecycleEvent->getRenderResult());
 
@@ -126,19 +127,19 @@ final class Tonis
     }
 
     /**
+     * @return ContainerInterface
+     */
+    public function di()
+    {
+        return $this->di;
+    }
+
+    /**
      * @return EventManager
      */
     public function events()
     {
         return $this->events;
-    }
-
-    /**
-     * @return Container
-     */
-    public function di()
-    {
-        return $this->di;
     }
 
     /**
@@ -150,27 +151,11 @@ final class Tonis
     }
 
     /**
-     * @return ViewManager
-     */
-    public function getViewManager()
-    {
-        return $this->viewManager;
-    }
-
-    /**
-     * @return PackageManager
+     * @return PackageManager::class
      */
     public function getPackageManager()
     {
         return $this->packageManager;
-    }
-
-    /**
-     * @return Dispatcher
-     */
-    public function getDispatcher()
-    {
-        return $this->dispatcher;
     }
 
     /**

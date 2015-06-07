@@ -2,14 +2,9 @@
 namespace Tonis\Mvc;
 
 use Tonis\Di\Container;
-use Tonis\Dispatcher\Dispatcher;
 use Tonis\Event\EventManager;
-use Tonis\Mvc\Subscriber\BootstrapSubscriber;
-use Tonis\Mvc\Subscriber\DispatchSubscriber;
-use Tonis\Mvc\Subscriber\RenderSubscriber;
-use Tonis\Mvc\Subscriber\RouteSubscriber;
+use Tonis\Mvc\Factory\TonisFactory;
 use Tonis\Mvc\TestAsset\NewRequestTrait;
-use Tonis\Package\PackageManager;
 use Tonis\Router\Route;
 use Tonis\Router\RouteCollection;
 use Tonis\Router\RouteMatch;
@@ -24,23 +19,6 @@ class TonisTest extends \PHPUnit_Framework_TestCase
 
     /** @var Tonis */
     private $tonis;
-
-    /**
-     * @covers ::createWithDefaults
-     */
-    public function testCreateWithDefaults()
-    {
-        $tonis = Tonis::createWithDefaults([]);
-        $this->assertInstanceOf(Tonis::class, $tonis);
-
-        $di = $tonis->di();
-        $this->assertTrue($di->has(Dispatcher::class));
-        $this->assertTrue($di->has(PackageManager::class));
-        $this->assertTrue($di->has(BootstrapSubscriber::class));
-        $this->assertTrue($di->has(DispatchSubscriber::class));
-        $this->assertTrue($di->has(RenderSubscriber::class));
-        $this->assertTrue($di->has(RouteSubscriber::class));
-    }
 
     /**
      * @covers ::events
@@ -212,7 +190,7 @@ class TonisTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertFalse($this->tonis->isDebugEnabled());
 
-        $tonis = new Tonis(['debug' => true]);
+        $tonis = TonisFactory::fromDefaults(['debug' => true]);
         $this->assertTrue($tonis->isDebugEnabled());
     }
 
@@ -242,7 +220,7 @@ class TonisTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->tonis = new Tonis();
+        $this->tonis = TonisFactory::fromDefaults();
         $this->tonis->bootstrap();
     }
 }

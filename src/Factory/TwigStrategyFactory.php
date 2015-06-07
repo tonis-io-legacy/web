@@ -12,7 +12,7 @@ final class TwigStrategyFactory extends AbstractViewStrategyFactory
      * @param Container $di
      * @return TwigStrategy
      */
-    public function createService(Container $di)
+    public function __invoke(Container $di)
     {
         $loader = new \Twig_Loader_Filesystem();
 

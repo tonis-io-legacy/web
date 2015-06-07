@@ -1,4 +1,11 @@
 <?php
 return [
-    'foo' => 'bar'
+    'foo' => 'bar',
+    'mvc' => [
+        'plates' => [
+            'folders' => [
+                'foo' => __DIR__
+            ]
+        ]
+    ]
 ];

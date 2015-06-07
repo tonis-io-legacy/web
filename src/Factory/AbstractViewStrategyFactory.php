@@ -1,11 +1,10 @@
 <?php
 namespace Tonis\Mvc\Factory;
 
-use Tonis\Di\ServiceFactoryInterface;
 use Tonis\Mvc\Package\PackageInterface;
 use Tonis\Package\PackageManager;
 
-abstract class AbstractViewStrategyFactory implements ServiceFactoryInterface
+abstract class AbstractViewStrategyFactory
 {
     /**
      * @param PackageManager $packageManager

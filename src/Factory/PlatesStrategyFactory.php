@@ -12,15 +12,17 @@ final class PlatesStrategyFactory extends AbstractViewStrategyFactory
      * @param Container $di
      * @return PlatesStrategy
      */
-    public function createService(Container $di)
+    public function __invoke(Container $di)
     {
         $engine = new Plates\Engine();
+        $pm = $di->get(PackageManager::class);
 
-        foreach ($this->getViewPaths($di->get(PackageManager::class)) as $name => $path) {
+        foreach ($this->getViewPaths($pm) as $name => $path) {
             $engine->addFolder($name, $path);
         }
 
-        foreach ($di['mvc']['plates']['folders'] as $name => $path) {
+        $config = $pm->getMergedConfig()['mvc']['plates']['folders'];
+        foreach ($config as $name => $path) {
             $engine->addFolder($name, $path);
         }
 
