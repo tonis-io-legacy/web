@@ -23,6 +23,15 @@ class TestViewModelStrategy implements StrategyInterface
         if (!$model instanceof ViewModel) {
             return '';
         }
-        return $model->getTemplate();
+        $vars = [];
+
+        foreach ($model->getVariables() as $key => $variable) {
+            if ($variable instanceof \Exception) {
+                $variable = get_class($variable);
+            }
+            $vars[$key] = $variable;
+        }
+
+        return $model->getTemplate() . ':' . json_encode($vars);
     }
 }

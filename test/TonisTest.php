@@ -176,7 +176,7 @@ class TonisTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->tonis = TonisFactory::fromDefaults();
+        $this->tonis = TonisFactory::fromDefaults(['subscribers' => []]);
         $this->tonis->bootstrap();
     }
 }

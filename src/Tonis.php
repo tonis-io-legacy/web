@@ -161,6 +161,7 @@ final class Tonis
         try {
             $this->events()->fire($event, $this->lifecycleEvent);
         } catch (\Exception $ex) {
+            echo $ex->getMessage();
             $this->lifecycleEvent->setException($ex);
             $this->events()->fire($exceptionEvent, $this->lifecycleEvent);
         }

@@ -69,6 +69,31 @@ class HttpSubscriberTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers ::onRender
+     * @covers ::createExceptionModel
+     */
+    public function testOnRenderWithException()
+    {
+        $event = new LifecycleEvent($this->newRequest('/'));
+        $event->setException(new \RuntimeException);
+        $this->s->onRender($event);
+
+        $this->assertSame(
+            'error/exception:{"exception":"RuntimeException","type":"unknown","path":"\/"}',
+            $event->getRenderResult()
+        );
+
+        $event->setException(new InvalidDispatchResultException());
+        $event->setRenderResult(null);
+
+        $this->s->onRender($event);
+        $this->assertSame(
+            'error/exception:{"exception":"Tonis\\\\Mvc\\\\Exception\\\\InvalidDispatchResultException","type":"invalid-dispatch-result","path":"\/"}',
+            $event->getRenderResult()
+        );
+    }
+
+    /**
+     * @covers ::onRender
      * @covers ::createTemplateModel
      */
     public function testOnRenderCreatesTemplateIfMissing()
@@ -78,17 +103,17 @@ class HttpSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $event->setRouteMatch(new RouteMatch(new Route('/', 'handler')));
         $this->s->onRender($event);
-        $this->assertSame('handler', $event->getRenderResult());
+        $this->assertSame('handler:{"foo":"bar"}', $event->getRenderResult());
 
         $event->setRenderResult(null);
         $event->setRouteMatch(new RouteMatch(new Route('/', [$this, 'foo'])));
         $this->s->onRender($event);
-        $this->assertSame('tonis/mvc/subscriber/http-subscriber-test', $event->getRenderResult());
+        $this->assertSame('tonis/mvc/subscriber/http-subscriber-test:{"foo":"bar"}', $event->getRenderResult());
 
         $event->setRenderResult(null);
         $event->setRouteMatch(new RouteMatch(new Route('/', null)));
         $this->s->onRender($event);
-        $this->assertSame('error/exception', $event->getRenderResult());
+        $this->assertSame('error/exception:{"type":"no-template-available","exception":"Tonis\\\\Mvc\\\\Exception\\\\InvalidTemplateException"}', $event->getRenderResult());
     }
 
     /**

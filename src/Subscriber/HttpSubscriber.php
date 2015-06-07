@@ -77,22 +77,15 @@ final class HttpSubscriber implements SubscriberInterface
             return;
         }
 
+        $vm = $this->di->get(ViewManager::class);
         $dispatchResult = $event->getDispatchResult();
-        if ($dispatchResult instanceof ViewModel && !$dispatchResult->getTemplate()) {
+
+        if ($event->getException()) {
+            $dispatchResult = $this->createExceptionModel($vm, $event->getRequest(), $event->getException());
+        } elseif ($dispatchResult instanceof ViewModel && !$dispatchResult->getTemplate()) {
             $match = $event->getRouteMatch();
             $handler = $match->getRoute()->getHandler();
             $dispatchResult = $this->createTemplateModel($dispatchResult, $handler);
-        }
-
-        $vm = $this->di->get(ViewManager::class);
-
-        if (!$dispatchResult instanceof ModelInterface) {
-            $dispatchResult = $this->createExceptionModel(
-                $vm,
-                $event->getRequest(),
-                new InvalidDispatchResultException(),
-                'invalid-dispatch-result'
-            );
         }
 
         $event->setRenderResult($vm->render($dispatchResult));
@@ -112,16 +105,23 @@ final class HttpSubscriber implements SubscriberInterface
     /**
      * @param ViewManager $vm
      * @param RequestInterface $request
-     * @param \Exception $ex
-     * @param string $type
+     * @param \Exception $exception
      * @return ViewModel
      */
-    private function createExceptionModel(ViewManager $vm, RequestInterface $request, \Exception $ex, $type)
+    private function createExceptionModel(ViewManager $vm, RequestInterface $request, \Exception $exception)
     {
+        $type = 'unknown';
+
+        switch (get_class($exception)) {
+            case InvalidDispatchResultException::class:
+                $type = 'invalid-dispatch-result';
+                break;
+        }
+
         return new ViewModel(
             $vm->getErrorTemplate(),
             [
-                'exception' => $ex,
+                'exception' => $exception,
                 'type' => $type,
                 'path' => $request->getUri()->getPath()
             ]
