@@ -57,6 +57,18 @@ class HttpSubscriberTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers ::onRender
+     */
+    public function testOnRenderReturnsEarlyIfRenderResultIsNotNull()
+    {
+        $event = new LifecycleEvent($this->newRequest('/'));
+        $event->setRenderResult('foo');
+
+        $this->s->onRender($event);
+        $this->assertSame('foo', $event->getRenderResult());
+    }
+
+    /**
+     * @covers ::onRender
      * @covers ::createTemplateModel
      */
     public function testOnRenderCreatesTemplateIfMissing()

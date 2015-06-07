@@ -78,22 +78,12 @@ final class Tonis
 
     public function dispatch()
     {
-        try {
-            $this->events()->fire(self::EVENT_DISPATCH, $this->lifecycleEvent);
-        } catch (\Exception $ex) {
-            $this->lifecycleEvent->setException($ex);
-            $this->events()->fire(self::EVENT_DISPATCH_EXCEPTION, $this->lifecycleEvent);
-        }
+        $this->tryFire(self::EVENT_DISPATCH, self::EVENT_DISPATCH_EXCEPTION);
     }
 
     public function render()
     {
-        try {
-            $this->events()->fire(self::EVENT_RENDER, $this->lifecycleEvent);
-        } catch (\Exception $ex) {
-            $this->lifecycleEvent->setException($ex);
-            $this->events()->fire(self::EVENT_RENDER_EXCEPTION, $this->lifecycleEvent);
-        }
+        $this->tryFire(self::EVENT_RENDER, self::EVENT_RENDER_EXCEPTION);
     }
 
     public function respond()
@@ -160,5 +150,19 @@ final class Tonis
     public function getLifecycleEvent()
     {
         return $this->lifecycleEvent;
+    }
+
+    /**
+     * @param string $event
+     * @param string $exceptionEvent
+     */
+    private function tryFire($event, $exceptionEvent)
+    {
+        try {
+            $this->events()->fire($event, $this->lifecycleEvent);
+        } catch (\Exception $ex) {
+            $this->lifecycleEvent->setException($ex);
+            $this->events()->fire($exceptionEvent, $this->lifecycleEvent);
+        }
     }
 }
