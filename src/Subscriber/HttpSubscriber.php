@@ -19,6 +19,9 @@ use Tonis\View\ViewManager;
 
 final class HttpSubscriber implements SubscriberInterface
 {
+    /** @var ContainerInterface */
+    private $di;
+
     /**
      * @param ContainerInterface $di
      */
