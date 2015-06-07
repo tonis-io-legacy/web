@@ -21,6 +21,8 @@ final class Tonis
     const EVENT_ROUTE_ERROR = 'route.error';
     const EVENT_RESPOND = 'respond';
 
+    /** @var ContainerInterface */
+    private $di;
     /** @var TonisConfig */
     private $config;
     /** @var EventManager */
