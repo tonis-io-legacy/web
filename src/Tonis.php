@@ -131,7 +131,7 @@ final class Tonis
     }
 
     /**
-     * @return PackageManager::class
+     * @return PackageManager
      */
     public function getPackageManager()
     {
