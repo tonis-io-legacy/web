@@ -4,7 +4,6 @@ namespace Tonis\Mvc;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Tonis\Di\ContainerAwareInterface;
-use Tonis\Package\PackageManager;
 
 class TonisConsole extends Application
 {
