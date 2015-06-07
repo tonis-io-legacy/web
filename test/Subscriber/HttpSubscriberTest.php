@@ -161,6 +161,18 @@ class HttpSubscriberTest extends \PHPUnit_Framework_TestCase
         $event = new LifecycleEvent($this->newRequest('/'));
         $event->setDispatchResult('foo');
         $this->s->onDispatch($event);
+        $this->assertSame('foo', $event->getDispatchResult());
+    }
+
+    /**
+     * @covers ::onDispatch
+     */
+    public function testOnDispatchReturnsEarlyWithNoRouteMatch()
+    {
+        $event = new LifecycleEvent($this->newRequest('/'));
+        $this->s->onDispatch($event);
+
+        $this->assertNull($event->getDispatchResult());
     }
 
     protected function setUp()

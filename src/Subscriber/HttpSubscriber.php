@@ -86,7 +86,11 @@ final class HttpSubscriber implements SubscriberInterface
         $vm = $this->di->get(ViewManager::class);
 
         if (!$dispatchResult instanceof ModelInterface) {
-            $dispatchResult = new ViewModel($vm->getErrorTemplate());
+            $dispatchResult = $this->createExceptionModel(
+                $vm,
+                new InvalidDispatchResultException(),
+                'invalid-dispatch-result'
+            );
         }
 
         $event->setRenderResult($vm->render($dispatchResult));
@@ -101,6 +105,23 @@ final class HttpSubscriber implements SubscriberInterface
         if ($match instanceof RouteMatch) {
             $event->setRouteMatch($match);
         }
+    }
+
+    /**
+     * @param ViewManager $vm
+     * @param \Exception $ex
+     * @param string $type
+     * @return ViewModel
+     */
+    private function createExceptionModel(ViewManager $vm, \Exception $ex, $type)
+    {
+        return new ViewModel(
+            $vm->getErrorTemplate(),
+            [
+                'exception' => $ex,
+                'type' => $type
+            ]
+        );
     }
 
     /**

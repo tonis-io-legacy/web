@@ -32,7 +32,7 @@ class AbstractPackageTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers ::configureRoutes
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage Default MVC package expects routes config to return a callable
+     * @expectedExceptionMessage routes.php should return a callable
      */
     public function testConfigureRoutesInvalidCallableThrowsException()
     {
@@ -54,7 +54,7 @@ class AbstractPackageTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers ::configureServices
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage Default MVC package expects di config to return a callable
+     * @expectedExceptionMessage services.php should return a callable
      */
     public function testConfigureDiInvalidCallableThrowsException()
     {

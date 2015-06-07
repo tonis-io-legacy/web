@@ -34,16 +34,7 @@ abstract class AbstractPackage implements PackageInterface
      */
     public function configureRoutes(RouteCollection $routes)
     {
-        $path = $this->getPath();
-        if (file_exists($path . '/config/routes.php')) {
-            $callable = include $path . '/config/routes.php';
-
-            if (!is_callable($callable)) {
-                throw new \RuntimeException('Default MVC package expects routes config to return a callable');
-            }
-
-            $callable($routes);
-        }
+        $this->loadCallable('routes.php', [$routes]);
     }
 
     /**
@@ -51,16 +42,7 @@ abstract class AbstractPackage implements PackageInterface
      */
     public function configureServices(ContainerInterface $di)
     {
-        $path = $this->getPath();
-        if (file_exists($path . '/config/services.php')) {
-            $callable = include $path . '/config/services.php';
-
-            if (!is_callable($callable)) {
-                throw new \RuntimeException('Default MVC package expects di config to return a callable');
-            }
-
-            $callable($di);
-        }
+        $this->loadCallable('services.php', [$di]);
     }
 
     /**
@@ -120,5 +102,25 @@ abstract class AbstractPackage implements PackageInterface
         $class = get_class($this);
         $this->namespace = substr($class, 0, strrpos($class, '\\'));
         return $this->namespace;
+    }
+
+    /**
+     * @param string $filename
+     * @param array $args
+     */
+    private function loadCallable($filename, array $args)
+    {
+        $path = $this->getPath();
+        $filename = $path . '/config/' . $filename;
+
+        if (file_exists($filename)) {
+            $callable = include $filename;
+
+            if (!is_callable($callable)) {
+                throw new \RuntimeException(sprintf('%s should return a callable', $filename));
+            }
+
+            call_user_func_array($callable, $args);
+        }
     }
 }
