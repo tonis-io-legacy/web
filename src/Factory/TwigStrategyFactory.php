@@ -15,18 +15,20 @@ final class TwigStrategyFactory extends AbstractViewStrategyFactory
     public function __invoke(Container $di)
     {
         $loader = new \Twig_Loader_Filesystem();
+        $pm = $di->get(PackageManager::class);
 
-        foreach ($this->getViewPaths($di->get(PackageManager::class)) as $name => $path) {
+        foreach ($this->getViewPaths($pm) as $name => $path) {
             $loader->addPath($path, $name);
         }
 
-        foreach ($di['tonis']['twig']['namespaces'] as $namespace => $path) {
+        $config = $pm->getMergedConfig()['mvc']['twig'];
+        foreach ($config['namespaces'] as $namespace => $path) {
             $loader->addPath($path, $namespace);
         }
 
-        $twig = new \Twig_Environment($loader, $di['tonis']['twig']['options']);
+        $twig = new \Twig_Environment($loader, $config['options']);
 
-        foreach ($di['tonis']['twig']['extensions'] as $extension) {
+        foreach ($config['extensions'] as $extension) {
             $twig->addExtension(ContainerUtil::get($di, $extension));
         }
 

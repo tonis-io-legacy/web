@@ -22,17 +22,6 @@ class TwigStrategyFactoryTest extends \PHPUnit_Framework_TestCase
         $pm->load();
 
         $di = new Container;
-        $di['tonis'] = [
-            'twig' => [
-                'extensions' => [
-                    TestTwigExtension::class
-                ],
-                'options' => [],
-                'namespaces' => [
-                    'foo' => __DIR__
-                ]
-            ]
-        ];
         $di->set(PackageManager::class, $pm);
 
         $factory = new TwigStrategyFactory();
