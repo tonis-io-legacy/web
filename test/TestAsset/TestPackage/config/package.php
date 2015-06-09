@@ -4,21 +4,21 @@ use Tonis\View\Strategy\StringStrategy;
 
 return [
     'foo' => 'bar',
+    'plates' => [
+        'folders' => [
+            'foo' => __DIR__
+        ]
+    ],
+    'twig' => [
+        'extensions' => [
+            TestTwigExtension::class
+        ],
+        'options' => [],
+        'namespaces' => [
+            'foo' => __DIR__
+        ]
+    ],
     'mvc' => [
-        'plates' => [
-            'folders' => [
-                'foo' => __DIR__
-            ]
-        ],
-        'twig' => [
-            'extensions' => [
-                TestTwigExtension::class
-            ],
-            'options' => [],
-            'namespaces' => [
-                'foo' => __DIR__
-            ]
-        ],
         'view_manager' => [
             'strategies' => [
                 StringStrategy::class,

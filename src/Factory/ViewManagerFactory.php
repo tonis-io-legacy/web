@@ -14,10 +14,8 @@ final class ViewManagerFactory
      */
     public function __invoke(Container $di)
     {
-        /** @var PackageManager $pm */
-        $pm = $di->get(PackageManager::class);
         $vm = new ViewManager();
-        $config = $pm->getMergedConfig()['mvc']['view_manager'];
+        $config = $di['config']['mvc']['view_manager'];
 
         $vm->setErrorTemplate($config['error_template']);
         $vm->setNotFoundTemplate($config['not_found_template']);

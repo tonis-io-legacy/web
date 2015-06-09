@@ -21,7 +21,7 @@ final class TwigStrategyFactory extends AbstractViewStrategyFactory
             $loader->addPath($path, $name);
         }
 
-        $config = $pm->getMergedConfig()['twig'];
+        $config = $di['config']['twig'];
         foreach ($config['namespaces'] as $namespace => $path) {
             $loader->addPath($path, $namespace);
         }

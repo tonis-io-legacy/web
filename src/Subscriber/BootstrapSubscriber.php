@@ -11,7 +11,6 @@ use Tonis\Mvc\Exception\InvalidDispatchResultException;
 use Tonis\Mvc\LifecycleEvent;
 use Tonis\Mvc\Package\PackageInterface;
 use Tonis\Mvc\Tonis;
-use Tonis\Package\PackageManager;
 use Tonis\Router\RouteCollection;
 use Tonis\Router\RouteMatch;
 use Tonis\View\ModelInterface;
@@ -48,17 +47,6 @@ final class BootstrapSubscriber implements SubscriberInterface
         $events->on(Tonis::EVENT_RENDER, [$this, 'onRender']);
     }
 
-    public function bootstrapSubscribers()
-    {
-        /** @var Tonis $tonis */
-        $tonis = $this->di->get(Tonis::class);
-        $subscribers = $this->di->get(PackageManager::class)->getMergedConfig()['mvc']['subscribers'];
-
-        foreach ($subscribers as $subscriber) {
-            $tonis->events()->subscribe(ContainerUtil::get($this->di, $subscriber));
-        }
-    }
-
     public function bootstrapPackageManager()
     {
         /** @var Tonis $tonis */
@@ -73,6 +61,21 @@ final class BootstrapSubscriber implements SubscriberInterface
                 $package->bootstrap($tonis);
                 $package->configureRoutes($tonis->routes());
             }
+        }
+
+        if ($this->di instanceof \ArrayAccess) {
+            $this->di['config'] = $pm->getMergedConfig();
+        }
+    }
+
+    public function bootstrapSubscribers()
+    {
+        /** @var Tonis $tonis */
+        $tonis = $this->di->get(Tonis::class);
+        $subscribers = $this->di['config']['mvc']['subscribers'];
+
+        foreach ($subscribers as $subscriber) {
+            $tonis->events()->subscribe(ContainerUtil::get($this->di, $subscriber));
         }
     }
 

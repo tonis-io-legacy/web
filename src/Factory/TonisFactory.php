@@ -15,7 +15,11 @@ use Tonis\View\ViewManager;
 
 final class TonisFactory
 {
-    public function fromDefaults(array $config = [])
+    /**
+     * @param array $config
+     * @return Tonis
+     */
+    public function fromWebDefaults(array $config = [])
     {
         $config['subscribers'] = [
             BootstrapSubscriber::class => function ($di) {
@@ -26,13 +30,13 @@ final class TonisFactory
             }
         ];
 
-        $di = $this->prepareServices($config);
-        $config = new TonisConfig($config);
-
-        $di->setService(TonisConfig::class, $config);
-        return $this->createTonisInstance($di, $config);
+        return $this->createTonisInstance($config);
     }
 
+    /**
+     * @param array $config
+     * @return Tonis
+     */
     public function fromApiDefaults(array $config = [])
     {
         $config['subscribers'] = [
@@ -44,21 +48,20 @@ final class TonisFactory
             }
         ];
 
-        $di = $this->prepareServices($config);
-        $config = new TonisConfig($config);
-
-        $di->setService(TonisConfig::class, $config);
-
-        return $this->createTonisInstance($di, $config);
+        return $this->createTonisInstance($config);
     }
 
     /**
-     * @param Container $di
-     * @param TonisConfig $config
+     * @param array $config
      * @return Tonis
      */
-    private function createTonisInstance(Container $di, TonisConfig $config)
+    private function createTonisInstance(array $config)
     {
+        $config = new TonisConfig($config);
+        $di = $this->prepareServices($config);
+
+        $di->set(TonisConfig::class, $config, true);
+
         $tonis = new Tonis(
             $config,
             $di,
@@ -67,7 +70,7 @@ final class TonisFactory
             $di->get(RouteCollection::class)
         );
 
-        $di->setService(Tonis::class, $tonis);
+        $di->set(Tonis::class, $tonis, true);
 
         return $tonis;
     }
@@ -82,8 +85,8 @@ final class TonisFactory
     {
         $di = new Container;
 
-        $di->setService(RouteCollection::class, new RouteCollection);
-        $di->setService(Dispatcher::class, new Dispatcher);
+        $di->set(RouteCollection::class, new RouteCollection, true);
+        $di->set(Dispatcher::class, new Dispatcher, true);
         $di->set(PackageManager::class, PackageManagerFactory::class);
         $di->set(EventManager::class, EventManagerFactory::class);
         $di->set(ViewManager::class, ViewManagerFactory::class);
