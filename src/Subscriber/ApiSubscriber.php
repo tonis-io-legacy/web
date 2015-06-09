@@ -33,6 +33,7 @@ final class ApiSubscriber implements SubscriberInterface
         $events->on(Tonis::EVENT_BOOTSTRAP, [$this, 'bootstrapViewManager']);
         $events->on(Tonis::EVENT_ROUTE_ERROR, [$this, 'onRouteError']);
         $events->on(Tonis::EVENT_DISPATCH, [$this, 'onDispatch']);
+        $events->on(Tonis::EVENT_DISPATCH_EXCEPTION, [$this, 'onDispatchException']);
         $events->on(Tonis::EVENT_RESPOND, [$this, 'onRespond']);
     }
 
@@ -56,8 +57,25 @@ final class ApiSubscriber implements SubscriberInterface
     /**
      * @param LifecycleEvent $event
      */
+    public function onDispatchException(LifecycleEvent $event)
+    {
+        $event->setResponse($event->getResponse()->withStatus(500));
+
+        $model = new JsonModel([
+            'error' => 'An error has occurred',
+            'exception' => $event->getException()->getMessage(),
+            'trace' => $event->getException()->getTrace()
+        ]);
+        $event->setDispatchResult($model);
+    }
+
+    /**
+     * @param LifecycleEvent $event
+     */
     public function onRouteError(LifecycleEvent $event)
     {
+        $event->setResponse($event->getResponse()->withStatus(404));
+
         $match = $event->getRouteMatch();
         if (!$match instanceof RouteMatch) {
             $event->setDispatchResult(

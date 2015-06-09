@@ -2,7 +2,6 @@
 namespace Tonis\Mvc\Subscriber;
 
 use Interop\Container\ContainerInterface;
-use Psr\Http\Message\RequestInterface;
 use Tonis\Event\EventManager;
 use Tonis\Event\SubscriberInterface;
 use Tonis\Mvc\Exception\InvalidDispatchResultException;
@@ -10,7 +9,9 @@ use Tonis\Mvc\Exception\InvalidTemplateException;
 use Tonis\Mvc\LifecycleEvent;
 use Tonis\Mvc\Tonis;
 use Tonis\Router\RouteMatch;
+use Tonis\View\Model\StringModel;
 use Tonis\View\Model\ViewModel;
+use Tonis\View\Strategy\PlatesStrategy;
 use Tonis\View\ViewManager;
 
 final class WebSubscriber implements SubscriberInterface
@@ -32,7 +33,17 @@ final class WebSubscriber implements SubscriberInterface
      */
     public function subscribe(EventManager $events)
     {
+        $events->on(Tonis::EVENT_BOOTSTRAP, [$this, 'bootstrapViewManager']);
         $events->on(Tonis::EVENT_ROUTE_ERROR, [$this, 'onRouteError']);
+        $events->on(Tonis::EVENT_DISPATCH, [$this, 'onDispatch']);
+        $events->on(Tonis::EVENT_DISPATCH_EXCEPTION, [$this, 'onDispatchException']);
+        $events->on(Tonis::EVENT_RENDER_EXCEPTION, [$this, 'onRenderException']);
+    }
+
+    public function bootstrapViewManager()
+    {
+        $vm = $this->di->get(ViewManager::class);
+        $vm->addStrategy($this->di->get(PlatesStrategy::class));
     }
 
     /**
@@ -57,16 +68,55 @@ final class WebSubscriber implements SubscriberInterface
     }
 
     /**
-     * @param ViewManager $vm
-     * @param RequestInterface $request
-     * @param \Exception $exception
+     * @param LifecycleEvent $event
+     */
+    public function onDispatch(LifecycleEvent $event)
+    {
+        $dispatchResult = $event->getDispatchResult();
+        if (is_array($dispatchResult)) {
+            $dispatchResult = new ViewModel(null, $dispatchResult);
+        } elseif (is_string($dispatchResult)) {
+            $dispatchResult = new StringModel($dispatchResult);
+        }
+
+        if ($dispatchResult instanceof ViewModel && !$dispatchResult->getTemplate()) {
+            $match = $event->getRouteMatch();
+            $handler = $match->getRoute()->getHandler();
+            $dispatchResult = $this->createTemplateModel($dispatchResult, $handler);
+        }
+
+        $event->setDispatchResult($dispatchResult);
+    }
+
+    /**
+     * @param LifecycleEvent $event
+     */
+    public function onDispatchException(LifecycleEvent $event)
+    {
+        $event->setDispatchResult($this->createExceptionModel($event));
+    }
+
+    /**
+     * @param LifecycleEvent $event
+     */
+    public function onRenderException(LifecycleEvent $event)
+    {
+        $vm = $this->di->get(ViewManager::class);
+        $model = $this->createExceptionModel($event);
+
+        $event->setRenderResult($vm->render($model));
+    }
+
+    /**
+     * @param LifecycleEvent $event
      * @return ViewModel
      */
-    private function createExceptionModel(ViewManager $vm, RequestInterface $request, \Exception $exception)
+    private function createExceptionModel(LifecycleEvent $event)
     {
-        $type = 'unknown';
+        $vm = $this->di->get(ViewManager::class);
+        $type = 'exception';
 
-        switch (get_class($exception)) {
+        switch (get_class($event->getException())) {
             case InvalidDispatchResultException::class:
                 $type = 'invalid-dispatch-result';
                 break;
@@ -75,9 +125,9 @@ final class WebSubscriber implements SubscriberInterface
         return new ViewModel(
             $vm->getErrorTemplate(),
             [
-                'exception' => $exception,
+                'exception' => $event->getException(),
                 'type' => $type,
-                'path' => $request->getUri()->getPath()
+                'path' => $event->getRequest()->getUri()->getPath()
             ]
         );
     }

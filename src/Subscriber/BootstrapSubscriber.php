@@ -119,7 +119,7 @@ final class BootstrapSubscriber implements SubscriberInterface
     {
         $result = $event->getDispatchResult();
         if (!$result instanceof ModelInterface) {
-            $event->setException(new InvalidDispatchResultException());
+            throw new InvalidDispatchResultException();
         }
     }
 
@@ -133,16 +133,6 @@ final class BootstrapSubscriber implements SubscriberInterface
         }
 
         $vm = $this->di->get(ViewManager::class);
-        $dispatchResult = $event->getDispatchResult();
-
-        if ($event->getException()) {
-            $dispatchResult = $this->createExceptionModel($vm, $event->getRequest(), $event->getException());
-        } elseif ($dispatchResult instanceof ViewModel && !$dispatchResult->getTemplate()) {
-            $match = $event->getRouteMatch();
-            $handler = $match->getRoute()->getHandler();
-            $dispatchResult = $this->createTemplateModel($dispatchResult, $handler);
-        }
-
-        $event->setRenderResult($vm->render($dispatchResult));
+        $event->setRenderResult($vm->render($event->getDispatchResult()));
     }
 }
