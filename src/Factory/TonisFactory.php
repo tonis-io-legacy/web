@@ -66,7 +66,7 @@ final class TonisFactory
     public function createTonisInstance(array $config = [])
     {
         $config = new TonisConfig($config);
-        $di = $this->prepareServices($config);
+        $di = $this->prepareServices();
 
         $di->set(TonisConfig::class, $config, true);
 

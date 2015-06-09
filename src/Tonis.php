@@ -63,7 +63,7 @@ final class Tonis
         ResponseInterface $response = null,
         callable $next = null
     ) {
-        return $this->run($request);
+        return $this->run($request, $response);
     }
 
     /**
