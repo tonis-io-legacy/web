@@ -75,16 +75,12 @@ final class ApiSubscriber implements SubscriberInterface
     public function onRouteError(LifecycleEvent $event)
     {
         $event->setResponse($event->getResponse()->withStatus(404));
-
-        $match = $event->getRouteMatch();
-        if (!$match instanceof RouteMatch) {
-            $event->setDispatchResult(
-                new JsonModel([
-                    'error' => 'Route could not be matched',
-                    'path' => $event->getRequest()->getUri()->getPath()
-                ])
-            );
-        }
+        $event->setDispatchResult(
+            new JsonModel([
+                'error' => 'Route could not be matched',
+                'path' => $event->getRequest()->getUri()->getPath()
+            ])
+        );
     }
 
     /**
