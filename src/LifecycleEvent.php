@@ -6,6 +6,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Tonis\Event\Event;
 use Tonis\Router\RouteMatch;
+use Zend\Diactoros\Response;
 
 final class LifecycleEvent extends Event
 {
@@ -59,6 +60,9 @@ final class LifecycleEvent extends Event
      */
     public function getResponse()
     {
+        if (!$this->response instanceof ResponseInterface) {
+            $this->response = new Response();
+        }
         return $this->response;
     }
 

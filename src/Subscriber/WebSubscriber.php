@@ -3,21 +3,17 @@ namespace Tonis\Mvc\Subscriber;
 
 use Interop\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface;
-use Tonis\Dispatcher\Dispatcher;
 use Tonis\Event\EventManager;
 use Tonis\Event\SubscriberInterface;
 use Tonis\Mvc\Exception\InvalidDispatchResultException;
 use Tonis\Mvc\Exception\InvalidTemplateException;
 use Tonis\Mvc\LifecycleEvent;
 use Tonis\Mvc\Tonis;
-use Tonis\Router\RouteCollection;
 use Tonis\Router\RouteMatch;
-use Tonis\View\Model\StringModel;
 use Tonis\View\Model\ViewModel;
-use Tonis\View\ModelInterface;
 use Tonis\View\ViewManager;
 
-final class HttpSubscriber implements SubscriberInterface
+final class WebSubscriber implements SubscriberInterface
 {
     /** @var ContainerInterface */
     private $di;
@@ -36,72 +32,27 @@ final class HttpSubscriber implements SubscriberInterface
      */
     public function subscribe(EventManager $events)
     {
-        $events->on(Tonis::EVENT_ROUTE, [$this, 'onRoute']);
-        $events->on(Tonis::EVENT_DISPATCH, [$this, 'onDispatch']);
-        $events->on(Tonis::EVENT_RENDER, [$this, 'onRender']);
+        $events->on(Tonis::EVENT_ROUTE_ERROR, [$this, 'onRouteError']);
     }
 
     /**
      * @param LifecycleEvent $event
      */
-    public function onDispatch(LifecycleEvent $event)
+    public function onRouteError(LifecycleEvent $event)
     {
-        if (null !== $event->getDispatchResult()) {
-            return;
-        }
+        $match = $event->getRouteMatch();
+        if (!$match instanceof RouteMatch) {
+            $vm = $this->di->get(ViewManager::class);
 
-        $routeMatch = $event->getRouteMatch();
-        if (!$routeMatch instanceof RouteMatch) {
-            return;
-        }
-
-        $handler = $routeMatch->getRoute()->getHandler();
-        $result = $this->di->get(Dispatcher::class)->dispatch($handler, $routeMatch->getParams());
-
-        if (is_array($result)) {
-            $result = new ViewModel(null, $result);
-        } elseif (is_string($result)) {
-            $result = new StringModel($result);
-        }
-
-        if (!$result instanceof ModelInterface) {
-            $event->setException(new InvalidDispatchResultException());
-        }
-
-        $event->setDispatchResult($result);
-    }
-
-    /**
-     * @param LifecycleEvent $event
-     */
-    public function onRender(LifecycleEvent $event)
-    {
-        if (null !== $event->getRenderResult()) {
-            return;
-        }
-
-        $vm = $this->di->get(ViewManager::class);
-        $dispatchResult = $event->getDispatchResult();
-
-        if ($event->getException()) {
-            $dispatchResult = $this->createExceptionModel($vm, $event->getRequest(), $event->getException());
-        } elseif ($dispatchResult instanceof ViewModel && !$dispatchResult->getTemplate()) {
-            $match = $event->getRouteMatch();
-            $handler = $match->getRoute()->getHandler();
-            $dispatchResult = $this->createTemplateModel($dispatchResult, $handler);
-        }
-
-        $event->setRenderResult($vm->render($dispatchResult));
-    }
-
-    /**
-     * @param LifecycleEvent $event
-     */
-    public function onRoute(LifecycleEvent $event)
-    {
-        $match = $this->di->get(RouteCollection::class)->match($event->getRequest());
-        if ($match instanceof RouteMatch) {
-            $event->setRouteMatch($match);
+            $event->setDispatchResult(
+                new ViewModel(
+                    $vm->getNotFoundTemplate(),
+                    [
+                        'path' => $event->getRequest()->getUri()->getPath(),
+                        'type' => 'route'
+                    ]
+                )
+            );
         }
     }
 
@@ -152,7 +103,7 @@ final class HttpSubscriber implements SubscriberInterface
             $template = preg_replace('@Action$@', '', $handler);
             $template = preg_replace_callback('@([a-z])([A-Z])@', $replace, $template);
             $template = strtolower($template);
-            $template = str_replace('\\', '/', $template);
+            $template = '@' . str_replace('\\', '/', $template);
 
             return new ViewModel($template, $model->getVariables());
         }

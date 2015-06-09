@@ -3,6 +3,7 @@ namespace Tonis\Mvc;
 
 use Interop\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 use Tonis\Event\EventManager;
 use Tonis\Package\PackageManager;
 use Tonis\Router\RouteCollection;
@@ -50,6 +51,18 @@ final class Tonis
 
     /**
      * @param RequestInterface $request
+     * @param ResponseInterface $response
+     * @param callable $next
+     * @return ResponseInterface|Response
+     */
+    public function __invoke(RequestInterface $request, ResponseInterface $response, callable $next = null)
+    {
+        return $this->run($request);
+    }
+
+    /**
+     * @param RequestInterface $request
+     * @return ResponseInterface|Response
      */
     public function run(RequestInterface $request = null)
     {
@@ -57,7 +70,8 @@ final class Tonis
         $this->route();
         $this->dispatch();
         $this->render();
-        $this->respond();
+
+        return $this->respond();
     }
 
     /**
@@ -95,7 +109,7 @@ final class Tonis
         $response = $this->lifecycleEvent->getResponse() ? $this->lifecycleEvent->getResponse() : new Response;
         $response->getBody()->write($this->lifecycleEvent->getRenderResult());
 
-        echo $response->getBody();
+        return $response;
     }
 
     /**

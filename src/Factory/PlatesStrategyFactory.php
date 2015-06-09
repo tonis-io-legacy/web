@@ -21,7 +21,7 @@ final class PlatesStrategyFactory extends AbstractViewStrategyFactory
             $engine->addFolder($name, $path);
         }
 
-        $config = $pm->getMergedConfig()['mvc']['plates']['folders'];
+        $config = $pm->getMergedConfig()['plates']['folders'];
         foreach ($config as $name => $path) {
             $engine->addFolder($name, $path);
         }

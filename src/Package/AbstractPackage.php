@@ -30,19 +30,17 @@ abstract class AbstractPackage implements PackageInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @param RouteCollection $routes
      */
     public function configureRoutes(RouteCollection $routes)
     {
-        $this->loadCallable('routes.php', [$routes]);
     }
 
     /**
-     * {@inheritDoc}
+     * @param ContainerInterface $di
      */
     public function configureServices(ContainerInterface $di)
     {
-        $this->loadCallable('services.php', [$di]);
     }
 
     /**
@@ -102,25 +100,5 @@ abstract class AbstractPackage implements PackageInterface
         $class = get_class($this);
         $this->namespace = substr($class, 0, strrpos($class, '\\'));
         return $this->namespace;
-    }
-
-    /**
-     * @param string $filename
-     * @param array $args
-     */
-    private function loadCallable($filename, array $args)
-    {
-        $path = $this->getPath();
-        $filename = $path . '/config/' . $filename;
-
-        if (file_exists($filename)) {
-            $callable = include $filename;
-
-            if (!is_callable($callable)) {
-                throw new \RuntimeException(sprintf('%s should return a callable', $filename));
-            }
-
-            call_user_func_array($callable, $args);
-        }
     }
 }

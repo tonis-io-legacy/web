@@ -2,8 +2,6 @@
 
 namespace Tonis\Mvc;
 
-use Tonis\Mvc\Subscriber\BootstrapSubscriber;
-use Tonis\Mvc\Subscriber\HttpSubscriber;
 use Tonis\View\Strategy;
 
 final class TonisConfig
@@ -23,14 +21,7 @@ final class TonisConfig
             'required_environment' => ['TONIS_DEBUG'],
             'packages' => [],
             'services' => [],
-            'subscribers' => [
-                BootstrapSubscriber::class => function ($di) {
-                    return new BootstrapSubscriber($di);
-                },
-                HttpSubscriber::class => function ($di) {
-                    return new HttpSubscriber($di);
-                }
-            ],
+            'subscribers' => [],
         ];
 
         $this->config = array_replace($defaults, $config);
