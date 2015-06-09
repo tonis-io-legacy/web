@@ -1,0 +1,116 @@
+<?php
+namespace Tonis\Mvc\Subscriber;
+
+use Tonis\Di\Container;
+use Tonis\Event\EventManager;
+use Tonis\Mvc\LifecycleEvent;
+use Tonis\Mvc\TestAsset\NewRequestTrait;
+use Tonis\Mvc\Tonis;
+use Tonis\View\Model\JsonModel;
+use Tonis\View\Strategy\JsonStrategy;
+use Tonis\View\ViewManager;
+
+/**
+ * @coversDefaultClass \Tonis\Mvc\Subscriber\ApiSubscriber
+ */
+class ApiSubscriberTest extends \PHPUnit_Framework_TestCase
+{
+    use NewRequestTrait;
+
+    /** @var ApiSubscriber */
+    private $s;
+    /** @var Container */
+    private $di;
+
+    /**
+     * @covers ::__construct
+     * @covers ::subscribe
+     */
+    public function testSubscribe()
+    {
+        $events = new EventManager();
+        $this->s->subscribe($events);
+
+        $this->assertCount(5, $events->getListeners());
+        $this->assertCount(1, $events->getListeners(Tonis::EVENT_BOOTSTRAP));
+        $this->assertCount(1, $events->getListeners(Tonis::EVENT_ROUTE_ERROR));
+        $this->assertCount(1, $events->getListeners(Tonis::EVENT_DISPATCH));
+        $this->assertCount(1, $events->getListeners(Tonis::EVENT_DISPATCH_EXCEPTION));
+        $this->assertCount(1, $events->getListeners(Tonis::EVENT_RESPOND));
+    }
+
+    /**
+     * @covers ::bootstrapViewManager
+     */
+    public function testBootstrapViewManager()
+    {
+        $vm = new ViewManager;
+        $this->di->set(ViewManager::class, $vm, true);
+
+        $this->s->bootstrapViewManager();
+
+        $this->assertCount(1, $vm->getStrategies());
+        $this->assertInstanceOf(JsonStrategy::class, $vm->getStrategies()[0]);
+    }
+
+    /**
+     * @covers ::onDispatch
+     */
+    public function testOnDispatch()
+    {
+        $event = new LifecycleEvent($this->newRequest('/'));
+        $event->setDispatchResult(['foo' => 'bar']);
+
+        $this->s->onDispatch($event);
+        $this->assertInstanceOf(JsonModel::class, $event->getDispatchResult());
+        $this->assertSame(['foo' => 'bar'], $event->getDispatchResult()->getData());
+    }
+
+    /**
+     * @covers ::onDispatchException
+     */
+    public function testOnDispatchException()
+    {
+        $ex = new \RuntimeException('foo');
+
+        $event = new LifecycleEvent($this->newRequest('/'));
+        $event->setException($ex);
+
+        $this->s->onDispatchException($event);
+        $this->assertSame(500, $event->getResponse()->getStatusCode());
+        $this->assertInstanceOf(JsonModel::class, $event->getDispatchResult());
+        $this->assertSame($ex->getMessage(), $event->getDispatchResult()->getData()['exception']);
+        $this->assertSame($ex->getTrace(), $event->getDispatchResult()->getData()['trace']);
+    }
+
+    /**
+     * @covers ::onRouteError
+     */
+    public function testOnRouteError()
+    {
+        $event = new LifecycleEvent($this->newRequest('/'));
+        $this->s->onRouteError($event);
+
+        $this->assertInstanceOf(JsonModel::class, $event->getDispatchResult());
+        $this->assertSame(404, $event->getResponse()->getStatusCode());
+        $this->assertSame('Route could not be matched', $event->getDispatchResult()->getData()['error']);
+        $this->assertSame('/', $event->getDispatchResult()->getData()['path']);
+    }
+
+    /**
+     * @covers ::onRespond
+     */
+    public function testOnRespond()
+    {
+        $event = new LifecycleEvent($this->newRequest('/'));
+        $this->s->onRespond($event);
+
+        $this->assertSame(['application/json'], $event->getResponse()->getHeader('Content-Type'));
+    }
+
+    protected function setUp()
+    {
+        $this->di = new Container;
+        $this->s = new ApiSubscriber($this->di);
+    }
+}
