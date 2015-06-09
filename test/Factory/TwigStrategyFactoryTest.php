@@ -22,6 +22,17 @@ class TwigStrategyFactoryTest extends \PHPUnit_Framework_TestCase
         $pm->load();
 
         $di = new Container;
+        $di['config'] = [
+            'twig' => [
+                'extensions' => [
+                    TestTwigExtension::class
+                ],
+                'namespaces' => [
+                    'foo' => __DIR__ . '/../TestAsset/TestPackage'
+                ],
+                'options' => []
+            ]
+        ];
         $di->set(PackageManager::class, $pm);
 
         $factory = new TwigStrategyFactory();

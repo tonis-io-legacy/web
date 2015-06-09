@@ -15,8 +15,9 @@ use Tonis\Router\RouteCollection;
 use Tonis\Router\RouteMatch;
 use Tonis\View\ModelInterface;
 use Tonis\View\ViewManager;
+use Zend\Diactoros\Response;
 
-final class BootstrapSubscriber implements SubscriberInterface
+final class BaseSubscriber implements SubscriberInterface
 {
     /** @var ContainerInterface */
     private $di;
@@ -35,9 +36,6 @@ final class BootstrapSubscriber implements SubscriberInterface
      */
     public function subscribe(EventManager $events)
     {
-        $events->on(Tonis::EVENT_BOOTSTRAP, [$this, 'bootstrapPackageManager']);
-        $events->on(Tonis::EVENT_BOOTSTRAP, [$this, 'bootstrapSubscribers']);
-
         $events->on(Tonis::EVENT_ROUTE, [$this, 'onRoute']);
         $events->on(Tonis::EVENT_DISPATCH, [$this, 'onDispatch'], 1000);
 
@@ -45,30 +43,10 @@ final class BootstrapSubscriber implements SubscriberInterface
         $events->on(Tonis::EVENT_DISPATCH, [$this, 'onDispatchValidateResult'], -1000);
 
         $events->on(Tonis::EVENT_RENDER, [$this, 'onRender']);
+        $events->on(Tonis::EVENT_RESPOND, [$this, 'onRespond']);
     }
 
-    public function bootstrapPackageManager()
-    {
-        /** @var Tonis $tonis */
-        $tonis = $this->di->get(Tonis::class);
-
-        $pm = $tonis->getPackageManager();
-        $pm->load();
-
-        foreach ($pm->getPackages() as $package) {
-            if ($package instanceof PackageInterface) {
-                $package->configureServices($tonis->di());
-                $package->bootstrap($tonis);
-                $package->configureRoutes($tonis->routes());
-            }
-        }
-
-        if ($this->di instanceof \ArrayAccess) {
-            $this->di['config'] = $pm->getMergedConfig();
-        }
-    }
-
-    public function bootstrapSubscribers()
+    public function bootstrapPackageSubscribers()
     {
         /** @var Tonis $tonis */
         $tonis = $this->di->get(Tonis::class);
@@ -137,5 +115,11 @@ final class BootstrapSubscriber implements SubscriberInterface
 
         $vm = $this->di->get(ViewManager::class);
         $event->setRenderResult($vm->render($event->getDispatchResult()));
+    }
+
+    public function onRespond(LifecycleEvent $event)
+    {
+        $response = $event->getResponse() ? $event->getResponse() : new Response;
+        $response->getBody()->write($event->getRenderResult());
     }
 }

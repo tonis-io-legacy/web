@@ -202,7 +202,7 @@ class HttpSubscriberTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->tonis = TonisFactory::fromDefaults();
+        $this->tonis = (new TonisFactory)->createWeb();
         /** @var \Tonis\Di\Container $di */
         $di = $this->tonis->di();
         $di->wrap(ViewManager::class, function () {

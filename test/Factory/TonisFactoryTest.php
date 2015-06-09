@@ -17,11 +17,14 @@ use Tonis\View\ViewManager;
 class TonisFactoryTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @covers ::fromDefaults
+     * @covers ::createWeb
+     * @covers ::createTonisInstance
+     * @covers ::prepareServices
      */
-    public function testInvoke()
+    public function testFromWebDefaults()
     {
-        $tonis = TonisFactory::fromDefaults();
+        $factory = new TonisFactory();
+        $tonis = $factory->createWeb();
 
         $this->assertInstanceOf(Tonis::class, $tonis);
 
@@ -32,7 +35,5 @@ class TonisFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($di->has(EventManager::class));
         $this->assertTrue($di->has(Dispatcher::class));
         $this->assertTrue($di->has(ViewManager::class));
-        $this->assertTrue($di->has(PlatesStrategy::class));
-        $this->assertTrue($di->has(TwigStrategy::class));
     }
 }

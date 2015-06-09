@@ -2,7 +2,7 @@
 namespace Tonis\Mvc;
 
 use Tonis\Di\Container;
-use Tonis\Mvc\Factory\TonisConsoleFactory;
+use Tonis\Mvc\Factory\TonisFactory;
 use Tonis\Mvc\TestAsset\TestCommand;
 
 /**
@@ -35,6 +35,6 @@ class TonisConsoleTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->console = TonisConsoleFactory::fromDefaults();
+        $this->console = (new TonisFactory)->createConsole([]);
     }
 }

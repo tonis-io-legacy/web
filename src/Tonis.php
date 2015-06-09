@@ -4,7 +4,9 @@ namespace Tonis\Mvc;
 use Interop\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Tonis\Di\ContainerUtil;
 use Tonis\Event\EventManager;
+use Tonis\Mvc\Package\PackageInterface;
 use Tonis\Package\PackageManager;
 use Tonis\Router\RouteCollection;
 use Tonis\Router\RouteMatch;
@@ -62,16 +64,22 @@ final class Tonis
 
     /**
      * @param RequestInterface $request
+     * @param ResponseInterface $response
      * @return ResponseInterface|Response
      */
-    public function run(RequestInterface $request = null)
+    public function run(RequestInterface $request = null, ResponseInterface $response = null)
     {
+        if (null !== $response) {
+            $this->lifecycleEvent->setResponse($response);
+        }
+
         $this->bootstrap($request);
         $this->route();
         $this->dispatch();
         $this->render();
+        $this->respond();
 
-        return $this->respond();
+        return $this->lifecycleEvent->getResponse();
     }
 
     /**
@@ -80,7 +88,23 @@ final class Tonis
     public function bootstrap(RequestInterface $request = null)
     {
         $this->lifecycleEvent = new LifecycleEvent($request ?: ServerRequestFactory::fromGlobals());
-        $this->events()->fire(self::EVENT_BOOTSTRAP, $this->lifecycleEvent);
+
+        $pm = $this->packageManager;
+        $pm->add(TonisPackage::class);
+        foreach ($this->config->getPackages() as $package) {
+            $pm->add($package);
+        }
+        $pm->load();
+
+        foreach ($pm->getPackages() as $package) {
+            if ($package instanceof PackageInterface) {
+                $package->configureServices($this->di);
+                $package->bootstrap($this);
+                $package->configureRoutes($this->routes);
+            }
+        }
+
+        $this->events->fire(self::EVENT_BOOTSTRAP, $this->lifecycleEvent);
     }
 
     public function route()
@@ -105,11 +129,6 @@ final class Tonis
     public function respond()
     {
         $this->events()->fire(self::EVENT_RESPOND, $this->lifecycleEvent);
-
-        $response = $this->lifecycleEvent->getResponse() ? $this->lifecycleEvent->getResponse() : new Response;
-        $response->getBody()->write($this->lifecycleEvent->getRenderResult());
-
-        return $response;
     }
 
     /**

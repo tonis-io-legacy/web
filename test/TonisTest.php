@@ -1,6 +1,7 @@
 <?php
 namespace Tonis\Mvc;
 
+use Psr\Http\Message\ResponseInterface;
 use Tonis\Di\Container;
 use Tonis\Event\EventManager;
 use Tonis\Mvc\Factory\TonisFactory;
@@ -27,9 +28,11 @@ class TonisTest extends \PHPUnit_Framework_TestCase
     public function testRun()
     {
         $request = ServerRequestFactory::fromGlobals();
-        $this->tonis->run($request);
 
-        $event = $this->tonis->getLifecycleEvent();
+        $tonis = (new TonisFactory)->createTonisInstance();
+        $tonis->run($request);
+
+        $event = $tonis->getLifecycleEvent();
         $this->assertSame($request, $event->getRequest());
     }
 
@@ -45,11 +48,9 @@ class TonisTest extends \PHPUnit_Framework_TestCase
             $event->setResponse($response);
         });
 
-        ob_start();
         $this->tonis->respond();
-
-        $this->assertSame('foobar', ob_get_contents());
-        ob_end_clean();
+        $this->assertInstanceOf(ResponseInterface::class, $response);
+        $this->assertSame('foobar', (string) $response->getBody());
     }
 
     /**
@@ -66,11 +67,12 @@ class TonisTest extends \PHPUnit_Framework_TestCase
      */
     public function testBootstrap()
     {
+        $tonis = (new TonisFactory)->createTonisInstance();
         $bootstrap = false;
-        $this->tonis->events()->on(Tonis::EVENT_BOOTSTRAP, function () use (&$bootstrap) {
+        $tonis->events()->on(Tonis::EVENT_BOOTSTRAP, function () use (&$bootstrap) {
             $bootstrap = true;
         });
-        $this->tonis->bootstrap();
+        $tonis->bootstrap();
 
         $this->assertTrue($bootstrap);
     }
@@ -178,7 +180,7 @@ class TonisTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertFalse($this->tonis->isDebugEnabled());
 
-        $tonis = TonisFactory::fromDefaults(['debug' => true]);
+        $tonis = (new TonisFactory)->createWeb(['debug' => true]);
         $this->assertTrue($tonis->isDebugEnabled());
     }
 
@@ -216,7 +218,7 @@ class TonisTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->tonis = TonisFactory::fromDefaults(['subscribers' => []]);
+        $this->tonis = (new TonisFactory)->createTonisInstance();
         $this->tonis->bootstrap();
     }
 }

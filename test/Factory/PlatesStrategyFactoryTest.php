@@ -22,6 +22,13 @@ class PlatesStrategyFactoryTest extends \PHPUnit_Framework_TestCase
         $pm->load();
 
         $di = new Container;
+        $di['config'] = [
+            'plates' => [
+                'folders' => [
+                    'foo' => __DIR__ . '/../TestAsset/TestPackage'
+                ]
+            ]
+        ];
         $di->set(PackageManager::class, $pm);
 
         $factory = new PlatesStrategyFactory();

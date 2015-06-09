@@ -5,10 +5,11 @@ use Tonis\Di\Container;
 use Tonis\Dispatcher\Dispatcher;
 use Tonis\Event\EventManager;
 use Tonis\Mvc\Subscriber\ApiSubscriber;
-use Tonis\Mvc\Subscriber\BootstrapSubscriber;
+use Tonis\Mvc\Subscriber\BaseSubscriber;
 use Tonis\Mvc\Subscriber\WebSubscriber;
 use Tonis\Mvc\Tonis;
 use Tonis\Mvc\TonisConfig;
+use Tonis\Mvc\TonisConsole;
 use Tonis\Package\PackageManager;
 use Tonis\Router\RouteCollection;
 use Tonis\View\ViewManager;
@@ -17,45 +18,47 @@ final class TonisFactory
 {
     /**
      * @param array $config
-     * @return Tonis
+     * @return TonisConsole
      */
-    public function fromWebDefaults(array $config = [])
+    public function createConsole(array $config = [])
     {
-        $config['subscribers'] = [
-            BootstrapSubscriber::class => function ($di) {
-                return new BootstrapSubscriber($di);
-            },
-            WebSubscriber::class => function ($di) {
-                return new WebSubscriber($di);
-            }
-        ];
+        $console = new TonisConsole($this->createTonisInstance($config));
+        $console->getTonis()->di()->set(TonisConsole::class, $console, true);
 
-        return $this->createTonisInstance($config);
+        return $console;
     }
 
     /**
      * @param array $config
      * @return Tonis
      */
-    public function fromApiDefaults(array $config = [])
+    public function createApi(array $config = [])
     {
-        $config['subscribers'] = [
-            BootstrapSubscriber::class => function ($di) {
-                return new BootstrapSubscriber($di);
-            },
-            ApiSubscriber::class => function ($di) {
-                return new ApiSubscriber($di);
-            }
-        ];
+        $tonis = $this->createTonisInstance($config);
+        $tonis->events()->subscribe(new BaseSubscriber($tonis->di()));
+        $tonis->events()->subscribe(new ApiSubscriber($tonis->di()));
 
-        return $this->createTonisInstance($config);
+        return $tonis;
     }
 
     /**
      * @param array $config
      * @return Tonis
      */
-    private function createTonisInstance(array $config)
+    public function createWeb(array $config = [])
+    {
+        $tonis = $this->createTonisInstance($config);
+        $tonis->events()->subscribe(new BaseSubscriber($tonis->di()));
+        $tonis->events()->subscribe(new WebSubscriber($tonis->di()));
+
+        return $tonis;
+    }
+
+    /**
+     * @param array $config
+     * @return Tonis
+     */
+    public function createTonisInstance(array $config = [])
     {
         $config = new TonisConfig($config);
         $di = $this->prepareServices($config);
@@ -87,8 +90,8 @@ final class TonisFactory
 
         $di->set(RouteCollection::class, new RouteCollection, true);
         $di->set(Dispatcher::class, new Dispatcher, true);
-        $di->set(PackageManager::class, PackageManagerFactory::class);
-        $di->set(EventManager::class, EventManagerFactory::class);
+        $di->set(PackageManager::class, new PackageManager, true);
+        $di->set(EventManager::class, new EventManager, true);
         $di->set(ViewManager::class, ViewManagerFactory::class);
 
         return $di;

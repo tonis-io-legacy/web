@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "8e66853912ae11b7bf2f656c4a9be158",
+    "hash": "5bcabdc0d2e6a6dfa0072a1728083b64",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -39,12 +39,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/tonis-io/di.git",
-                "reference": "d6df1077ef678d37a2b15703eeadedf58f3f05f7"
+                "reference": "79da982e1c0f04c421a78a136fa503d3dc025cae"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tonis-io/di/zipball/d6df1077ef678d37a2b15703eeadedf58f3f05f7",
-                "reference": "d6df1077ef678d37a2b15703eeadedf58f3f05f7",
+                "url": "https://api.github.com/repos/tonis-io/di/zipball/79da982e1c0f04c421a78a136fa503d3dc025cae",
+                "reference": "79da982e1c0f04c421a78a136fa503d3dc025cae",
                 "shasum": ""
             },
             "require": {
@@ -54,7 +54,6 @@
             "require-dev": {
                 "doctrine/annotations": "^1.2",
                 "phpunit/phpunit": "^4.0",
-                "scrutinizer/ocular": "^1.1.1",
                 "squizlabs/php_codesniffer": "^1.0",
                 "symfony/finder": "^2.1"
             },
@@ -86,7 +85,7 @@
                 }
             ],
             "description": "A light-weight, HHVM compatible, and dependency lite DI container.",
-            "time": "2015-06-07 13:28:08"
+            "time": "2015-06-09 13:29:40"
         },
         {
             "name": "tonis/dispatcher",
@@ -142,12 +141,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/tonis-io/event.git",
-                "reference": "5b2cc6f3ddf488ae3d60d446f0556055fd77aaab"
+                "reference": "96b84f10aefa41bbade78bca4222e1de8413d763"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tonis-io/event/zipball/5b2cc6f3ddf488ae3d60d446f0556055fd77aaab",
-                "reference": "5b2cc6f3ddf488ae3d60d446f0556055fd77aaab",
+                "url": "https://api.github.com/repos/tonis-io/event/zipball/96b84f10aefa41bbade78bca4222e1de8413d763",
+                "reference": "96b84f10aefa41bbade78bca4222e1de8413d763",
                 "shasum": ""
             },
             "require": {
@@ -181,7 +180,7 @@
                 }
             ],
             "description": "Tonis\\Event is a light-weight, HHVM compatible, and dependency free event library.",
-            "time": "2015-06-05 03:42:14"
+            "time": "2015-06-08 14:56:35"
         },
         {
             "name": "tonis/package",
@@ -189,12 +188,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/tonis-io/package.git",
-                "reference": "8b492ec638fa9acd201f50b23c0e70425a922f92"
+                "reference": "72fa3f8e1221a1d46dcc94af42da9fa677f055bd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tonis-io/package/zipball/8b492ec638fa9acd201f50b23c0e70425a922f92",
-                "reference": "8b492ec638fa9acd201f50b23c0e70425a922f92",
+                "url": "https://api.github.com/repos/tonis-io/package/zipball/72fa3f8e1221a1d46dcc94af42da9fa677f055bd",
+                "reference": "72fa3f8e1221a1d46dcc94af42da9fa677f055bd",
                 "shasum": ""
             },
             "require": {
@@ -202,10 +201,8 @@
                 "tonis/event": "~1.0-dev"
             },
             "require-dev": {
-                "mockery/mockery": "~0.9",
-                "phpunit/phpunit": "~4.0",
-                "scrutinizer/ocular": "^1.1.1",
-                "squizlabs/php_codesniffer": "~1.0"
+                "phpunit/phpunit": "^4.0",
+                "squizlabs/php_codesniffer": "^1.0"
             },
             "type": "library",
             "extra": {
@@ -231,7 +228,7 @@
                 }
             ],
             "description": "Spiffy\\Package is a light-weight, HHVM compatible, and dependency lite package manager.",
-            "time": "2015-06-05 13:24:16"
+            "time": "2015-06-07 20:10:50"
         },
         {
             "name": "tonis/router",
@@ -239,12 +236,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/tonis-io/router.git",
-                "reference": "cff2ddf9694695e8dfad3209da6f8d877ec4d7d3"
+                "reference": "af221c905609bc8406d87fce86c185347c4dad88"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tonis-io/router/zipball/cff2ddf9694695e8dfad3209da6f8d877ec4d7d3",
-                "reference": "cff2ddf9694695e8dfad3209da6f8d877ec4d7d3",
+                "url": "https://api.github.com/repos/tonis-io/router/zipball/af221c905609bc8406d87fce86c185347c4dad88",
+                "reference": "af221c905609bc8406d87fce86c185347c4dad88",
                 "shasum": ""
             },
             "require": {
@@ -280,7 +277,7 @@
                 }
             ],
             "description": "Tonis\\Router is a light-weight, HHVM compatible, and dependency free router library.",
-            "time": "2015-06-05 13:59:54"
+            "time": "2015-06-07 19:38:39"
         },
         {
             "name": "tonis/view",
@@ -288,12 +285,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/tonis-io/view.git",
-                "reference": "6b666d851ac36ffaa77492877801b6952ffad4fc"
+                "reference": "04e9430208ff4c7011e7401021ddec96c47b7188"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tonis-io/view/zipball/6b666d851ac36ffaa77492877801b6952ffad4fc",
-                "reference": "6b666d851ac36ffaa77492877801b6952ffad4fc",
+                "url": "https://api.github.com/repos/tonis-io/view/zipball/04e9430208ff4c7011e7401021ddec96c47b7188",
+                "reference": "04e9430208ff4c7011e7401021ddec96c47b7188",
                 "shasum": ""
             },
             "require": {
@@ -302,7 +299,6 @@
             "require-dev": {
                 "league/plates": "^3.1",
                 "phpunit/phpunit": "^4.0",
-                "scrutinizer/ocular": "^1.1.1",
                 "squizlabs/php_codesniffer": "^1.0",
                 "twig/twig": "^1.18"
             },
@@ -333,7 +329,7 @@
                 }
             ],
             "description": "Tonis\\View is a light-weight, HHVM compatible, and dependency free view compatability layer. It does not provide its own templating system!",
-            "time": "2015-06-04 01:31:51"
+            "time": "2015-06-08 15:21:08"
         }
     ],
     "packages-dev": [
@@ -1027,16 +1023,16 @@
         },
         {
             "name": "phpunit/php-code-coverage",
-            "version": "2.1.4",
+            "version": "2.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "3703c4bb67c8700957dd41c843254658539d091d"
+                "reference": "be2286cb8c7e1773eded49d9719219e6f74f9e3e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/3703c4bb67c8700957dd41c843254658539d091d",
-                "reference": "3703c4bb67c8700957dd41c843254658539d091d",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/be2286cb8c7e1773eded49d9719219e6f74f9e3e",
+                "reference": "be2286cb8c7e1773eded49d9719219e6f74f9e3e",
                 "shasum": ""
             },
             "require": {
@@ -1085,7 +1081,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2015-06-06 08:33:23"
+            "time": "2015-06-09 13:05:42"
         },
         {
             "name": "phpunit/php-file-iterator",

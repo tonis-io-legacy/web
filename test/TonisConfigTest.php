@@ -31,7 +31,7 @@ class TonisConfigTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetSubscribers()
     {
-        $this->assertCount(2, $this->config->getSubscribers());
+        $this->assertEmpty($this->config->getSubscribers());
     }
 
     /**
