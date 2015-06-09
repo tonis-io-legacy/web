@@ -23,6 +23,8 @@ final class Tonis
     const EVENT_ROUTE_ERROR = 'route.error';
     const EVENT_RESPOND = 'respond';
 
+    /** @var bool */
+    private $bootstrapped = false;
     /** @var ContainerInterface */
     private $di;
     /** @var TonisConfig */
@@ -56,8 +58,11 @@ final class Tonis
      * @param callable $next
      * @return ResponseInterface|Response
      */
-    public function __invoke(RequestInterface $request, ResponseInterface $response, callable $next = null)
-    {
+    public function __invoke(
+        RequestInterface $request = null,
+        ResponseInterface $response = null,
+        callable $next = null
+    ) {
         return $this->run($request);
     }
 
@@ -86,6 +91,10 @@ final class Tonis
      */
     public function bootstrap(RequestInterface $request = null)
     {
+        if ($this->bootstrapped) {
+            return;
+        }
+
         $this->lifecycleEvent = new LifecycleEvent($request ?: ServerRequestFactory::fromGlobals());
 
         $pm = $this->packageManager;
@@ -104,6 +113,7 @@ final class Tonis
         }
 
         $this->events->fire(self::EVENT_BOOTSTRAP, $this->lifecycleEvent);
+        $this->bootstrapped = true;
     }
 
     public function route()

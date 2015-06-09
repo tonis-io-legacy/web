@@ -6,6 +6,8 @@ use Tonis\Di\Container;
 use Tonis\Event\EventManager;
 use Tonis\Mvc\Factory\TonisFactory;
 use Tonis\Mvc\TestAsset\NewRequestTrait;
+use Tonis\Mvc\TestAsset\TestPackage\TestPackage;
+use Tonis\Package\PackageManager;
 use Tonis\Router\Route;
 use Tonis\Router\RouteCollection;
 use Tonis\Router\RouteMatch;
@@ -23,6 +25,14 @@ class TonisTest extends \PHPUnit_Framework_TestCase
     private $tonis;
 
     /**
+     * @covers ::__invoke
+     */
+    public function testInvokeProxiesToRun()
+    {
+        $this->assertSame($this->tonis->run(), $this->tonis->__invoke());
+    }
+
+    /**
      * @covers ::run
      */
     public function testRun()
@@ -34,6 +44,11 @@ class TonisTest extends \PHPUnit_Framework_TestCase
 
         $event = $tonis->getLifecycleEvent();
         $this->assertSame($request, $event->getRequest());
+
+        $response = new Response;
+        $tonis->run($request, $response);
+        $this->assertSame($request, $event->getRequest());
+        $this->assertSame($response, $event->getResponse());
     }
 
     /**
@@ -68,13 +83,16 @@ class TonisTest extends \PHPUnit_Framework_TestCase
     public function testBootstrap()
     {
         $tonis = (new TonisFactory)->createTonisInstance();
-        $bootstrap = false;
-        $tonis->events()->on(Tonis::EVENT_BOOTSTRAP, function () use (&$bootstrap) {
-            $bootstrap = true;
+        $count = 0;
+        $tonis->events()->on(Tonis::EVENT_BOOTSTRAP, function () use (&$count) {
+            $count++;
         });
-        $tonis->bootstrap();
 
-        $this->assertTrue($bootstrap);
+        $tonis->bootstrap();
+        $this->assertSame(1, $count);
+
+        $tonis->bootstrap();
+        $this->assertSame(1, $count);
     }
 
     /**
@@ -193,6 +211,14 @@ class TonisTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers ::getPackageManager
+     */
+    public function testGetPackageManager()
+    {
+        $this->assertInstanceOf(PackageManager::class, $this->tonis->getPackageManager());
+    }
+
+    /**
      * @covers ::di
      */
     public function testDi()
@@ -218,7 +244,7 @@ class TonisTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->tonis = (new TonisFactory)->createTonisInstance();
+        $this->tonis = (new TonisFactory)->createTonisInstance(['packages' => [TestPackage::class]]);
         $this->tonis->bootstrap();
     }
 }

@@ -38,10 +38,6 @@ class TonisPackage extends AbstractPackage
      */
     public function configureServices(ContainerInterface $di)
     {
-        if (!method_exists($di, 'set')) {
-            return;
-        }
-
         $di['config'] = $di->get(PackageManager::class)->getMergedConfig();
 
         $di->set(PlatesStrategy::class, PlatesStrategyFactory::class);

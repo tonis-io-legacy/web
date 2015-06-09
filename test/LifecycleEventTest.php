@@ -47,6 +47,14 @@ class LifecycleEventTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($value, $this->event->$getter());
     }
 
+    /**
+     * @covers ::getResponse
+     */
+    public function testGetResponseLazyLoads()
+    {
+        $this->assertInstanceOf(Response::class, $this->event->getResponse());
+    }
+
     public function getterSetterProvider()
     {
         return [
