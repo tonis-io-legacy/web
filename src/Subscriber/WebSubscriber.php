@@ -12,6 +12,7 @@ use Tonis\Router\RouteMatch;
 use Tonis\View\Model\StringModel;
 use Tonis\View\Model\ViewModel;
 use Tonis\View\Strategy\PlatesStrategy;
+use Tonis\View\Strategy\StringStrategy;
 use Tonis\View\ViewManager;
 
 final class WebSubscriber implements SubscriberInterface
@@ -38,11 +39,13 @@ final class WebSubscriber implements SubscriberInterface
         $events->on(Tonis::EVENT_DISPATCH, [$this, 'onDispatch']);
         $events->on(Tonis::EVENT_DISPATCH_EXCEPTION, [$this, 'onDispatchException']);
         $events->on(Tonis::EVENT_RENDER_EXCEPTION, [$this, 'onRenderException']);
+
     }
 
     public function bootstrapViewManager()
     {
         $vm = $this->di->get(ViewManager::class);
+        $vm->addStrategy(new StringStrategy());
         $vm->addStrategy($this->di->get(PlatesStrategy::class));
     }
 

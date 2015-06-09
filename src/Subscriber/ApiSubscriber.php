@@ -59,8 +59,6 @@ final class ApiSubscriber implements SubscriberInterface
      */
     public function onDispatchException(LifecycleEvent $event)
     {
-        $event->setResponse($event->getResponse()->withStatus(500));
-
         $model = new JsonModel([
             'error' => 'An error has occurred',
             'exception' => $event->getException()->getMessage(),

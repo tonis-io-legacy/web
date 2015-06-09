@@ -36,6 +36,7 @@ final class BaseSubscriber implements SubscriberInterface
     public function subscribe(EventManager $events)
     {
         $events->on(Tonis::EVENT_ROUTE, [$this, 'onRoute']);
+        $events->on(Tonis::EVENT_ROUTE_ERROR, [$this, 'onRouteError']);
         $events->on(Tonis::EVENT_DISPATCH, [$this, 'onDispatch'], 1000);
 
         // This needs to run as the last Dispatch event which detects if the dispatch result is valid
@@ -43,6 +44,8 @@ final class BaseSubscriber implements SubscriberInterface
 
         $events->on(Tonis::EVENT_RENDER, [$this, 'onRender']);
         $events->on(Tonis::EVENT_RESPOND, [$this, 'onRespond']);
+
+        $events->on(Tonis::EVENT_DISPATCH_EXCEPTION, [$this, 'onDispatchException']);
     }
 
     public function bootstrapPackageSubscribers()
@@ -65,6 +68,14 @@ final class BaseSubscriber implements SubscriberInterface
         if ($match instanceof RouteMatch) {
             $event->setRouteMatch($match);
         }
+    }
+
+    /**
+     * @param LifecycleEvent $event
+     */
+    public function onRouteError(LifecycleEvent $event)
+    {
+        $event->setResponse($event->getResponse()->withStatus(404));
     }
 
     /**
@@ -102,6 +113,14 @@ final class BaseSubscriber implements SubscriberInterface
         if (!$result instanceof ModelInterface) {
             throw new InvalidDispatchResultException();
         }
+    }
+
+    /**
+     * @param LifecycleEvent $event
+     */
+    public function onDispatchException(LifecycleEvent $event)
+    {
+        $event->setResponse($event->getResponse()->withStatus(500));
     }
 
     /**

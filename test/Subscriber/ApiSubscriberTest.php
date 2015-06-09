@@ -77,7 +77,6 @@ class ApiSubscriberTest extends \PHPUnit_Framework_TestCase
         $event->setException($ex);
 
         $this->s->onDispatchException($event);
-        $this->assertSame(500, $event->getResponse()->getStatusCode());
         $this->assertInstanceOf(JsonModel::class, $event->getDispatchResult());
         $this->assertSame($ex->getMessage(), $event->getDispatchResult()->getData()['exception']);
         $this->assertSame($ex->getTrace(), $event->getDispatchResult()->getData()['trace']);
@@ -92,7 +91,6 @@ class ApiSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->s->onRouteError($event);
 
         $this->assertInstanceOf(JsonModel::class, $event->getDispatchResult());
-        $this->assertSame(404, $event->getResponse()->getStatusCode());
         $this->assertSame('Route could not be matched', $event->getDispatchResult()->getData()['error']);
         $this->assertSame('/', $event->getDispatchResult()->getData()['path']);
     }

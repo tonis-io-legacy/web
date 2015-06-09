@@ -36,9 +36,11 @@ class BaseSubscriberTest extends \PHPUnit_Framework_TestCase
         $events = new EventManager();
         $this->s->subscribe($events);
 
-        $this->assertCount(4, $events->getListeners());
+        $this->assertCount(6, $events->getListeners());
         $this->assertCount(1, $events->getListeners(Tonis::EVENT_ROUTE));
+        $this->assertCount(1, $events->getListeners(Tonis::EVENT_ROUTE_ERROR));
         $this->assertCount(2, $events->getListeners(Tonis::EVENT_DISPATCH));
+        $this->assertCount(1, $events->getListeners(Tonis::EVENT_DISPATCH_EXCEPTION));
         $this->assertCount(1, $events->getListeners(Tonis::EVENT_RENDER));
         $this->assertCount(1, $events->getListeners(Tonis::EVENT_RESPOND));
     }
@@ -192,6 +194,30 @@ class BaseSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertNotSame($response, $event->getResponse());
         $this->assertInstanceOf(Response::class, $event->getResponse());
         $this->assertSame('response', (string) $response->getBody());
+    }
+
+    /**
+     * @covers ::onDispatchException
+     */
+    public function testOnDispatchException()
+    {
+        $ex = new \RuntimeException('foo');
+
+        $event = new LifecycleEvent($this->newRequest('/'));
+        $event->setException($ex);
+
+        $this->s->onDispatchException($event);
+        $this->assertSame(500, $event->getResponse()->getStatusCode());
+    }
+
+    /**
+     * @covers ::onRouteError
+     */
+    public function testOnRouteError()
+    {
+        $event = new LifecycleEvent($this->newRequest('/'));
+        $this->s->onRouteError($event);
+        $this->assertSame(404, $event->getResponse()->getStatusCode());
     }
 
     protected function setUp()
