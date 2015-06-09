@@ -5,6 +5,7 @@ use Tonis\Dispatcher\Dispatcher;
 use Tonis\Event\EventManager;
 use Tonis\Mvc\Tonis;
 use Tonis\Mvc\TonisConfig;
+use Tonis\Mvc\TonisConsole;
 use Tonis\Package\PackageManager;
 use Tonis\Router\RouteCollection;
 use Tonis\View\Strategy\PlatesStrategy;
@@ -17,14 +18,12 @@ use Tonis\View\ViewManager;
 class TonisFactoryTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @covers ::createWeb
      * @covers ::createTonisInstance
      * @covers ::prepareServices
      */
-    public function testFromWebDefaults()
+    public function testCreateTonisInstance()
     {
-        $factory = new TonisFactory();
-        $tonis = $factory->createWeb();
+        $tonis = (new TonisFactory)->createTonisInstance();
 
         $this->assertInstanceOf(Tonis::class, $tonis);
 
@@ -35,5 +34,35 @@ class TonisFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($di->has(EventManager::class));
         $this->assertTrue($di->has(Dispatcher::class));
         $this->assertTrue($di->has(ViewManager::class));
+    }
+
+    /**
+     * @covers ::createApi
+     */
+    public function testCreateApi()
+    {
+        $tonis = (new TonisFactory)->createApi();
+        $this->assertInstanceOf(Tonis::class, $tonis);
+        $this->assertNotEmpty($tonis->events()->getListeners());
+    }
+
+    /**
+     * @covers ::createWeb
+     */
+    public function testCreateWeb()
+    {
+        $tonis = (new TonisFactory)->createWeb();
+        $this->assertInstanceOf(Tonis::class, $tonis);
+        $this->assertNotEmpty($tonis->events()->getListeners());
+    }
+
+    /**
+     * @covers ::createConsole
+     */
+    public function testCreateConsole()
+    {
+        $console = (new TonisFactory)->createConsole();
+        $this->assertInstanceOf(TonisConsole::class, $console);
+        $this->assertInstanceOf(Tonis::class, $console->getTonis());
     }
 }

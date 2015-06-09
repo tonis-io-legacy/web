@@ -6,6 +6,7 @@ use Tonis\Dispatcher\Dispatcher;
 use Tonis\Event\EventManager;
 use Tonis\Mvc\Subscriber\ApiSubscriber;
 use Tonis\Mvc\Subscriber\BaseSubscriber;
+use Tonis\Mvc\Subscriber\ConsoleSubscriber;
 use Tonis\Mvc\Subscriber\WebSubscriber;
 use Tonis\Mvc\Tonis;
 use Tonis\Mvc\TonisConfig;
@@ -24,6 +25,10 @@ final class TonisFactory
     {
         $console = new TonisConsole($this->createTonisInstance($config));
         $console->getTonis()->di()->set(TonisConsole::class, $console, true);
+
+        $tonis = $console->getTonis();
+        $tonis->events()->subscribe(new BaseSubscriber($tonis->di()));
+        $tonis->events()->subscribe(new ConsoleSubscriber($tonis->di()));
 
         return $console;
     }

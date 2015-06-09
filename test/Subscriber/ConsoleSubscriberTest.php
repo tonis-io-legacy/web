@@ -2,7 +2,6 @@
 namespace Tonis\Mvc\Subscriber;
 
 use Tonis\Event\EventManager;
-use Tonis\Mvc\Factory\TonisConsoleFactory;
 use Tonis\Mvc\Factory\TonisFactory;
 use Tonis\Mvc\TestAsset\TestPackage\TestPackage;
 use Tonis\Mvc\Tonis;
@@ -19,14 +18,12 @@ class ConsoleSubscriberTest extends \PHPUnit_Framework_TestCase
      */
     public function testSubscribe()
     {
-        $pm = new PackageManager;
-        $pm->add(TestPackage::class);
-        $pm->load();
+        $console = (new TonisFactory)->createConsole(['packages' => [TestPackage::class]]);
+        $console->getTonis()->bootstrap();
 
-        $console = (new TonisFactory)->createConsole([]);
         $subscriber = new ConsoleSubscriber($console->getTonis()->di());
 
-        $events = new EventManager();
+        $events = new EventManager;
         $subscriber->subscribe($events);
 
         $this->assertCount(1, $events->getListeners());

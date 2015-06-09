@@ -4,7 +4,6 @@ namespace Tonis\Mvc;
 use Interop\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Tonis\Di\ContainerUtil;
 use Tonis\Event\EventManager;
 use Tonis\Mvc\Package\PackageInterface;
 use Tonis\Package\PackageManager;

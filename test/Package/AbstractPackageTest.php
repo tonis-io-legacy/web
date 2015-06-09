@@ -3,7 +3,6 @@ namespace Tonis\Mvc\Package;
 
 use Tonis\Di\Container;
 use Tonis\Mvc\Factory\TonisFactory;
-use Tonis\Mvc\TestAsset\InvalidTestPackage\InvalidTestPackage;
 use Tonis\Mvc\TestAsset\PlainPackage;
 use Tonis\Mvc\TestAsset\TestPackage\TestPackage;
 use Tonis\Mvc\TestAsset\TestPackageWithNoConfigs;
@@ -73,6 +72,28 @@ class AbstractPackageTest extends \PHPUnit_Framework_TestCase
     {
         $factory = new TonisFactory;
         $this->assertNull($this->package->bootstrapConsole($factory->createConsole([])));
+    }
+
+    /**
+     * @covers ::configureRoutes
+     */
+    public function testConfigureRoutes()
+    {
+        $package = new PlainPackage;
+        $routes = new RouteCollection;
+        $package->configureRoutes($routes);
+
+        $this->assertEmpty($routes->getRoutes());
+    }
+
+    /**
+     * @covers ::configureServices
+     */
+    public function testConfigureServices()
+    {
+        $package = new PlainPackage;
+        $di = new Container;
+        $package->configureServices($di);
     }
 
     protected function setUp()
