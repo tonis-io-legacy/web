@@ -29,7 +29,9 @@ class TonisTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvokeProxiesToRun()
     {
-        $this->assertSame($this->tonis->run(), $this->tonis->__invoke());
+        $request = ServerRequestFactory::fromGlobals();
+        $response = new Response;
+        $this->assertSame($this->tonis->run($request, $response), $this->tonis->__invoke($request, $response));
     }
 
     /**
@@ -47,6 +49,8 @@ class TonisTest extends \PHPUnit_Framework_TestCase
 
         $response = new Response;
         $tonis->run($request, $response);
+
+        $event = $tonis->getLifecycleEvent();
         $this->assertSame($request, $event->getRequest());
         $this->assertSame($response, $event->getResponse());
     }
@@ -63,6 +67,7 @@ class TonisTest extends \PHPUnit_Framework_TestCase
             $event->setResponse($response);
         });
 
+        $this->tonis->route();
         $this->tonis->respond();
         $this->assertInstanceOf(ResponseInterface::class, $response);
         $this->assertSame('foobar', (string) $response->getBody());
@@ -120,6 +125,7 @@ class TonisTest extends \PHPUnit_Framework_TestCase
             throw new \RuntimeException();
         });
 
+        $this->tonis->route();
         $this->tonis->dispatch();
 
         $this->assertNotNull($this->tonis->getLifecycleEvent()->getException());
@@ -151,6 +157,7 @@ class TonisTest extends \PHPUnit_Framework_TestCase
             throw new \RuntimeException();
         });
 
+        $this->tonis->route();
         $this->tonis->render();
 
         $this->assertNotNull($this->tonis->getLifecycleEvent()->getException());
@@ -239,6 +246,8 @@ class TonisTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetLifecycleEvent()
     {
+        $this->assertNull($this->tonis->getLifecycleEvent());
+        $this->tonis->route();
         $this->assertInstanceOf(LifecycleEvent::class, $this->tonis->getLifecycleEvent());
     }
 

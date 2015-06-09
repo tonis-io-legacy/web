@@ -5,8 +5,10 @@ use League\Plates\Engine;
 use Tonis\Di\Container;
 use Tonis\Event\EventManager;
 use Tonis\Mvc\Exception\InvalidDispatchResultException;
+use Tonis\Mvc\Exception\InvalidTemplateException;
 use Tonis\Mvc\LifecycleEvent;
 use Tonis\Mvc\TestAsset\NewRequestTrait;
+use Tonis\Mvc\TestAsset\TestAction;
 use Tonis\Mvc\TestAsset\TestViewModelStrategy;
 use Tonis\Mvc\Tonis;
 use Tonis\Router\Route;
@@ -69,17 +71,40 @@ class WebSubscriberTest extends \PHPUnit_Framework_TestCase
     public function testOnDispatch()
     {
         $event = new LifecycleEvent($this->newRequest('/'));
-        $event->setRouteMatch(new RouteMatch(new Route('/', 'handler')));
+        $event->setRouteMatch(new RouteMatch(new Route('/', [new TestAction, 'run'])));
 
         $event->setDispatchResult(['foo' => 'bar']);
         $this->s->onDispatch($event);
-        $this->assertInstanceOf(ViewModel::class, $event->getDispatchResult());
-        $this->assertSame(['foo' => 'bar'], $event->getDispatchResult()->getVariables());
+        $model = $event->getDispatchResult();
+        $this->assertInstanceOf(ViewModel::class, $model);
+        $this->assertSame('@tonis/mvc/test-asset/test', $model->getTemplate());
+        $this->assertSame(['foo' => 'bar'], $model->getVariables());
 
         $event->setDispatchResult('foo');
         $this->s->onDispatch($event);
         $this->assertInstanceOf(StringModel::class, $event->getDispatchResult());
         $this->assertSame('foo', $event->getDispatchResult()->getString());
+    }
+
+    /**
+     * @covers ::onDispatch
+     * @covers ::createTemplateModel
+     */
+    public function testOnDispatchWithNoViewModel()
+    {
+        $event = new LifecycleEvent($this->newRequest('/'));
+        $event->setRouteMatch(new RouteMatch(new Route('/', function() {})));
+
+        $event->setDispatchResult(['foo' => 'bar']);
+        $this->s->onDispatch($event);
+        $model = $event->getDispatchResult();
+
+        $this->assertInstanceOf(ViewModel::class, $model);
+        $this->assertSame('error/exception', $model->getTemplate());
+        $this->assertEquals(
+            ['type' => 'no-template-available', 'exception' => new InvalidTemplateException()],
+            $model->getVariables()
+        );
     }
 
     /**

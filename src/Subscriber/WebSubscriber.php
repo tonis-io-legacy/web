@@ -145,7 +145,7 @@ final class WebSubscriber implements SubscriberInterface
         if (is_array($handler)) {
             $handler = $handler[0];
         }
-        if (is_object($handler)) {
+        if (is_object($handler) && !$handler instanceof \Closure) {
             $handler = get_class($handler);
         }
         if (is_string($handler)) {

@@ -73,12 +73,13 @@ final class Tonis
      */
     public function run(RequestInterface $request = null, ResponseInterface $response = null)
     {
+        $this->bootstrap();
+        $this->route($request);
+
         if (null !== $response) {
             $this->lifecycleEvent->setResponse($response);
         }
 
-        $this->bootstrap($request);
-        $this->route();
         $this->dispatch();
         $this->render();
         $this->respond();
@@ -86,16 +87,11 @@ final class Tonis
         return $this->lifecycleEvent->getResponse();
     }
 
-    /**
-     * @param RequestInterface $request
-     */
-    public function bootstrap(RequestInterface $request = null)
+    public function bootstrap()
     {
         if ($this->bootstrapped) {
             return;
         }
-
-        $this->lifecycleEvent = new LifecycleEvent($request ?: ServerRequestFactory::fromGlobals());
 
         $pm = $this->packageManager;
         $pm->add(TonisPackage::class);
@@ -116,8 +112,13 @@ final class Tonis
         $this->bootstrapped = true;
     }
 
-    public function route()
+    /**
+     * @param RequestInterface $request
+     */
+    public function route(RequestInterface $request = null)
     {
+        $this->lifecycleEvent = new LifecycleEvent($request ?: ServerRequestFactory::fromGlobals());
+
         $this->events()->fire(self::EVENT_ROUTE, $this->lifecycleEvent);
 
         if (!$this->lifecycleEvent->getRouteMatch() instanceof RouteMatch) {
