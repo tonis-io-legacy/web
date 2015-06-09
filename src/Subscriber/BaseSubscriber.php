@@ -9,7 +9,6 @@ use Tonis\Event\EventManager;
 use Tonis\Event\SubscriberInterface;
 use Tonis\Mvc\Exception\InvalidDispatchResultException;
 use Tonis\Mvc\LifecycleEvent;
-use Tonis\Mvc\Package\PackageInterface;
 use Tonis\Mvc\Tonis;
 use Tonis\Router\RouteCollection;
 use Tonis\Router\RouteMatch;
@@ -84,11 +83,12 @@ final class BaseSubscriber implements SubscriberInterface
 
         $dispatcher = $this->di->get(Dispatcher::class);
         $handler = $routeMatch->getRoute()->getHandler();
-        $result = $dispatcher->dispatch($handler, $routeMatch->getParams());
 
-        if ($result instanceof ServiceFactoryInterface) {
-            $result = $dispatcher->dispatch($result->createService($this->di), $routeMatch->getParams());
+        if (is_string($handler) && $this->di->has($handler)) {
+            $handler = $this->di->get($handler);
         }
+
+        $result = $dispatcher->dispatch($handler, $routeMatch->getParams());
 
         $event->setDispatchResult($result);
     }
