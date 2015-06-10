@@ -61,7 +61,8 @@ final class ApiSubscriber implements SubscriberInterface
     {
         $model = new JsonModel([
             'error' => 'An error has occurred',
-            'exception' => $event->getException()->getMessage(),
+            'exception' => get_class($event->getException()),
+            'message' => $event->getException()->getMessage(),
             'trace' => $event->getException()->getTrace()
         ]);
         $event->setDispatchResult($model);

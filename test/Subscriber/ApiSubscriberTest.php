@@ -78,7 +78,8 @@ class ApiSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->s->onDispatchException($event);
         $this->assertInstanceOf(JsonModel::class, $event->getDispatchResult());
-        $this->assertSame($ex->getMessage(), $event->getDispatchResult()->getData()['exception']);
+        $this->assertSame($ex->getMessage(), $event->getDispatchResult()->getData()['message']);
+        $this->assertSame(get_class($ex), $event->getDispatchResult()->getData()['exception']);
         $this->assertSame($ex->getTrace(), $event->getDispatchResult()->getData()['trace']);
     }
 
