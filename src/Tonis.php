@@ -5,6 +5,7 @@ use Interop\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Tonis\Event\EventManager;
+use Tonis\Tonis\Exception\MissingRequiredEnvironmentException;
 use Tonis\Tonis\Package\PackageInterface;
 use Tonis\Package\PackageManager;
 use Tonis\Router\RouteCollection;
@@ -93,20 +94,8 @@ final class Tonis
             return;
         }
 
-        $pm = $this->packageManager;
-        $pm->add(TonisPackage::class);
-        foreach ($this->config->getPackages() as $package) {
-            $pm->add($package);
-        }
-        $pm->load();
-
-        foreach ($pm->getPackages() as $package) {
-            if ($package instanceof PackageInterface) {
-                $package->configureServices($this->di);
-                $package->bootstrap($this);
-                $package->configureRoutes($this->routes);
-            }
-        }
+        $this->bootstrapEnvironment();
+        $this->bootstrapPackages();
 
         $this->events->fire(self::EVENT_BOOTSTRAP, $this->lifecycleEvent);
         $this->bootstrapped = true;
@@ -208,6 +197,40 @@ final class Tonis
         } catch (\Exception $ex) {
             $this->lifecycleEvent->setException($ex);
             $this->events()->fire($exceptionEvent, $this->lifecycleEvent);
+        }
+    }
+
+    private function bootstrapEnvironment()
+    {
+        putenv("TONIS_DEBUG={$this->isDebugEnabled()}");
+
+        foreach ($this->config->getEnvironment() as $key => $value) {
+            putenv("{$key}={$value}");
+        }
+        foreach ($this->config->getRequiredEnvironment() as $key) {
+            if (false === getenv($key)) {
+                throw new MissingRequiredEnvironmentException(
+                    sprintf('The environment variable "%s" is missing but is set as required', $key)
+                );
+            }
+        }
+    }
+
+    private function bootstrapPackages()
+    {
+        $pm = $this->packageManager;
+        $pm->add(TonisPackage::class);
+        foreach ($this->config->getPackages() as $package) {
+            $pm->add($package);
+        }
+        $pm->load();
+
+        foreach ($pm->getPackages() as $package) {
+            if ($package instanceof PackageInterface) {
+                $package->configureServices($this->di);
+                $package->bootstrap($this);
+                $package->configureRoutes($this->routes);
+            }
         }
     }
 }

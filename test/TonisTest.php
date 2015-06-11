@@ -84,6 +84,7 @@ class TonisTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers ::__construct
      * @covers ::bootstrap
+     * @covers ::bootstrapPackages
      */
     public function testBootstrap()
     {
@@ -249,6 +250,29 @@ class TonisTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->tonis->getLifecycleEvent());
         $this->tonis->route();
         $this->assertInstanceOf(LifecycleEvent::class, $this->tonis->getLifecycleEvent());
+    }
+
+    /**
+     * @covers ::bootstrapEnvironment
+     * @runInSeparateProcess
+     */
+    public function testBootstrapEnvironment()
+    {
+        $tonis = (new TonisFactory)->createTonisInstance(['environment' => ['TONIS_ENV_TEST' => 'bar']]);
+        $tonis->bootstrap();
+
+        $this->assertSame('bar', getenv('TONIS_ENV_TEST'));
+    }
+
+    /**
+     * @covers ::bootstrapEnvironment
+     * @expectedException \Tonis\Tonis\Exception\MissingRequiredEnvironmentException
+     * @expectedExceptionMessage The environment variable "TONIS_ENV_TEST" is missing but is set as required
+     */
+    public function testMissingEnvironmentThrowsException()
+    {
+        $tonis = (new TonisFactory)->createTonisInstance(['required_environment' => ['TONIS_ENV_TEST']]);
+        $tonis->bootstrap();
     }
 
     protected function setUp()

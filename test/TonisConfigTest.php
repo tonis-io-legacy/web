@@ -1,57 +1,39 @@
 <?php
 namespace Tonis\Tonis;
 
+use Tonis\Tonis\TestAsset\TestPackage\TestPackage;
+use Tonis\Tonis\TestAsset\TestSubscriber;
+
 /**
  * @coversDefaultClass \Tonis\Tonis\TonisConfig
  */
 class TonisConfigTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var TonisConfig */
-    private $config;
-
     /**
      * @covers ::__construct
      * @covers ::isDebugEnabled
-     */
-    public function testIsDebugEnabled()
-    {
-        $this->assertFalse($this->config->isDebugEnabled());
-    }
-
-    /**
-     * @covers ::getEnvironment
-     */
-    public function testGetEnvironment()
-    {
-        $this->assertEmpty($this->config->getEnvironment());
-    }
-
-    /**
-     * @covers ::getSubscribers
-     */
-    public function testGetSubscribers()
-    {
-        $this->assertEmpty($this->config->getSubscribers());
-    }
-
-    /**
      * @covers ::getCacheDir
-     */
-    public function testGetCacheDir()
-    {
-        $this->assertSame(null, $this->config->getCacheDir());
-    }
-
-    /**
+     * @covers ::getEnvironment
+     * @covers ::getRequiredEnvironment
      * @covers ::getPackages
+     * @covers ::getSubscribers
+     * @dataProvider configProvider
      */
-    public function testGetPackages()
+    public function testGetters($key, $method, $value)
     {
-        $this->assertEmpty($this->config->getPackages());
+        $config = new TonisConfig([$key => $value]);
+        $this->assertSame($value, $config->{$method}());
     }
 
-    protected function setUp()
+    public function configProvider()
     {
-        $this->config = new TonisConfig;
+        return [
+            ['environment', 'getEnvironment', ['FOO' => 'bar']],
+            ['required_environment', 'getRequiredEnvironment', ['FOO']],
+            ['debug', 'isDebugEnabled', true],
+            ['cache_dir', 'getCacheDir', 'cache'],
+            ['packages', 'getPackages', [TestPackage::class]],
+            ['subscribers', 'getSubscribers', [TestSubscriber::class]],
+        ];
     }
 }

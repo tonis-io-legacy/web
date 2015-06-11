@@ -31,7 +31,7 @@ final class TonisConfig
      */
     public function isDebugEnabled()
     {
-        return $this->config['debug'];
+        return (bool) $this->config['debug'];
     }
 
     /**
@@ -47,7 +47,15 @@ final class TonisConfig
      */
     public function getEnvironment()
     {
-        return $this->config['environment'];
+        return (array) $this->config['environment'];
+    }
+
+    /**
+     * @return array
+     */
+    public function getRequiredEnvironment()
+    {
+        return (array) $this->config['required_environment'];
     }
 
     /**
@@ -55,7 +63,7 @@ final class TonisConfig
      */
     public function getPackages()
     {
-        return $this->config['packages'];
+        return (array) $this->config['packages'];
     }
 
     /**
@@ -63,6 +71,6 @@ final class TonisConfig
      */
     public function getSubscribers()
     {
-        return $this->config['subscribers'];
+        return (array) $this->config['subscribers'];
     }
 }
