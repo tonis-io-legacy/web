@@ -1,10 +1,12 @@
 <?php
-namespace Tonis\Tonis\Package;
+namespace Tonis\Web\Package;
 
 use Interop\Container\ContainerInterface;
-use Tonis\Tonis;
+use Tonis\Web;
 use Tonis\Package\Feature;
 use Tonis\Router\RouteCollection;
+use Tonis\Web\Tonis;
+use Tonis\Web\TonisConsole;
 
 interface PackageInterface extends
     Feature\ConfigProviderInterface,
@@ -13,14 +15,14 @@ interface PackageInterface extends
     Feature\PathProviderInterface
 {
     /**
-     * @param Tonis\Tonis $tonis
+     * @param Tonis $tonis
      */
-    public function bootstrap(Tonis\Tonis $tonis);
+    public function bootstrap(Tonis $tonis);
 
     /**
-     * @param Tonis\TonisConsole $console
+     * @param TonisConsole $console
      */
-    public function bootstrapConsole(Tonis\TonisConsole $console);
+    public function bootstrapConsole(TonisConsole $console);
 
     /**
      * @param ContainerInterface $di

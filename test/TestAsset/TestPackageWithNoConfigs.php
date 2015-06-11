@@ -1,7 +1,7 @@
 <?php
-namespace Tonis\Tonis\TestAsset;
+namespace Tonis\Web\TestAsset;
 
-use Tonis\Tonis\Package\AbstractPackage;
+use Tonis\Web\Package\AbstractPackage;
 
 class TestPackageWithNoConfigs extends AbstractPackage
 {

@@ -1,13 +1,13 @@
 <?php
-namespace Tonis\Tonis\Factory;
+namespace Tonis\Web\Factory;
 
 use Tonis\Di\Container;
-use Tonis\Tonis\TestAsset\TestPackage\TestPackage;
-use Tonis\Tonis\TestAsset\TestViewStrategyFactory;
+use Tonis\Web\TestAsset\TestPackage\TestPackage;
+use Tonis\Web\TestAsset\TestViewStrategyFactory;
 use Tonis\Package\PackageManager;
 
 /**
- * @coversDefaultClass \Tonis\Tonis\Factory\AbstractViewStrategyFactory
+ * @coversDefaultClass \Tonis\Web\Factory\AbstractViewStrategyFactory
  */
 class AbstractViewStrategyFactoryTest extends \PHPUnit_Framework_TestCase
 {

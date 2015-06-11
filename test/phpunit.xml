@@ -10,7 +10,7 @@
         </whitelist>
     </filter>
     <testsuites>
-        <testsuite name="Tonis\Tonis">
+        <testsuite name="Tonis\Web">
             <directory>.</directory>
         </testsuite>
     </testsuites>

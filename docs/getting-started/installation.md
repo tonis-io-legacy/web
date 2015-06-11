@@ -4,11 +4,11 @@ installed you can install Tonis using the following command:
 As a Micro-Framework
 --------------------
 
-To use Tonis as micro-framework you need to add `tonis/tonis` to `composer.json`. You will also need a PSR-7
+To use Tonis as micro-framework you need to add `tonis/web` to `composer.json`. You will also need a PSR-7
 implementation like `zendframework/zend-diactoros`.
 
 ```sh
-composer require tonis/tonis zendframework/zend-diactoros
+composer require tonis/web zendframework/zend-diactoros
 ```
 
 Once complete you use one of the following `index.php` to get started.
@@ -17,7 +17,7 @@ Once complete you use one of the following `index.php` to get started.
 <?php
 require __DIR__ . '/vendor/autoload.php';
 
-$tonis = (new \Tonis\Tonis\Factory\TonisFactory)->createWeb();
+$tonis = (new \Tonis\Web\Factory\TonisFactory)->createWeb();
 $routes = $tonis->routes();
 
 $routes->get('/hello/{name}', function ($name) {

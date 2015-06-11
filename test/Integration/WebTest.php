@@ -1,9 +1,9 @@
 <?php
-namespace Tonis\Tonis\Integration;
+namespace Tonis\Web\Integration;
 
-use Tonis\Tonis\Factory\TonisFactory;
-use Tonis\Tonis\TestAsset\TestPackage\TestPackage;
-use Tonis\Tonis\Tonis;
+use Tonis\Web\Factory\TonisFactory;
+use Tonis\Web\TestAsset\TestPackage\TestPackage;
+use Tonis\Web\Tonis;
 use Tonis\View\Model\ViewModel;
 
 class WebTest extends \PHPUnit_Framework_TestCase

@@ -15,7 +15,7 @@ Return Results
 
 Tonis expects all dispatchables to return a result it can work with. By default, this includes `array`, `string`, and 
 any instance of `Tonis\View\ModelInterface`. If an invalid result is returned then Tonis will throw a 
-`Tonis\Tonis\Exception\InvalidDispatchResultException`.
+`Tonis\Web\Exception\InvalidDispatchResultException`.
 
 Valid return results and conversions are:
 

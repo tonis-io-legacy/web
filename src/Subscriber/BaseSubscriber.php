@@ -1,5 +1,5 @@
 <?php
-namespace Tonis\Tonis\Subscriber;
+namespace Tonis\Web\Subscriber;
 
 use Interop\Container\ContainerInterface;
 use Tonis\Di\ContainerUtil;
@@ -7,9 +7,9 @@ use Tonis\Di\ServiceFactoryInterface;
 use Tonis\Dispatcher\Dispatcher;
 use Tonis\Event\EventManager;
 use Tonis\Event\SubscriberInterface;
-use Tonis\Tonis\Exception\InvalidDispatchResultException;
-use Tonis\Tonis\LifecycleEvent;
-use Tonis\Tonis\Tonis;
+use Tonis\Web\Exception\InvalidDispatchResultException;
+use Tonis\Web\LifecycleEvent;
+use Tonis\Web\Tonis;
 use Tonis\Router\RouteCollection;
 use Tonis\Router\RouteMatch;
 use Tonis\View\ModelInterface;

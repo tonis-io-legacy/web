@@ -1,13 +1,13 @@
 <?php
-namespace Tonis\Tonis\Subscriber;
+namespace Tonis\Web\Subscriber;
 
 use Interop\Container\ContainerInterface;
 use Tonis\Event\EventManager;
 use Tonis\Event\SubscriberInterface;
-use Tonis\Tonis\Exception\InvalidDispatchResultException;
-use Tonis\Tonis\Exception\InvalidTemplateException;
-use Tonis\Tonis\LifecycleEvent;
-use Tonis\Tonis\Tonis;
+use Tonis\Web\Exception\InvalidDispatchResultException;
+use Tonis\Web\Exception\InvalidTemplateException;
+use Tonis\Web\LifecycleEvent;
+use Tonis\Web\Tonis;
 use Tonis\Router\RouteMatch;
 use Tonis\View\Model\StringModel;
 use Tonis\View\Model\ViewModel;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tonis\Tonis;
+namespace Tonis\Web;
 
 use Tonis\View\Strategy;
 

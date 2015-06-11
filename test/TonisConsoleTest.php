@@ -1,12 +1,12 @@
 <?php
-namespace Tonis\Tonis;
+namespace Tonis\Web;
 
 use Tonis\Di\Container;
-use Tonis\Tonis\Factory\TonisFactory;
-use Tonis\Tonis\TestAsset\TestCommand;
+use Tonis\Web\Factory\TonisFactory;
+use Tonis\Web\TestAsset\TestCommand;
 
 /**
- * @coversDefaultClass \Tonis\Tonis\TonisConsole
+ * @coversDefaultClass \Tonis\Web\TonisConsole
  */
 class TonisConsoleTest extends \PHPUnit_Framework_TestCase
 {

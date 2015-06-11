@@ -1,5 +1,5 @@
 <?php
-namespace Tonis\Tonis\TestAsset;
+namespace Tonis\Web\TestAsset;
 
 use Psr\Http\Message\ResponseInterface;
 use Zend\Diactoros\Response\EmitterInterface;

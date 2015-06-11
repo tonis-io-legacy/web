@@ -1,5 +1,5 @@
 <?php
-namespace Tonis\Tonis\Factory;
+namespace Tonis\Web\Factory;
 
 use League\Plates;
 use Tonis\Di\Container;

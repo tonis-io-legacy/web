@@ -68,13 +68,13 @@ Packages to load. See the [Packages](/basics/packages) documentation for more in
   <dd>[]</dd>
   
   <dt>Notes</dt>
-  <dd>Tonis\Tonis is a package itself and is automatically loaded for you.</dd>
+  <dd>Tonis\Web is a package itself and is automatically loaded for you.</dd>
 </dl>
 
 subscribers
 -----------
 
-Subscribers to register. In generaly this is set for you by the `Tonis\Tonis\Factory\TonisFactory`. For most 
+Subscribers to register. In generaly this is set for you by the `Tonis\Web\Factory\TonisFactory`. For most 
 users this will not need to be modified.
 
 <dl>

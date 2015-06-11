@@ -36,4 +36,4 @@ Note: This section is only relevant for ViewModel's. If you are using Tonis for 
 If you do not return a `Tonis\View\Model\ViewModel` then Tonis will attempt to guess a template name based on the
 dispatchable name. This is very crud, however, and it is recommended that you set your template explicitly. When returning
 an array you can do so by setting the `$$template` key. If no template is able to be determined then a
-`Tonis\Tonis\Exception\InvalidTemplateException` will be thrown.
+`Tonis\Web\Exception\InvalidTemplateException` will be thrown.

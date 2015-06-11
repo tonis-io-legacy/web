@@ -1,13 +1,13 @@
 <?php
-namespace Tonis\Tonis;
+namespace Tonis\Web;
 
 use Psr\Http\Message\ResponseInterface;
 use Tonis\Di\Container;
 use Tonis\Event\EventManager;
-use Tonis\Tonis\Factory\TonisFactory;
-use Tonis\Tonis\TestAsset\NewRequestTrait;
-use Tonis\Tonis\TestAsset\TestEmitter;
-use Tonis\Tonis\TestAsset\TestPackage\TestPackage;
+use Tonis\Web\Factory\TonisFactory;
+use Tonis\Web\TestAsset\NewRequestTrait;
+use Tonis\Web\TestAsset\TestEmitter;
+use Tonis\Web\TestAsset\TestPackage\TestPackage;
 use Tonis\Package\PackageManager;
 use Tonis\Router\Route;
 use Tonis\Router\RouteCollection;
@@ -16,7 +16,7 @@ use Zend\Diactoros\Response;
 use Zend\Diactoros\ServerRequestFactory;
 
 /**
- * @coversDefaultClass \Tonis\Tonis\Tonis
+ * @coversDefaultClass \Tonis\Web\Tonis
  */
 class TonisTest extends \PHPUnit_Framework_TestCase
 {
@@ -268,7 +268,7 @@ class TonisTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers ::bootstrapEnvironment
-     * @expectedException \Tonis\Tonis\Exception\MissingRequiredEnvironmentException
+     * @expectedException \Tonis\Web\Exception\MissingRequiredEnvironmentException
      * @expectedExceptionMessage The environment variable "TONIS_ENV_TEST" is missing but is set as required
      */
     public function testMissingEnvironmentThrowsException()

@@ -1,5 +1,5 @@
 <?php
-namespace Tonis\Tonis;
+namespace Tonis\Web;
 
 use Tonis\Router\Route;
 use Tonis\Router\RouteMatch;
@@ -7,7 +7,7 @@ use Zend\Diactoros\Response;
 use Zend\Diactoros\ServerRequestFactory;
 
 /**
- * @coversDefaultClass \Tonis\Tonis\LifecycleEvent
+ * @coversDefaultClass \Tonis\Web\LifecycleEvent
  */
 class LifecycleEventTest extends \PHPUnit_Framework_TestCase
 {

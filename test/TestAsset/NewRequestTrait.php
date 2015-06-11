@@ -1,5 +1,5 @@
 <?php
-namespace Tonis\Tonis\TestAsset;
+namespace Tonis\Web\TestAsset;
 
 use Zend\Diactoros\ServerRequestFactory;
 

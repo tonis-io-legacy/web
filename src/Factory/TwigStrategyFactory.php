@@ -1,5 +1,5 @@
 <?php
-namespace Tonis\Tonis\Factory;
+namespace Tonis\Web\Factory;
 
 use Tonis\Di\Container;
 use Tonis\Di\ContainerUtil;

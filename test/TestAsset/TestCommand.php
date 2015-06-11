@@ -1,5 +1,5 @@
 <?php
-namespace Tonis\Tonis\TestAsset;
+namespace Tonis\Web\TestAsset;
 
 use Symfony\Component\Console\Command\Command;
 use Tonis\Di\ContainerAwareInterface;

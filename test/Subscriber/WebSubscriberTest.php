@@ -1,16 +1,16 @@
 <?php
-namespace Tonis\Tonis\Subscriber;
+namespace Tonis\Web\Subscriber;
 
 use League\Plates\Engine;
 use Tonis\Di\Container;
 use Tonis\Event\EventManager;
-use Tonis\Tonis\Exception\InvalidDispatchResultException;
-use Tonis\Tonis\Exception\InvalidTemplateException;
-use Tonis\Tonis\LifecycleEvent;
-use Tonis\Tonis\TestAsset\NewRequestTrait;
-use Tonis\Tonis\TestAsset\TestAction;
-use Tonis\Tonis\TestAsset\TestViewModelStrategy;
-use Tonis\Tonis\Tonis;
+use Tonis\Web\Exception\InvalidDispatchResultException;
+use Tonis\Web\Exception\InvalidTemplateException;
+use Tonis\Web\LifecycleEvent;
+use Tonis\Web\TestAsset\NewRequestTrait;
+use Tonis\Web\TestAsset\TestAction;
+use Tonis\Web\TestAsset\TestViewModelStrategy;
+use Tonis\Web\Tonis;
 use Tonis\Router\Route;
 use Tonis\Router\RouteMatch;
 use Tonis\View\Model\StringModel;
@@ -20,7 +20,7 @@ use Tonis\View\Strategy\StringStrategy;
 use Tonis\View\ViewManager;
 
 /**
- * @coversDefaultClass \Tonis\Tonis\Subscriber\WebSubscriber
+ * @coversDefaultClass \Tonis\Web\Subscriber\WebSubscriber
  */
 class WebSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -77,7 +77,7 @@ class WebSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->s->onDispatch($event);
         $model = $event->getDispatchResult();
         $this->assertInstanceOf(ViewModel::class, $model);
-        $this->assertSame('@tonis/tonis/test-asset/test', $model->getTemplate());
+        $this->assertSame('@tonis/web/test-asset/test', $model->getTemplate());
         $this->assertSame(['foo' => 'bar'], $model->getVariables());
 
         $event->setDispatchResult('foo');
@@ -149,12 +149,12 @@ class WebSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $event->setException(new InvalidDispatchResultException());
         $this->s->onRenderException($event);
-        $this->assertSame('error/exception:{"exception":"Tonis\\\\Tonis\\\\Exception\\\\InvalidDispatchResultException","type":"invalid-dispatch-result","path":"\/"}', $event->getRenderResult());
+        $this->assertSame('error/exception:{"exception":"Tonis\\\\Web\\\\Exception\\\\InvalidDispatchResultException","type":"invalid-dispatch-result","path":"\/"}', $event->getRenderResult());
     }
 
     protected function setUp()
     {
-        $this->vm = new ViewManager;
+        $this->vm = new ViewManager(new StringStrategy());
         $this->vm->addStrategy(new TestViewModelStrategy());
 
         $this->di = new Container;

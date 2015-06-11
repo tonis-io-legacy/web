@@ -1,7 +1,7 @@
 <?php
-namespace Tonis\Tonis\TestAsset\InvalidTestPackage;
+namespace Tonis\Web\TestAsset\InvalidTestPackage;
 
-use Tonis\Tonis\Package\AbstractPackage;
+use Tonis\Web\Package\AbstractPackage;
 
 class InvalidTestPackage extends AbstractPackage
 {

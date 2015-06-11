@@ -1,14 +1,14 @@
 <?php
-namespace Tonis\Tonis\Factory;
+namespace Tonis\Web\Factory;
 
 use Tonis\Di\Container;
-use Tonis\Tonis\TestAsset\TestPackage\TestPackage;
-use Tonis\Tonis\TestAsset\TestTwigExtension;
+use Tonis\Web\TestAsset\TestPackage\TestPackage;
+use Tonis\Web\TestAsset\TestTwigExtension;
 use Tonis\Package\PackageManager;
 use Tonis\View\Strategy\TwigStrategy;
 
 /**
- * @coversDefaultClass \Tonis\Tonis\Factory\TwigStrategyFactory
+ * @coversDefaultClass \Tonis\Web\Factory\TwigStrategyFactory
  */
 class TwigStrategyFactoryTest extends \PHPUnit_Framework_TestCase
 {

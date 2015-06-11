@@ -1,15 +1,15 @@
 <?php
-namespace Tonis\Tonis\Package;
+namespace Tonis\Web\Package;
 
 use Tonis\Di\Container;
-use Tonis\Tonis\Factory\TonisFactory;
-use Tonis\Tonis\TestAsset\PlainPackage;
-use Tonis\Tonis\TestAsset\TestPackage\TestPackage;
-use Tonis\Tonis\TestAsset\TestPackageWithNoConfigs;
+use Tonis\Web\Factory\TonisFactory;
+use Tonis\Web\TestAsset\PlainPackage;
+use Tonis\Web\TestAsset\TestPackage\TestPackage;
+use Tonis\Web\TestAsset\TestPackageWithNoConfigs;
 use Tonis\Router\RouteCollection;
 
 /**
- * @coversDefaultClass \Tonis\Tonis\Package\AbstractPackage
+ * @coversDefaultClass \Tonis\Web\Package\AbstractPackage
  */
 class AbstractPackageTest extends \PHPUnit_Framework_TestCase
 {
@@ -43,8 +43,8 @@ class AbstractPackageTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetNamespace()
     {
-        $this->assertSame('Tonis\Tonis\TestAsset\TestPackage', $this->package->getNamespace());
-        $this->assertSame('Tonis\Tonis\TestAsset\TestPackage', $this->package->getNamespace());
+        $this->assertSame('Tonis\Web\TestAsset\TestPackage', $this->package->getNamespace());
+        $this->assertSame('Tonis\Web\TestAsset\TestPackage', $this->package->getNamespace());
     }
 
     /**

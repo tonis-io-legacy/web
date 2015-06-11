@@ -1,11 +1,11 @@
 <?php
-namespace Tonis\Tonis;
+namespace Tonis\Web;
 
 use Interop\Container\ContainerInterface;
 use Tonis\Di\ContainerUtil;
-use Tonis\Tonis\Factory\PlatesStrategyFactory;
-use Tonis\Tonis\Factory\TwigStrategyFactory;
-use Tonis\Tonis\Package\AbstractPackage;
+use Tonis\Web\Factory\PlatesStrategyFactory;
+use Tonis\Web\Factory\TwigStrategyFactory;
+use Tonis\Web\Package\AbstractPackage;
 use Tonis\Package\PackageManager;
 use Tonis\View\Strategy\PlatesStrategy;
 use Tonis\View\Strategy\TwigStrategy;

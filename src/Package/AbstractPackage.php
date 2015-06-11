@@ -1,9 +1,9 @@
 <?php
-namespace Tonis\Tonis\Package;
+namespace Tonis\Web\Package;
 
 use Interop\Container\ContainerInterface;
-use Tonis\Tonis\Tonis;
-use Tonis\Tonis\TonisConsole;
+use Tonis\Web\Tonis;
+use Tonis\Web\TonisConsole;
 use Tonis\Router\RouteCollection;
 
 abstract class AbstractPackage implements PackageInterface

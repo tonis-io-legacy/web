@@ -1,8 +1,8 @@
 <?php
-namespace Tonis\Tonis\Integration;
+namespace Tonis\Web\Integration;
 
-use Tonis\Tonis\Factory\TonisFactory;
-use Tonis\Tonis\Tonis;
+use Tonis\Web\Factory\TonisFactory;
+use Tonis\Web\Tonis;
 
 class ApiTest extends \PHPUnit_Framework_TestCase
 {
@@ -58,7 +58,7 @@ class ApiTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(500, $response->getStatusCode());
         $this->assertSame(['application/json'], $response->getHeader('Content-Type'));
         $this->assertSame('An error has occurred', $json['error']);
-        $this->assertSame('Tonis\Tonis\Exception\InvalidDispatchResultException', $json['exception']);
+        $this->assertSame('Tonis\Web\Exception\InvalidDispatchResultException', $json['exception']);
     }
 
     protected function setUp()

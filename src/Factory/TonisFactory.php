@@ -1,16 +1,16 @@
 <?php
-namespace Tonis\Tonis\Factory;
+namespace Tonis\Web\Factory;
 
 use Tonis\Di\Container;
 use Tonis\Dispatcher\Dispatcher;
 use Tonis\Event\EventManager;
-use Tonis\Tonis\Subscriber\ApiSubscriber;
-use Tonis\Tonis\Subscriber\BaseSubscriber;
-use Tonis\Tonis\Subscriber\ConsoleSubscriber;
-use Tonis\Tonis\Subscriber\WebSubscriber;
-use Tonis\Tonis\Tonis;
-use Tonis\Tonis\TonisConfig;
-use Tonis\Tonis\TonisConsole;
+use Tonis\Web\Subscriber\ApiSubscriber;
+use Tonis\Web\Subscriber\BaseSubscriber;
+use Tonis\Web\Subscriber\ConsoleSubscriber;
+use Tonis\Web\Subscriber\WebSubscriber;
+use Tonis\Web\Tonis;
+use Tonis\Web\TonisConfig;
+use Tonis\Web\TonisConsole;
 use Tonis\Package\PackageManager;
 use Tonis\Router\RouteCollection;
 use Tonis\View\ViewManager;

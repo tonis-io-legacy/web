@@ -1,11 +1,11 @@
 <?php
-namespace Tonis\Tonis;
+namespace Tonis\Web;
 
-use Tonis\Tonis\TestAsset\TestPackage\TestPackage;
-use Tonis\Tonis\TestAsset\TestSubscriber;
+use Tonis\Web\TestAsset\TestPackage\TestPackage;
+use Tonis\Web\TestAsset\TestSubscriber;
 
 /**
- * @coversDefaultClass \Tonis\Tonis\TonisConfig
+ * @coversDefaultClass \Tonis\Web\TonisConfig
  */
 class TonisConfigTest extends \PHPUnit_Framework_TestCase
 {

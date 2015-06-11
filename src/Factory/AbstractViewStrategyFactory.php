@@ -1,7 +1,7 @@
 <?php
-namespace Tonis\Tonis\Factory;
+namespace Tonis\Web\Factory;
 
-use Tonis\Tonis\Package\PackageInterface;
+use Tonis\Web\Package\PackageInterface;
 use Tonis\Package\PackageManager;
 
 abstract class AbstractViewStrategyFactory

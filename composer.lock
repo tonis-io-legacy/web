@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "a17c573e2b90f8ce113913fcc43b26e7",
+    "hash": "ad59aa4844d79d0b43839f7604c67b0e",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -285,12 +285,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/tonis-io/view.git",
-                "reference": "04e9430208ff4c7011e7401021ddec96c47b7188"
+                "reference": "7107c3740bae47b15a898285d5e48d4a4694c642"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tonis-io/view/zipball/04e9430208ff4c7011e7401021ddec96c47b7188",
-                "reference": "04e9430208ff4c7011e7401021ddec96c47b7188",
+                "url": "https://api.github.com/repos/tonis-io/view/zipball/7107c3740bae47b15a898285d5e48d4a4694c642",
+                "reference": "7107c3740bae47b15a898285d5e48d4a4694c642",
                 "shasum": ""
             },
             "require": {
@@ -329,7 +329,7 @@
                 }
             ],
             "description": "Tonis\\View is a light-weight, HHVM compatible, and dependency free view compatability layer. It does not provide its own templating system!",
-            "time": "2015-06-08 15:21:08"
+            "time": "2015-06-11 21:56:51"
         }
     ],
     "packages-dev": [

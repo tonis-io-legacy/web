@@ -1,5 +1,5 @@
 <?php
-namespace Tonis\Tonis\Exception;
+namespace Tonis\Web\Exception;
 
 class InvalidViewModelException extends \RuntimeException
 {

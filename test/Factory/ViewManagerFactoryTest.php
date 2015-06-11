@@ -1,14 +1,14 @@
 <?php
-namespace Tonis\Tonis\Factory;
+namespace Tonis\Web\Factory;
 
 use Tonis\Di\Container;
-use Tonis\Tonis\TestAsset\TestPackage\TestPackage;
+use Tonis\Web\TestAsset\TestPackage\TestPackage;
 use Tonis\Package\PackageManager;
 use Tonis\View\Strategy\StringStrategy;
 use Tonis\View\ViewManager;
 
 /**
- * @coversDefaultClass \Tonis\Tonis\Factory\ViewManagerFactory
+ * @coversDefaultClass \Tonis\Web\Factory\ViewManagerFactory
  */
 class ViewStrategyFactoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,7 +24,15 @@ class ViewStrategyFactoryTest extends \PHPUnit_Framework_TestCase
         $di = new Container;
         $di->set(PackageManager::class, $pm);
 
-        $di['config'] = ['tonis' => ['view_manager' => ['error_template' => 'error', 'not_found_template' => '404']]];
+        $di['config'] = [
+            'tonis' => [
+                'view_manager' => [
+                    'fallback_strategy' => new StringStrategy(),
+                    'error_template' => 'error',
+                    'not_found_template' => '404'
+                ]
+            ]
+        ];
 
         $factory = new ViewManagerFactory();
         $vm = $factory->__invoke($di);

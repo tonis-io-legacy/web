@@ -1,12 +1,12 @@
 <?php
-namespace Tonis\Tonis;
+namespace Tonis\Web;
 
 use Interop\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Tonis\Event\EventManager;
-use Tonis\Tonis\Exception\MissingRequiredEnvironmentException;
-use Tonis\Tonis\Package\PackageInterface;
+use Tonis\Web\Exception\MissingRequiredEnvironmentException;
+use Tonis\Web\Package\PackageInterface;
 use Tonis\Package\PackageManager;
 use Tonis\Router\RouteCollection;
 use Tonis\Router\RouteMatch;

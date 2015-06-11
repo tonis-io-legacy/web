@@ -1,8 +1,8 @@
 <?php
-namespace Tonis\Tonis\TestAsset;
+namespace Tonis\Web\TestAsset;
 
 use Tonis\Di\Container;
-use Tonis\Tonis\Factory\AbstractViewStrategyFactory;
+use Tonis\Web\Factory\AbstractViewStrategyFactory;
 use Tonis\Package\PackageManager;
 
 class TestViewStrategyFactory extends AbstractViewStrategyFactory

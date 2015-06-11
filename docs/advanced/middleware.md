@@ -35,7 +35,7 @@ class IndexController
 require __DIR__ . '/../vendor/autoload.php';
 
 $config = ['packages' => [ExamplePackage\ExamplePackage::class]];
-$tonisFactory = new Tonis\Tonis\Factory\TonisFactory;
+$tonisFactory = new Tonis\Web\Factory\TonisFactory;
 
 $app = new Zend\Stratigility\MiddlewarePipe();
 

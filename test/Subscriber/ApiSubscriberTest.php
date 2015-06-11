@@ -1,18 +1,19 @@
 <?php
-namespace Tonis\Tonis\Subscriber;
+namespace Tonis\Web\Subscriber;
 
 use Tonis\Di\Container;
 use Tonis\Event\EventManager;
-use Tonis\Tonis\LifecycleEvent;
-use Tonis\Tonis\TestAsset\NewRequestTrait;
-use Tonis\Tonis\Tonis;
+use Tonis\View\Strategy\StringStrategy;
+use Tonis\Web\LifecycleEvent;
+use Tonis\Web\TestAsset\NewRequestTrait;
+use Tonis\Web\Tonis;
 use Tonis\View\Model\JsonModel;
 use Tonis\View\Model\StringModel;
 use Tonis\View\Strategy\JsonStrategy;
 use Tonis\View\ViewManager;
 
 /**
- * @coversDefaultClass \Tonis\Tonis\Subscriber\ApiSubscriber
+ * @coversDefaultClass \Tonis\Web\Subscriber\ApiSubscriber
  */
 class ApiSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -45,7 +46,7 @@ class ApiSubscriberTest extends \PHPUnit_Framework_TestCase
      */
     public function testBootstrapViewManager()
     {
-        $vm = new ViewManager;
+        $vm = new ViewManager(new StringStrategy());
         $this->di->set(ViewManager::class, $vm, true);
 
         $this->s->bootstrapViewManager();
