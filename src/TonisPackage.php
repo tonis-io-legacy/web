@@ -19,7 +19,7 @@ class TonisPackage extends AbstractPackage
     {
         $di = $tonis->di();
         $config = $tonis->getConfig();
-        $packageConfig = $di['config']['mvc'];
+        $packageConfig = $di['config']['tonis'];
 
         $subscribers = array_merge($config->getSubscribers(), $packageConfig['subscribers']);
         foreach ($subscribers as $subscriber => $factory) {

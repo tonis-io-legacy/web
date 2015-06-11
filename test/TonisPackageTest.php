@@ -24,7 +24,7 @@ class TonisPackageTest extends \PHPUnit_Framework_TestCase
         $tonis = (new TonisFactory)->createTonisInstance();
         $di = $tonis->di();
         $di['config'] = [
-            'mvc' => [
+            'tonis' => [
                 'subscribers' => [
                     new TestSubscriber(),
                     TestSubscriber::class => TestSubscriber::class

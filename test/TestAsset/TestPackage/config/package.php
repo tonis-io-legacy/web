@@ -3,7 +3,7 @@ use Tonis\View\Strategy\StringStrategy;
 
 return [
     'foo' => 'bar',
-    'mvc' => [
+    'tonis' => [
         'view_manager' => [
             'strategies' => [
                 StringStrategy::class,

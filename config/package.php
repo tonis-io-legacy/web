@@ -16,7 +16,7 @@ return [
             'layout' => __DIR__ . '/../view/twig/layout'
         ]
     ],
-    'mvc' => [
+    'tonis' => [
         'subscribers' => [],
         'view_manager' => [
             'not_found_template' => '@error/404',

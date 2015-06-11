@@ -51,7 +51,7 @@ class BaseSubscriberTest extends \PHPUnit_Framework_TestCase
     public function testBootstrapPackageSubscribers()
     {
         $di = $this->tonis->di();
-        $di['config'] = ['mvc' => ['subscribers' => [new TestSubscriber()]]];
+        $di['config'] = ['tonis' => ['subscribers' => [new TestSubscriber()]]];
 
         $this->s->bootstrapPackageSubscribers();
         $this->assertNotEmpty($this->tonis->events()->getListeners());

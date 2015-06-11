@@ -1,8 +1,6 @@
 <?php
 namespace Tonis\Tonis\Integration;
 
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\BufferedOutput;
 use Tonis\Tonis\Factory\TonisFactory;
 use Tonis\Tonis\Tonis;
 

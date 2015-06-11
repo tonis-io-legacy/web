@@ -15,7 +15,7 @@ final class ViewManagerFactory
     public function __invoke(Container $di)
     {
         $vm = new ViewManager();
-        $config = $di['config']['mvc']['view_manager'];
+        $config = $di['config']['tonis']['view_manager'];
 
         $vm->setErrorTemplate($config['error_template']);
         $vm->setNotFoundTemplate($config['not_found_template']);

@@ -254,7 +254,6 @@ class TonisTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers ::bootstrapEnvironment
-     * @runInSeparateProcess
      */
     public function testBootstrapEnvironment()
     {
@@ -273,6 +272,11 @@ class TonisTest extends \PHPUnit_Framework_TestCase
     {
         $tonis = (new TonisFactory)->createTonisInstance(['required_environment' => ['TONIS_ENV_TEST']]);
         $tonis->bootstrap();
+    }
+
+    protected function tearDown()
+    {
+        putenv('TONIS_ENV_TEST');
     }
 
     protected function setUp()

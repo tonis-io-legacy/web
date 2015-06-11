@@ -52,7 +52,7 @@ final class BaseSubscriber implements SubscriberInterface
     {
         /** @var Tonis $tonis */
         $tonis = $this->di->get(Tonis::class);
-        $subscribers = $this->di['config']['mvc']['subscribers'];
+        $subscribers = $this->di['config']['tonis']['subscribers'];
 
         foreach ($subscribers as $subscriber) {
             $tonis->events()->subscribe(ContainerUtil::get($this->di, $subscriber));
