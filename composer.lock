@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "5bcabdc0d2e6a6dfa0072a1728083b64",
+    "hash": "39f3ac4c943df97430e16e2a48ea785b",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -236,12 +236,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/tonis-io/router.git",
-                "reference": "af221c905609bc8406d87fce86c185347c4dad88"
+                "reference": "bab34c58d4c7e2a2cf37fd9d07e08e53fb6a2851"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tonis-io/router/zipball/af221c905609bc8406d87fce86c185347c4dad88",
-                "reference": "af221c905609bc8406d87fce86c185347c4dad88",
+                "url": "https://api.github.com/repos/tonis-io/router/zipball/bab34c58d4c7e2a2cf37fd9d07e08e53fb6a2851",
+                "reference": "bab34c58d4c7e2a2cf37fd9d07e08e53fb6a2851",
                 "shasum": ""
             },
             "require": {
@@ -277,7 +277,7 @@
                 }
             ],
             "description": "Tonis\\Router is a light-weight, HHVM compatible, and dependency free router library.",
-            "time": "2015-06-07 19:38:39"
+            "time": "2015-06-10 13:25:08"
         },
         {
             "name": "tonis/view",
