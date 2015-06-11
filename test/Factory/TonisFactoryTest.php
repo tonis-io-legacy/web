@@ -1,11 +1,11 @@
 <?php
-namespace Tonis\Mvc\Factory;
+namespace Tonis\Tonis\Factory;
 
 use Tonis\Dispatcher\Dispatcher;
 use Tonis\Event\EventManager;
-use Tonis\Mvc\Tonis;
-use Tonis\Mvc\TonisConfig;
-use Tonis\Mvc\TonisConsole;
+use Tonis\Tonis\Tonis;
+use Tonis\Tonis\TonisConfig;
+use Tonis\Tonis\TonisConsole;
 use Tonis\Package\PackageManager;
 use Tonis\Router\RouteCollection;
 use Tonis\View\Strategy\PlatesStrategy;
@@ -13,7 +13,7 @@ use Tonis\View\Strategy\TwigStrategy;
 use Tonis\View\ViewManager;
 
 /**
- * @coversDefaultClass \Tonis\Mvc\Factory\TonisFactory
+ * @coversDefaultClass \Tonis\Tonis\Factory\TonisFactory
  */
 class TonisFactoryTest extends \PHPUnit_Framework_TestCase
 {

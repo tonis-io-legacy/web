@@ -1,8 +1,8 @@
 <?php
-namespace Tonis\Mvc;
+namespace Tonis\Tonis;
 
 /**
- * @coversDefaultClass \Tonis\Mvc\TonisConfig
+ * @coversDefaultClass \Tonis\Tonis\TonisConfig
  */
 class TonisConfigTest extends \PHPUnit_Framework_TestCase
 {

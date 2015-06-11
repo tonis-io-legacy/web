@@ -1,5 +1,5 @@
 <?php
-namespace Tonis\Mvc\TestAsset;
+namespace Tonis\Tonis\TestAsset;
 
 use Tonis\View\Model\ViewModel;
 use Tonis\View\ModelInterface;

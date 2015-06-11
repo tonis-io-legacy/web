@@ -1,5 +1,5 @@
 <?php
-namespace Tonis\Mvc\Exception;
+namespace Tonis\Tonis\Exception;
 
 class MissingRequiredEnvironmentException extends \InvalidArgumentException
 {

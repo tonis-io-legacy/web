@@ -1,5 +1,5 @@
 <?php
-namespace Tonis\Mvc;
+namespace Tonis\Tonis;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;

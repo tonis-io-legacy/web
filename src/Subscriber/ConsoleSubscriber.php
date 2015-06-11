@@ -1,12 +1,12 @@
 <?php
-namespace Tonis\Mvc\Subscriber;
+namespace Tonis\Tonis\Subscriber;
 
 use Interop\Container\ContainerInterface;
 use Tonis\Event\EventManager;
 use Tonis\Event\SubscriberInterface;
-use Tonis\Mvc\Package\PackageInterface;
-use Tonis\Mvc\Tonis;
-use Tonis\Mvc\TonisConsole;
+use Tonis\Tonis\Package\PackageInterface;
+use Tonis\Tonis\Tonis;
+use Tonis\Tonis\TonisConsole;
 use Tonis\Package\PackageManager;
 
 final class ConsoleSubscriber implements SubscriberInterface

@@ -1,12 +1,12 @@
 <?php
-namespace Tonis\Mvc;
+namespace Tonis\Tonis;
 
 use Psr\Http\Message\ResponseInterface;
 use Tonis\Di\Container;
 use Tonis\Event\EventManager;
-use Tonis\Mvc\Factory\TonisFactory;
-use Tonis\Mvc\TestAsset\NewRequestTrait;
-use Tonis\Mvc\TestAsset\TestPackage\TestPackage;
+use Tonis\Tonis\Factory\TonisFactory;
+use Tonis\Tonis\TestAsset\NewRequestTrait;
+use Tonis\Tonis\TestAsset\TestPackage\TestPackage;
 use Tonis\Package\PackageManager;
 use Tonis\Router\Route;
 use Tonis\Router\RouteCollection;
@@ -15,7 +15,7 @@ use Zend\Diactoros\Response;
 use Zend\Diactoros\ServerRequestFactory;
 
 /**
- * @coversDefaultClass \Tonis\Mvc\Tonis
+ * @coversDefaultClass \Tonis\Tonis\Tonis
  */
 class TonisTest extends \PHPUnit_Framework_TestCase
 {

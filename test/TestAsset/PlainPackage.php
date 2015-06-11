@@ -1,7 +1,7 @@
 <?php
-namespace Tonis\Mvc\TestAsset;
+namespace Tonis\Tonis\TestAsset;
 
-use Tonis\Mvc\Package\AbstractPackage;
+use Tonis\Tonis\Package\AbstractPackage;
 
 class PlainPackage extends AbstractPackage
 {

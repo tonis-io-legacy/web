@@ -1,14 +1,14 @@
 <?php
-namespace Tonis\Mvc\Subscriber;
+namespace Tonis\Tonis\Subscriber;
 
 use Tonis\Event\EventManager;
-use Tonis\Mvc\Factory\TonisFactory;
-use Tonis\Mvc\TestAsset\TestPackage\TestPackage;
-use Tonis\Mvc\Tonis;
+use Tonis\Tonis\Factory\TonisFactory;
+use Tonis\Tonis\TestAsset\TestPackage\TestPackage;
+use Tonis\Tonis\Tonis;
 use Tonis\Package\PackageManager;
 
 /**
- * @coversDefaultClass \Tonis\Mvc\Subscriber\ConsoleSubscriber
+ * @coversDefaultClass \Tonis\Tonis\Subscriber\ConsoleSubscriber
  */
 class ConsoleSubscriberTest extends \PHPUnit_Framework_TestCase
 {

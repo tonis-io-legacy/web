@@ -1,5 +1,5 @@
 <?php
-namespace Tonis\Mvc\TestAsset;
+namespace Tonis\Tonis\TestAsset;
 
 class TestTwigExtension extends \Twig_Extension
 {

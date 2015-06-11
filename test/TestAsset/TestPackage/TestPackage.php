@@ -1,8 +1,8 @@
 <?php
-namespace Tonis\Mvc\TestAsset\TestPackage;
+namespace Tonis\Tonis\TestAsset\TestPackage;
 
 use Interop\Container\ContainerInterface;
-use Tonis\Mvc\Package\AbstractPackage;
+use Tonis\Tonis\Package\AbstractPackage;
 use Tonis\Router\RouteCollection;
 
 class TestPackage extends AbstractPackage

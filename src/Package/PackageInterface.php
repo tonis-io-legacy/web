@@ -1,8 +1,8 @@
 <?php
-namespace Tonis\Mvc\Package;
+namespace Tonis\Tonis\Package;
 
 use Interop\Container\ContainerInterface;
-use Tonis\Mvc;
+use Tonis\Tonis;
 use Tonis\Package\Feature;
 use Tonis\Router\RouteCollection;
 

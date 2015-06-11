@@ -1,16 +1,16 @@
 <?php
-namespace Tonis\Mvc\Subscriber;
+namespace Tonis\Tonis\Subscriber;
 
 use League\Plates\Engine;
 use Tonis\Di\Container;
 use Tonis\Event\EventManager;
-use Tonis\Mvc\Exception\InvalidDispatchResultException;
-use Tonis\Mvc\Exception\InvalidTemplateException;
-use Tonis\Mvc\LifecycleEvent;
-use Tonis\Mvc\TestAsset\NewRequestTrait;
-use Tonis\Mvc\TestAsset\TestAction;
-use Tonis\Mvc\TestAsset\TestViewModelStrategy;
-use Tonis\Mvc\Tonis;
+use Tonis\Tonis\Exception\InvalidDispatchResultException;
+use Tonis\Tonis\Exception\InvalidTemplateException;
+use Tonis\Tonis\LifecycleEvent;
+use Tonis\Tonis\TestAsset\NewRequestTrait;
+use Tonis\Tonis\TestAsset\TestAction;
+use Tonis\Tonis\TestAsset\TestViewModelStrategy;
+use Tonis\Tonis\Tonis;
 use Tonis\Router\Route;
 use Tonis\Router\RouteMatch;
 use Tonis\View\Model\StringModel;
@@ -20,7 +20,7 @@ use Tonis\View\Strategy\StringStrategy;
 use Tonis\View\ViewManager;
 
 /**
- * @coversDefaultClass \Tonis\Mvc\Subscriber\WebSubscriber
+ * @coversDefaultClass \Tonis\Tonis\Subscriber\WebSubscriber
  */
 class WebSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -77,7 +77,7 @@ class WebSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->s->onDispatch($event);
         $model = $event->getDispatchResult();
         $this->assertInstanceOf(ViewModel::class, $model);
-        $this->assertSame('@tonis/mvc/test-asset/test', $model->getTemplate());
+        $this->assertSame('@tonis/tonis/test-asset/test', $model->getTemplate());
         $this->assertSame(['foo' => 'bar'], $model->getVariables());
 
         $event->setDispatchResult('foo');

@@ -1,5 +1,5 @@
 <?php
-namespace Tonis\Mvc;
+namespace Tonis\Tonis;
 
 use Exception;
 use Psr\Http\Message\RequestInterface;

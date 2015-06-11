@@ -1,5 +1,5 @@
 <?php
-namespace Tonis\Mvc\TestAsset;
+namespace Tonis\Tonis\TestAsset;
 
 use Tonis\Event\EventManager;
 use Tonis\Event\SubscriberInterface;

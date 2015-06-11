@@ -1,14 +1,14 @@
 <?php
-namespace Tonis\Mvc\Factory;
+namespace Tonis\Tonis\Factory;
 
 use Tonis\Di\Container;
-use Tonis\Mvc\TestAsset\TestPackage\TestPackage;
+use Tonis\Tonis\TestAsset\TestPackage\TestPackage;
 use Tonis\Package\PackageManager;
 use Tonis\View\Strategy\StringStrategy;
 use Tonis\View\ViewManager;
 
 /**
- * @coversDefaultClass \Tonis\Mvc\Factory\ViewManagerFactory
+ * @coversDefaultClass \Tonis\Tonis\Factory\ViewManagerFactory
  */
 class ViewStrategyFactoryTest extends \PHPUnit_Framework_TestCase
 {

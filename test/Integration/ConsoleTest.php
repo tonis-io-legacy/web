@@ -1,9 +1,9 @@
 <?php
-namespace Tonis\Mvc\Integration;
+namespace Tonis\Tonis\Integration;
 
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
-use Tonis\Mvc\Factory\TonisFactory;
+use Tonis\Tonis\Factory\TonisFactory;
 
 class ConsoleTest extends \PHPUnit_Framework_TestCase
 {

@@ -1,14 +1,14 @@
 <?php
-namespace Tonis\Mvc\Factory;
+namespace Tonis\Tonis\Factory;
 
 use League\Plates\Engine;
 use Tonis\Di\Container;
-use Tonis\Mvc\TestAsset\TestPackage\TestPackage;
+use Tonis\Tonis\TestAsset\TestPackage\TestPackage;
 use Tonis\Package\PackageManager;
 use Tonis\View\Strategy\PlatesStrategy;
 
 /**
- * @coversDefaultClass \Tonis\Mvc\Factory\PlatesStrategyFactory
+ * @coversDefaultClass \Tonis\Tonis\Factory\PlatesStrategyFactory
  */
 class PlatesStrategyFactoryTest extends \PHPUnit_Framework_TestCase
 {

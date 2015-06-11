@@ -1,10 +1,10 @@
 <?php
-namespace Tonis\Mvc\Integration;
+namespace Tonis\Tonis\Integration;
 
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
-use Tonis\Mvc\Factory\TonisFactory;
-use Tonis\Mvc\Tonis;
+use Tonis\Tonis\Factory\TonisFactory;
+use Tonis\Tonis\Tonis;
 
 class ApiTest extends \PHPUnit_Framework_TestCase
 {
@@ -60,7 +60,7 @@ class ApiTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(500, $response->getStatusCode());
         $this->assertSame(['application/json'], $response->getHeader('Content-Type'));
         $this->assertSame('An error has occurred', $json['error']);
-        $this->assertSame('Tonis\Mvc\Exception\InvalidDispatchResultException', $json['exception']);
+        $this->assertSame('Tonis\Tonis\Exception\InvalidDispatchResultException', $json['exception']);
     }
 
     protected function setUp()

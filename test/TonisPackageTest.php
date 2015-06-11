@@ -1,15 +1,15 @@
 <?php
-namespace Tonis\Mvc;
+namespace Tonis\Tonis;
 
 use Tonis\Di\Container;
-use Tonis\Mvc\Factory\TonisFactory;
-use Tonis\Mvc\TestAsset\TestSubscriber;
+use Tonis\Tonis\Factory\TonisFactory;
+use Tonis\Tonis\TestAsset\TestSubscriber;
 use Tonis\Package\PackageManager;
 use Tonis\View\Strategy\PlatesStrategy;
 use Tonis\View\Strategy\TwigStrategy;
 
 /**
- * @coversDefaultClass \Tonis\Mvc\TonisPackage
+ * @coversDefaultClass \Tonis\Tonis\TonisPackage
  */
 class TonisPackageTest extends \PHPUnit_Framework_TestCase
 {

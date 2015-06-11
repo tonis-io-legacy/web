@@ -1,6 +1,6 @@
 <?php
 
-namespace Tonis\Mvc;
+namespace Tonis\Tonis;
 
 use Tonis\View\Strategy;
 
@@ -20,7 +20,6 @@ final class TonisConfig
             'environment' => [],
             'required_environment' => ['TONIS_DEBUG'],
             'packages' => [],
-            'services' => [],
             'subscribers' => [],
         ];
 

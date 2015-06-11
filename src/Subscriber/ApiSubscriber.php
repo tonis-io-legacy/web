@@ -1,11 +1,11 @@
 <?php
-namespace Tonis\Mvc\Subscriber;
+namespace Tonis\Tonis\Subscriber;
 
 use Interop\Container\ContainerInterface;
 use Tonis\Event\EventManager;
 use Tonis\Event\SubscriberInterface;
-use Tonis\Mvc\LifecycleEvent;
-use Tonis\Mvc\Tonis;
+use Tonis\Tonis\LifecycleEvent;
+use Tonis\Tonis\Tonis;
 use Tonis\Router\RouteMatch;
 use Tonis\View\Model\JsonModel;
 use Tonis\View\Strategy\JsonStrategy;

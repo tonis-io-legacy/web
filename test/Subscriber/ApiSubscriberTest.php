@@ -1,17 +1,17 @@
 <?php
-namespace Tonis\Mvc\Subscriber;
+namespace Tonis\Tonis\Subscriber;
 
 use Tonis\Di\Container;
 use Tonis\Event\EventManager;
-use Tonis\Mvc\LifecycleEvent;
-use Tonis\Mvc\TestAsset\NewRequestTrait;
-use Tonis\Mvc\Tonis;
+use Tonis\Tonis\LifecycleEvent;
+use Tonis\Tonis\TestAsset\NewRequestTrait;
+use Tonis\Tonis\Tonis;
 use Tonis\View\Model\JsonModel;
 use Tonis\View\Strategy\JsonStrategy;
 use Tonis\View\ViewManager;
 
 /**
- * @coversDefaultClass \Tonis\Mvc\Subscriber\ApiSubscriber
+ * @coversDefaultClass \Tonis\Tonis\Subscriber\ApiSubscriber
  */
 class ApiSubscriberTest extends \PHPUnit_Framework_TestCase
 {

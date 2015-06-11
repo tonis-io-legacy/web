@@ -1,11 +1,11 @@
 <?php
-namespace Tonis\Mvc;
+namespace Tonis\Tonis;
 
 use Interop\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Tonis\Event\EventManager;
-use Tonis\Mvc\Package\PackageInterface;
+use Tonis\Tonis\Package\PackageInterface;
 use Tonis\Package\PackageManager;
 use Tonis\Router\RouteCollection;
 use Tonis\Router\RouteMatch;

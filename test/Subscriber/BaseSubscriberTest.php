@@ -1,13 +1,13 @@
 <?php
-namespace Tonis\Mvc\Subscriber;
+namespace Tonis\Tonis\Subscriber;
 
 use Tonis\Event\EventManager;
-use Tonis\Mvc\Factory\TonisFactory;
-use Tonis\Mvc\LifecycleEvent;
-use Tonis\Mvc\TestAsset\NewRequestTrait;
-use Tonis\Mvc\TestAsset\TestSubscriber;
-use Tonis\Mvc\TestAsset\TestViewModelStrategy;
-use Tonis\Mvc\Tonis;
+use Tonis\Tonis\Factory\TonisFactory;
+use Tonis\Tonis\LifecycleEvent;
+use Tonis\Tonis\TestAsset\NewRequestTrait;
+use Tonis\Tonis\TestAsset\TestSubscriber;
+use Tonis\Tonis\TestAsset\TestViewModelStrategy;
+use Tonis\Tonis\Tonis;
 use Tonis\Router\Route;
 use Tonis\Router\RouteMatch;
 use Tonis\View\Model\StringModel;
@@ -16,7 +16,7 @@ use Tonis\View\ViewManager;
 use Zend\Diactoros\Response;
 
 /**
- * @coversDefaultClass \Tonis\Mvc\Subscriber\BaseSubscriber
+ * @coversDefaultClass \Tonis\Tonis\Subscriber\BaseSubscriber
  */
 class BaseSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -154,7 +154,7 @@ class BaseSubscriberTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers ::onDispatchValidateResult
-     * @expectedException \Tonis\Mvc\Exception\InvalidDispatchResultException
+     * @expectedException \Tonis\Tonis\Exception\InvalidDispatchResultException
      */
     public function testOnDispatchValidateResult()
     {

@@ -4,7 +4,7 @@
 </p>
 <pre>
 // config/routes.php
-use Tonis\Mvc\ViewModel;
+use Tonis\Tonis\ViewModel;
 use Tonis\Router\RouteCollection;
 
 return function(RouteCollection $routes) {
