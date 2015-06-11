@@ -1,5 +1,5 @@
 {
-    "name": "tonis/tonis",
+    "name": "tonis/web",
     "authors": [
         {
             "name": "Kyle Spraggs",
@@ -33,14 +33,14 @@
     },
     "autoload": {
         "psr-4": {
-            "Tonis\\Tonis\\": [
+            "Tonis\\Web\\": [
                 "src/"
             ]
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Tonis\\Tonis\\": [
+            "Tonis\\Web\\": [
                 "test/"
             ]
         }
