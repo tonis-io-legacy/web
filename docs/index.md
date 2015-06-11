@@ -10,7 +10,7 @@ With the abundance of frameworks and micro-frameworks out there why would you us
   * You want 100% unit tested and integration tested code.
   * You want high quality code.
   * You want to take advantage of PSR-7.
-  * You want a middleware enabled framework.
+  * You want a middleware ready framework.
   * You want code that runs on HHVM or PHP7 out of the box.
   * You want to avoid overused globals and static method calls.
   * You want modular and reusable code.

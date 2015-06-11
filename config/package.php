@@ -1,4 +1,6 @@
 <?php
+use Tonis\View\Strategy\PlatesStrategy;
+
 return [
     'plates' => [
         'folders' => [
@@ -19,6 +21,7 @@ return [
     'tonis' => [
         'subscribers' => [],
         'view_manager' => [
+            'fallback_strategy' => PlatesStrategy::class,
             'not_found_template' => '@error/404',
             'error_template' => '@error/error',
             'strategies' => [],
