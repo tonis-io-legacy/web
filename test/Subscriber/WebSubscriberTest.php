@@ -149,7 +149,7 @@ class WebSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $event->setException(new InvalidDispatchResultException());
         $this->s->onRenderException($event);
-        $this->assertSame('error/exception:{"exception":"Tonis\\\\Mvc\\\\Exception\\\\InvalidDispatchResultException","type":"invalid-dispatch-result","path":"\/"}', $event->getRenderResult());
+        $this->assertSame('error/exception:{"exception":"Tonis\\\\Tonis\\\\Exception\\\\InvalidDispatchResultException","type":"invalid-dispatch-result","path":"\/"}', $event->getRenderResult());
     }
 
     protected function setUp()

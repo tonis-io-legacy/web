@@ -13,14 +13,14 @@ interface PackageInterface extends
     Feature\PathProviderInterface
 {
     /**
-     * @param Mvc\Tonis $tonis
+     * @param Tonis\Tonis $tonis
      */
-    public function bootstrap(Mvc\Tonis $tonis);
+    public function bootstrap(Tonis\Tonis $tonis);
 
     /**
-     * @param Mvc\TonisConsole $console
+     * @param Tonis\TonisConsole $console
      */
-    public function bootstrapConsole(Mvc\TonisConsole $console);
+    public function bootstrapConsole(Tonis\TonisConsole $console);
 
     /**
      * @param ContainerInterface $di
