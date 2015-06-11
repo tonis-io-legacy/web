@@ -33,14 +33,14 @@
     },
     "autoload": {
         "psr-4": {
-            "Tonis\\Mvc\\": [
+            "Tonis\\Tonis\\": [
                 "src/"
             ]
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Tonis\\Mvc\\": [
+            "Tonis\\Tonis\\": [
                 "test/"
             ]
         }
