@@ -15,7 +15,7 @@ class ApiTest extends \PHPUnit_Framework_TestCase
             return ['foo' => 'bar'];
         });
 
-        $response = $this->tonis->run();
+        $response = $this->tonis->__invoke();
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame(['application/json'], $response->getHeader('Content-Type'));
         $this->assertSame('{"foo":"bar"}', (string) $response->getBody());
@@ -23,7 +23,7 @@ class ApiTest extends \PHPUnit_Framework_TestCase
 
     public function testApiHandlesInvalidRoutes()
     {
-        $response = $this->tonis->run();
+        $response = $this->tonis->__invoke();
 
         $this->assertSame(404, $response->getStatusCode());
         $this->assertSame(['application/json'], $response->getHeader('Content-Type'));
@@ -36,7 +36,7 @@ class ApiTest extends \PHPUnit_Framework_TestCase
             throw new \RuntimeException('foobar');
         });
 
-        $response = $this->tonis->run();
+        $response = $this->tonis->__invoke();
         $json = json_decode((string) $response->getBody(), true);
 
         $this->assertSame(500, $response->getStatusCode());
@@ -52,7 +52,7 @@ class ApiTest extends \PHPUnit_Framework_TestCase
             return null;
         });
 
-        $response = $this->tonis->run();
+        $response = $this->tonis->__invoke();
         $json = json_decode((string) $response->getBody(), true);
 
         $this->assertSame(500, $response->getStatusCode());

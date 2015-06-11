@@ -17,7 +17,7 @@ class WebTest extends \PHPUnit_Framework_TestCase
             return ['foo' => 'bar', '$$template' => '@test-package/test'];
         });
 
-        $response = $this->tonis->run();
+        $response = $this->tonis->__invoke();
         $body = (string) $response->getBody();
 
         $this->assertSame(200, $response->getStatusCode());
@@ -27,7 +27,7 @@ class WebTest extends \PHPUnit_Framework_TestCase
 
     public function testWebHandlesInvalidRoutes()
     {
-        $response = $this->tonis->run();
+        $response = $this->tonis->__invoke();
         $body = (string) $response->getBody();
 
         $this->assertSame(404, $response->getStatusCode());
@@ -41,7 +41,7 @@ class WebTest extends \PHPUnit_Framework_TestCase
             throw new \RuntimeException('foobar');
         });
 
-        $response = $this->tonis->run();
+        $response = $this->tonis->__invoke();
         $body = (string) $response->getBody();
 
         $this->assertSame(500, $response->getStatusCode());
@@ -56,7 +56,7 @@ class WebTest extends \PHPUnit_Framework_TestCase
             return null;
         });
 
-        $response = $this->tonis->run();
+        $response = $this->tonis->__invoke();
         $body = (string) $response->getBody();
 
         $this->assertSame(500, $response->getStatusCode());

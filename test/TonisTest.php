@@ -6,6 +6,7 @@ use Tonis\Di\Container;
 use Tonis\Event\EventManager;
 use Tonis\Tonis\Factory\TonisFactory;
 use Tonis\Tonis\TestAsset\NewRequestTrait;
+use Tonis\Tonis\TestAsset\TestEmitter;
 use Tonis\Tonis\TestAsset\TestPackage\TestPackage;
 use Tonis\Package\PackageManager;
 use Tonis\Router\Route;
@@ -25,30 +26,32 @@ class TonisTest extends \PHPUnit_Framework_TestCase
     private $tonis;
 
     /**
-     * @covers ::__invoke
-     */
-    public function testInvokeProxiesToRun()
-    {
-        $request = ServerRequestFactory::fromGlobals();
-        $response = new Response;
-        $this->assertSame($this->tonis->run($request, $response), $this->tonis->__invoke($request, $response));
-    }
-
-    /**
      * @covers ::run
      */
     public function testRun()
     {
+        $emitter = new TestEmitter;
+        $tonis = (new TonisFactory)->createTonisInstance();
+        $tonis->run($emitter);
+
+        $this->assertInstanceOf(ResponseInterface::class, $emitter->getResponse());
+    }
+
+    /**
+     * @covers ::__invoke
+     */
+    public function testInvoke()
+    {
         $request = ServerRequestFactory::fromGlobals();
 
         $tonis = (new TonisFactory)->createTonisInstance();
-        $tonis->run($request);
+        $tonis->__invoke($request);
 
         $event = $tonis->getLifecycleEvent();
         $this->assertSame($request, $event->getRequest());
 
         $response = new Response;
-        $tonis->run($request, $response);
+        $tonis->__invoke($request, $response);
 
         $event = $tonis->getLifecycleEvent();
         $this->assertSame($request, $event->getRequest());

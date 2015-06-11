@@ -7,6 +7,7 @@ use Tonis\Tonis\LifecycleEvent;
 use Tonis\Tonis\TestAsset\NewRequestTrait;
 use Tonis\Tonis\Tonis;
 use Tonis\View\Model\JsonModel;
+use Tonis\View\Model\StringModel;
 use Tonis\View\Strategy\JsonStrategy;
 use Tonis\View\ViewManager;
 
@@ -56,7 +57,7 @@ class ApiSubscriberTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers ::onDispatch
      */
-    public function testOnDispatch()
+    public function testOnDispatchHandlesArrayResults()
     {
         $event = new LifecycleEvent($this->newRequest('/'));
         $event->setDispatchResult(['foo' => 'bar']);
@@ -64,6 +65,19 @@ class ApiSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->s->onDispatch($event);
         $this->assertInstanceOf(JsonModel::class, $event->getDispatchResult());
         $this->assertSame(['foo' => 'bar'], $event->getDispatchResult()->getData());
+    }
+
+    /**
+     * @covers ::onDispatch
+     */
+    public function testOnDispatchHandlesStringResults()
+    {
+        $event = new LifecycleEvent($this->newRequest('/'));
+        $event->setDispatchResult('foo');
+
+        $this->s->onDispatch($event);
+        $this->assertInstanceOf(StringModel::class, $event->getDispatchResult());
+        $this->assertSame('foo', $event->getDispatchResult()->getString());
     }
 
     /**

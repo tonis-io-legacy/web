@@ -11,6 +11,7 @@ use Tonis\Package\PackageManager;
 use Tonis\Router\RouteCollection;
 use Tonis\Router\RouteMatch;
 use Zend\Diactoros\Response;
+use Zend\Diactoros\Server;
 use Zend\Diactoros\ServerRequestFactory;
 
 final class Tonis
@@ -64,16 +65,6 @@ final class Tonis
         ResponseInterface $response = null,
         callable $next = null
     ) {
-        return $this->run($request, $response);
-    }
-
-    /**
-     * @param RequestInterface $request
-     * @param ResponseInterface $response
-     * @return ResponseInterface|Response
-     */
-    public function run(RequestInterface $request = null, ResponseInterface $response = null)
-    {
         $this->bootstrap();
         $this->route($request);
 
@@ -86,6 +77,17 @@ final class Tonis
         $this->respond();
 
         return $this->lifecycleEvent->getResponse();
+    }
+
+    public function run(Response\EmitterInterface $emitter = null)
+    {
+        $server = Server::createServer($this, $_SERVER, $_GET, $_POST, $_COOKIE, $_FILES);
+
+        if ($emitter) {
+            $server->setEmitter($emitter);
+        }
+
+        $server->listen();
     }
 
     public function bootstrap()
