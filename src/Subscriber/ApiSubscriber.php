@@ -8,6 +8,7 @@ use Tonis\Tonis\LifecycleEvent;
 use Tonis\Tonis\Tonis;
 use Tonis\Router\RouteMatch;
 use Tonis\View\Model\JsonModel;
+use Tonis\View\Model\StringModel;
 use Tonis\View\Strategy\JsonStrategy;
 use Tonis\View\ViewManager;
 
@@ -51,6 +52,8 @@ final class ApiSubscriber implements SubscriberInterface
         $result = $event->getDispatchResult();
         if (is_array($result)) {
             $event->setDispatchResult(new JsonModel($result));
+        } elseif (is_string($result)) {
+            $event->setDispatchResult(new StringModel($result));
         }
     }
 

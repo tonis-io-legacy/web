@@ -77,8 +77,10 @@ final class WebSubscriber implements SubscriberInterface
     {
         $dispatchResult = $event->getDispatchResult();
         if (is_array($dispatchResult)) {
-            $template = isset($dispatchResult['$$template']) ? $dispatchResult['$$template'] : null;
-            $dispatchResult = new ViewModel($template, $dispatchResult);
+            $dispatchResult = new ViewModel(
+                isset($dispatchResult['$$template']) ? $dispatchResult['$$template'] : null,
+                $dispatchResult
+            );
         } elseif (is_string($dispatchResult)) {
             $dispatchResult = new StringModel($dispatchResult);
         }

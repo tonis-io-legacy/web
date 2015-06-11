@@ -9,6 +9,51 @@ about what your dispatchable is only that it can be called.
  * Any object with the `__invoke()` magic method
  * Any object implementing `Tonis\Dispatcher\DispatchableInterface`
  * A closure `function() {}`
+ 
+Return Results
+--------------
+
+Tonis expects all dispatchables to return a result it can work with. By default, this includes `array`, `string`, and 
+any instance of `Tonis\View\ModelInterface`. If an invalid result is returned then Tonis will throw a 
+`Tonis\Tonis\Exception\InvalidDispatchResultException`.
+
+Valid return results and conversions are:
+
+<dl>
+    <dt>Return Result</dt>
+    <dd>string</dd>
+    <dt>API Result</dt>
+    <dd><code>new StringModel(string)</code></dd>
+    <dt>Web Result</dt>
+    <dd><code>new StringModel(string)</code></dd>
+</dl>
+
+----
+
+<dl>
+    <dt>Return Result</dt>
+    <dd>array</dd>
+    <dt>API Result</dt>
+    <dd><code>new JsonModel(array)</code></dd>
+    <dt>Web Result</dt>
+    <dd><code>new ViewModel(null, array)</code></dd>
+    <dt>Extra Note</dt>
+    <dd>
+        If the <code>$$template</code> key is specified then the ViewModel will use it instead of <code>null</code> for 
+        the template.
+    </dd>
+</dl>
+
+----
+
+<dl>
+    <dt>Return Result</dt>
+    <dd>Tonis\View\ModelInterface</dd>
+    <dt>API Result</dt>
+    <dd>No change</dd>
+    <dt>Web Result</dt>
+    <dd>No change</dd>
+</dl>
 
 Examples
 --------
