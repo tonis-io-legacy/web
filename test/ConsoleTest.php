@@ -2,24 +2,23 @@
 namespace Tonis\Web;
 
 use Tonis\Di\Container;
-use Tonis\Web\Factory\TonisFactory;
 use Tonis\Web\TestAsset\TestCommand;
 
 /**
- * @coversDefaultClass \Tonis\Web\TonisConsole
+ * @coversDefaultClass \Tonis\Web\Console
  */
-class TonisConsoleTest extends \PHPUnit_Framework_TestCase
+class ConsoleTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var TonisConsole */
+    /** @var Console */
     private $console;
 
     /**
      * @covers ::__construct
-     * @covers ::getTonis
+     * @covers ::getApp
      */
     public function testGetTonis()
     {
-        $this->assertInstanceOf(Tonis::class, $this->console->getTonis());
+        $this->assertInstanceOf(App::class, $this->console->getApp());
     }
 
     /**
@@ -30,11 +29,11 @@ class TonisConsoleTest extends \PHPUnit_Framework_TestCase
         $cmd = new TestCommand('Test');
         $this->console->add($cmd);
 
-        $this->assertInstanceOf(Container::class, $cmd->di());
+        $this->assertInstanceOf(Container::class, $cmd->getServiceContainer());
     }
 
     protected function setUp()
     {
-        $this->console = (new TonisFactory)->createConsole([]);
+        $this->console = (new AppFactory)->createConsole([]);
     }
 }

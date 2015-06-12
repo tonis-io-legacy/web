@@ -9,19 +9,19 @@ use Tonis\View\Strategy\TwigStrategy;
 final class TwigStrategyFactory extends AbstractViewStrategyFactory
 {
     /**
-     * @param Container $di
+     * @param Container $services
      * @return TwigStrategy
      */
-    public function __invoke(Container $di)
+    public function __invoke(Container $services)
     {
         $loader = new \Twig_Loader_Filesystem();
-        $pm = $di->get(PackageManager::class);
+        $pm = $services->get(PackageManager::class);
 
         foreach ($this->getViewPaths($pm) as $name => $path) {
             $loader->addPath($path, $name);
         }
 
-        $config = $di['config']['twig'];
+        $config = $services['config']['twig'];
         foreach ($config['namespaces'] as $namespace => $path) {
             $loader->addPath($path, $namespace);
         }
@@ -29,7 +29,7 @@ final class TwigStrategyFactory extends AbstractViewStrategyFactory
         $twig = new \Twig_Environment($loader, $config['options']);
 
         foreach ($config['extensions'] as $extension) {
-            $twig->addExtension(ContainerUtil::get($di, $extension));
+            $twig->addExtension(ContainerUtil::get($services, $extension));
         }
 
         return new TwigStrategy($twig);

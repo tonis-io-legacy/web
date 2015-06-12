@@ -10,7 +10,7 @@ use Tonis\Web\LifecycleEvent;
 use Tonis\Web\TestAsset\NewRequestTrait;
 use Tonis\Web\TestAsset\TestAction;
 use Tonis\Web\TestAsset\TestViewModelStrategy;
-use Tonis\Web\Tonis;
+use Tonis\Web\App;
 use Tonis\Router\Route;
 use Tonis\Router\RouteMatch;
 use Tonis\View\Model\StringModel;
@@ -43,11 +43,11 @@ class WebSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->s->subscribe($events);
 
         $this->assertCount(5, $events->getListeners());
-        $this->assertCount(1, $events->getListeners(Tonis::EVENT_BOOTSTRAP));
-        $this->assertCount(1, $events->getListeners(Tonis::EVENT_ROUTE_ERROR));
-        $this->assertCount(1, $events->getListeners(Tonis::EVENT_DISPATCH));
-        $this->assertCount(1, $events->getListeners(Tonis::EVENT_DISPATCH_EXCEPTION));
-        $this->assertCount(1, $events->getListeners(Tonis::EVENT_RENDER_EXCEPTION));
+        $this->assertCount(1, $events->getListeners(App::EVENT_BOOTSTRAP));
+        $this->assertCount(1, $events->getListeners(App::EVENT_ROUTE_ERROR));
+        $this->assertCount(1, $events->getListeners(App::EVENT_DISPATCH));
+        $this->assertCount(1, $events->getListeners(App::EVENT_DISPATCH_EXCEPTION));
+        $this->assertCount(1, $events->getListeners(App::EVENT_RENDER_EXCEPTION));
     }
 
     /**

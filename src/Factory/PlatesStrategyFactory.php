@@ -9,19 +9,19 @@ use Tonis\View\Strategy\PlatesStrategy;
 final class PlatesStrategyFactory extends AbstractViewStrategyFactory
 {
     /**
-     * @param Container $di
+     * @param Container $services
      * @return PlatesStrategy
      */
-    public function __invoke(Container $di)
+    public function __invoke(Container $services)
     {
         $engine = new Plates\Engine();
-        $pm = $di->get(PackageManager::class);
+        $pm = $services->get(PackageManager::class);
 
         foreach ($this->getViewPaths($pm) as $name => $path) {
             $engine->addFolder($name, $path);
         }
 
-        $config = $di['config']['plates']['folders'];
+        $config = $services['config']['plates']['folders'];
         foreach ($config as $name => $path) {
             $engine->addFolder($name, $path);
         }

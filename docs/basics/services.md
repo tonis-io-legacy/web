@@ -35,13 +35,13 @@ You can define your services using the following:
 
 ```php
 // using the fqcn
-$di->set('stdclass', 'StdClass');
+$services->set('stdclass', 'StdClass');
 
 // setting the object directly
-$di->set('stdclass', new StdClass);
+$services->set('stdclass', new StdClass);
 
 // using a callable
-$di->set('stdclass', function (\Tonis\Di\Container $di) {
+$services->set('stdclass', function (\Tonis\Di\Container $di) {
     return new StdClass;
 });
 
@@ -57,13 +57,13 @@ class StdClassFactory implements \Tonis\Di\ServiceFactoryInterface
 ### Check if a service exists
 
 ```php
-$di->has('StdClass'); // true/false
+$services->has('StdClass'); // true/false
 ```
 
 ### Retrieving services
 
 ```php
-$di->get('StdClass');
+$services->get('StdClass');
 ```
 
 Setting a raw service
@@ -81,12 +81,12 @@ class MyClass
     }
 }
 
-$di = $tonis->di();
+$di = $app->getServiceContainer();
 // normally get(MyClass::class) will return StdClass
-$di->set(MyClass::class, MyClass::class);
+$services->set(MyClass::class, MyClass::class);
 
 // now get(MyClass::class) will return an instance of MyClass instead  
-$di->set(MyClass::class, MyClass::class, true);
+$services->set(MyClass::class, MyClass::class, true);
 ```
 
 Decorating Services
@@ -101,8 +101,8 @@ The `decorate` method allows you to modify the service after it has been created
 accepts a closure or an instance of `Tonis\Di\ServiceDecoratorInterface`.
 
 ```php
-$di->set(StdClass::class, new StdClass);
-$di->decorate(StdClass::class, function (\Tonis\Di\Container $di, StdClass $stdclass) {
+$services->set(StdClass::class, new StdClass);
+$services->decorate(StdClass::class, function (\Tonis\Di\Container $di, StdClass $stdclass) {
     $stdclass->foo = 'bar';
 });
 ```
@@ -129,10 +129,10 @@ class MyDog
     public function speak() { echo 'My: ' . $this->dog->speak(); }
 }
 
-$di->set(Dog::class, Dog::class);
+$services->set(Dog::class, Dog::class);
 
 // tell the dog to sleep so it doesn't speak
-$di->wrap(Dog::class, function (\Tonis\Di\Container $di, $serviceName, $callable) {
+$services->wrap(Dog::class, function (\Tonis\Di\Container $di, $serviceName, $callable) {
     $dog = $callable();
     $dog->sleep();
     
@@ -140,7 +140,7 @@ $di->wrap(Dog::class, function (\Tonis\Di\Container $di, $serviceName, $callable
 });
 
 // I want to use my own dog not the dog the neighbor (package) has
-$di->wrap(Dog::class, function (\Tonis\Di\Container $di, $serviceName, $callable) {
+$services->wrap(Dog::class, function (\Tonis\Di\Container $di, $serviceName, $callable) {
     return new MyDog($callable());
 });
 ```
@@ -159,12 +159,12 @@ you should use factories to create your services with the dependencies your serv
 use Tonis\Di\Container;
 
 // do not do this
-$di->set('MyClass', function (Container $di) {
+$services->set('MyClass', function (Container $di) {
     return new MyClass($di);
 });
 
 // do this instead
-$di->set('MyClass', function (Container $di) {
-    return new MyClass($di->get('dep1'), $di->get('dep2'));
+$services->set('MyClass', function (Container $di) {
+    return new MyClass($services->get('dep1'), $services->get('dep2'));
 });
 ```

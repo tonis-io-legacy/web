@@ -7,10 +7,10 @@ use Tonis\Di\ServiceFactoryInterface;
 use Tonis\Dispatcher\Dispatcher;
 use Tonis\Event\EventManager;
 use Tonis\Event\SubscriberInterface;
+use Tonis\Router\Router;
 use Tonis\Web\Exception\InvalidDispatchResultException;
 use Tonis\Web\LifecycleEvent;
-use Tonis\Web\Tonis;
-use Tonis\Router\RouteCollection;
+use Tonis\Web\App;
 use Tonis\Router\RouteMatch;
 use Tonis\View\ModelInterface;
 use Tonis\View\ViewManager;
@@ -35,27 +35,27 @@ final class BaseSubscriber implements SubscriberInterface
      */
     public function subscribe(EventManager $events)
     {
-        $events->on(Tonis::EVENT_ROUTE, [$this, 'onRoute']);
-        $events->on(Tonis::EVENT_ROUTE_ERROR, [$this, 'onRouteError']);
-        $events->on(Tonis::EVENT_DISPATCH, [$this, 'onDispatch'], 1000);
+        $events->on(App::EVENT_ROUTE, [$this, 'onRoute']);
+        $events->on(App::EVENT_ROUTE_ERROR, [$this, 'onRouteError']);
+        $events->on(App::EVENT_DISPATCH, [$this, 'onDispatch'], 1000);
 
         // This needs to run as the last Dispatch event which detects if the dispatch result is valid
-        $events->on(Tonis::EVENT_DISPATCH, [$this, 'onDispatchValidateResult'], -1000);
+        $events->on(App::EVENT_DISPATCH, [$this, 'onDispatchValidateResult'], -1000);
 
-        $events->on(Tonis::EVENT_RENDER, [$this, 'onRender']);
-        $events->on(Tonis::EVENT_RESPOND, [$this, 'onRespond']);
+        $events->on(App::EVENT_RENDER, [$this, 'onRender']);
+        $events->on(App::EVENT_RESPOND, [$this, 'onRespond']);
 
-        $events->on(Tonis::EVENT_DISPATCH_EXCEPTION, [$this, 'onDispatchException']);
+        $events->on(App::EVENT_DISPATCH_EXCEPTION, [$this, 'onDispatchException']);
     }
 
     public function bootstrapPackageSubscribers()
     {
-        /** @var Tonis $tonis */
-        $tonis = $this->di->get(Tonis::class);
+        /** @var App $app */
+        $app = $this->di->get(App::class);
         $subscribers = $this->di['config']['tonis']['subscribers'];
 
         foreach ($subscribers as $subscriber) {
-            $tonis->events()->subscribe(ContainerUtil::get($this->di, $subscriber));
+            $app->getEventManager()->subscribe(ContainerUtil::get($this->di, $subscriber));
         }
     }
 
@@ -64,7 +64,7 @@ final class BaseSubscriber implements SubscriberInterface
      */
     public function onRoute(LifecycleEvent $event)
     {
-        $match = $this->di->get(RouteCollection::class)->match($event->getRequest());
+        $match = $this->di->get(Router::class)->match($event->getRequest());
         if ($match instanceof RouteMatch) {
             $event->setRouteMatch($match);
         }

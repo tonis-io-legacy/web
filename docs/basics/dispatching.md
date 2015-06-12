@@ -118,7 +118,7 @@ class MyController
     public function viewAction($id) { ... }
 }
 
-$di->set('my.controller', function (\Tonis\Di\Container $di) {
-    return new MyController($di->get('foo'));
+$services->set('my.controller', function (\Tonis\Di\Container $di) {
+    return new MyController($services->get('foo'));
 });
 ```

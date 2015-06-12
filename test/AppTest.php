@@ -4,26 +4,25 @@ namespace Tonis\Web;
 use Psr\Http\Message\ResponseInterface;
 use Tonis\Di\Container;
 use Tonis\Event\EventManager;
-use Tonis\Web\Factory\TonisFactory;
+use Tonis\Router\Router;
 use Tonis\Web\TestAsset\NewRequestTrait;
 use Tonis\Web\TestAsset\TestEmitter;
 use Tonis\Web\TestAsset\TestPackage\TestPackage;
 use Tonis\Package\PackageManager;
 use Tonis\Router\Route;
-use Tonis\Router\RouteCollection;
 use Tonis\Router\RouteMatch;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\ServerRequestFactory;
 
 /**
- * @coversDefaultClass \Tonis\Web\Tonis
+ * @coversDefaultClass \Tonis\Web\App
  */
 class TonisTest extends \PHPUnit_Framework_TestCase
 {
     use NewRequestTrait;
 
-    /** @var Tonis */
-    private $tonis;
+    /** @var App */
+    private $app;
 
     /**
      * @covers ::run
@@ -31,8 +30,8 @@ class TonisTest extends \PHPUnit_Framework_TestCase
     public function testRun()
     {
         $emitter = new TestEmitter;
-        $tonis = (new TonisFactory)->createTonisInstance();
-        $tonis->run($emitter);
+        $app = (new AppFactory)->create();
+        $app->run($emitter);
 
         $this->assertInstanceOf(ResponseInterface::class, $emitter->getResponse());
     }
@@ -44,16 +43,16 @@ class TonisTest extends \PHPUnit_Framework_TestCase
     {
         $request = ServerRequestFactory::fromGlobals();
 
-        $tonis = (new TonisFactory)->createTonisInstance();
-        $tonis->__invoke($request);
+        $app = (new AppFactory)->create();
+        $app->__invoke($request);
 
-        $event = $tonis->getLifecycleEvent();
+        $event = $app->getLifecycleEvent();
         $this->assertSame($request, $event->getRequest());
 
         $response = new Response;
-        $tonis->__invoke($request, $response);
+        $app->__invoke($request, $response);
 
-        $event = $tonis->getLifecycleEvent();
+        $event = $app->getLifecycleEvent();
         $this->assertSame($request, $event->getRequest());
         $this->assertSame($response, $event->getResponse());
     }
@@ -65,23 +64,23 @@ class TonisTest extends \PHPUnit_Framework_TestCase
     {
         $response = new Response;
 
-        $this->tonis->events()->on(Tonis::EVENT_RESPOND, function (LifecycleEvent $event) use ($response) {
+        $this->app->getEventManager()->on(App::EVENT_RESPOND, function (LifecycleEvent $event) use ($response) {
             $response->getBody()->write('foobar');
             $event->setResponse($response);
         });
 
-        $this->tonis->route();
-        $this->tonis->respond();
+        $this->app->route();
+        $this->app->respond();
         $this->assertInstanceOf(ResponseInterface::class, $response);
         $this->assertSame('foobar', (string) $response->getBody());
     }
 
     /**
-     * @covers ::events
+     * @covers ::getEventManager
      */
-    public function testEvents()
+    public function testGetEventManager()
     {
-        $this->assertInstanceOf(EventManager::class, $this->tonis->events());
+        $this->assertInstanceOf(EventManager::class, $this->app->getEventManager());
     }
 
     /**
@@ -91,16 +90,16 @@ class TonisTest extends \PHPUnit_Framework_TestCase
      */
     public function testBootstrap()
     {
-        $tonis = (new TonisFactory)->createTonisInstance();
+        $app = (new AppFactory)->create();
         $count = 0;
-        $tonis->events()->on(Tonis::EVENT_BOOTSTRAP, function () use (&$count) {
+        $app->getEventManager()->on(App::EVENT_BOOTSTRAP, function () use (&$count) {
             $count++;
         });
 
-        $tonis->bootstrap();
+        $app->bootstrap();
         $this->assertSame(1, $count);
 
-        $tonis->bootstrap();
+        $app->bootstrap();
         $this->assertSame(1, $count);
     }
 
@@ -111,11 +110,11 @@ class TonisTest extends \PHPUnit_Framework_TestCase
     public function testDispatch()
     {
         $dispatch = false;
-        $this->tonis->events()->on(Tonis::EVENT_DISPATCH, function () use (&$dispatch) {
+        $this->app->getEventManager()->on(App::EVENT_DISPATCH, function () use (&$dispatch) {
             $dispatch = true;
         });
 
-        $this->tonis->dispatch();
+        $this->app->dispatch();
         $this->assertTrue($dispatch);
     }
 
@@ -125,14 +124,14 @@ class TonisTest extends \PHPUnit_Framework_TestCase
      */
     public function testDispatchCatchesExceptions()
     {
-        $this->tonis->events()->on(Tonis::EVENT_DISPATCH, function () {
+        $this->app->getEventManager()->on(App::EVENT_DISPATCH, function () {
             throw new \RuntimeException();
         });
 
-        $this->tonis->route();
-        $this->tonis->dispatch();
+        $this->app->route();
+        $this->app->dispatch();
 
-        $this->assertNotNull($this->tonis->getLifecycleEvent()->getException());
+        $this->assertNotNull($this->app->getLifecycleEvent()->getException());
     }
 
     /**
@@ -142,11 +141,11 @@ class TonisTest extends \PHPUnit_Framework_TestCase
     public function testRender()
     {
         $render = false;
-        $this->tonis->events()->on(Tonis::EVENT_RENDER, function () use (&$render) {
+        $this->app->getEventManager()->on(App::EVENT_RENDER, function () use (&$render) {
             $render = true;
         });
 
-        $this->tonis->render();
+        $this->app->render();
 
         $this->assertTrue($render);
     }
@@ -157,14 +156,14 @@ class TonisTest extends \PHPUnit_Framework_TestCase
      */
     public function testRenderCatchesExceptions()
     {
-        $this->tonis->events()->on(Tonis::EVENT_RENDER, function () {
+        $this->app->getEventManager()->on(App::EVENT_RENDER, function () {
             throw new \RuntimeException();
         });
 
-        $this->tonis->route();
-        $this->tonis->render();
+        $this->app->route();
+        $this->app->render();
 
-        $this->assertNotNull($this->tonis->getLifecycleEvent()->getException());
+        $this->assertNotNull($this->app->getLifecycleEvent()->getException());
     }
 
     /**
@@ -174,17 +173,17 @@ class TonisTest extends \PHPUnit_Framework_TestCase
     public function testRoute()
     {
         $error = false;
-        $this->tonis->events()->on(Tonis::EVENT_ROUTE, function (LifecycleEvent $event) use (&$route) {
+        $this->app->getEventManager()->on(App::EVENT_ROUTE, function (LifecycleEvent $event) use (&$route) {
             $event->setRouteMatch(new RouteMatch(new Route('/', 'handler')));
         });
-        $this->tonis->events()->on(Tonis::EVENT_ROUTE_ERROR, function () use (&$error) {
+        $this->app->getEventManager()->on(App::EVENT_ROUTE_ERROR, function () use (&$error) {
             $error = true;
         });
 
-        $this->tonis->route($this->newRequest('/'));
+        $this->app->route($this->newRequest('/'));
 
         $this->assertFalse($error);
-        $this->assertInstanceOf(RouteMatch::class, $this->tonis->getLifecycleEvent()->getRouteMatch());
+        $this->assertInstanceOf(RouteMatch::class, $this->app->getLifecycleEvent()->getRouteMatch());
     }
 
     /**
@@ -193,11 +192,11 @@ class TonisTest extends \PHPUnit_Framework_TestCase
     public function testRouteError()
     {
         $error = false;
-        $this->tonis->events()->on(Tonis::EVENT_ROUTE_ERROR, function () use (&$error) {
+        $this->app->getEventManager()->on(App::EVENT_ROUTE_ERROR, function () use (&$error) {
             $error = true;
         });
 
-        $this->tonis->route($this->newRequest('/'));
+        $this->app->route($this->newRequest('/'));
 
         $this->assertTrue($error);
     }
@@ -207,10 +206,10 @@ class TonisTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsDebugEnabled()
     {
-        $this->assertFalse($this->tonis->isDebugEnabled());
+        $this->assertFalse($this->app->isDebugEnabled());
 
-        $tonis = (new TonisFactory)->createWeb(['debug' => true]);
-        $this->assertTrue($tonis->isDebugEnabled());
+        $app = (new AppFactory)->createWeb(['debug' => true]);
+        $this->assertTrue($app->isDebugEnabled());
     }
 
     /**
@@ -218,7 +217,7 @@ class TonisTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetConfig()
     {
-        $this->assertInstanceOf(TonisConfig::class, $this->tonis->getConfig());
+        $this->assertInstanceOf(AppConfig::class, $this->app->getConfig());
     }
 
     /**
@@ -226,23 +225,23 @@ class TonisTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetPackageManager()
     {
-        $this->assertInstanceOf(PackageManager::class, $this->tonis->getPackageManager());
+        $this->assertInstanceOf(PackageManager::class, $this->app->getPackageManager());
     }
 
     /**
-     * @covers ::di
+     * @covers ::getServiceContainer
      */
-    public function testDi()
+    public function testGetServiceContainer()
     {
-        $this->assertInstanceOf(Container::class, $this->tonis->di());
+        $this->assertInstanceOf(Container::class, $this->app->getServiceContainer());
     }
 
     /**
-     * @covers ::routes
+     * @covers ::getRouter
      */
-    public function testRoutes()
+    public function testGetRouter()
     {
-        $this->assertInstanceOf(RouteCollection::class, $this->tonis->routes());
+        $this->assertInstanceOf(Router::class, $this->app->getRouter());
     }
 
     /**
@@ -250,9 +249,9 @@ class TonisTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetLifecycleEvent()
     {
-        $this->assertNull($this->tonis->getLifecycleEvent());
-        $this->tonis->route();
-        $this->assertInstanceOf(LifecycleEvent::class, $this->tonis->getLifecycleEvent());
+        $this->assertNull($this->app->getLifecycleEvent());
+        $this->app->route();
+        $this->assertInstanceOf(LifecycleEvent::class, $this->app->getLifecycleEvent());
     }
 
     /**
@@ -260,8 +259,8 @@ class TonisTest extends \PHPUnit_Framework_TestCase
      */
     public function testBootstrapEnvironment()
     {
-        $tonis = (new TonisFactory)->createTonisInstance(['environment' => ['TONIS_ENV_TEST' => 'bar']]);
-        $tonis->bootstrap();
+        $app = (new AppFactory)->create(['environment' => ['TONIS_ENV_TEST' => 'bar']]);
+        $app->bootstrap();
 
         $this->assertSame('bar', getenv('TONIS_ENV_TEST'));
     }
@@ -273,8 +272,8 @@ class TonisTest extends \PHPUnit_Framework_TestCase
      */
     public function testMissingEnvironmentThrowsException()
     {
-        $tonis = (new TonisFactory)->createTonisInstance(['required_environment' => ['TONIS_ENV_TEST']]);
-        $tonis->bootstrap();
+        $app = (new AppFactory)->create(['required_environment' => ['TONIS_ENV_TEST']]);
+        $app->bootstrap();
     }
 
     protected function tearDown()
@@ -284,7 +283,7 @@ class TonisTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->tonis = (new TonisFactory)->createTonisInstance(['packages' => [TestPackage::class]]);
-        $this->tonis->bootstrap();
+        $this->app = (new AppFactory)->create(['packages' => [TestPackage::class]]);
+        $this->app->bootstrap();
     }
 }

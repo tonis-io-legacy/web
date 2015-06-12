@@ -1,21 +1,21 @@
 <?php
 namespace Tonis\Web\Integration;
 
-use Tonis\Web\Factory\TonisFactory;
-use Tonis\Web\Tonis;
+use Tonis\Web\App;
+use Tonis\Web\AppFactory;
 
 class ApiTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var Tonis */
-    private $tonis;
+    /** @var App */
+    private $app;
 
     public function testApiLoads()
     {
-        $this->tonis->routes()->get('/', function () {
+        $this->app->getRouter()->get('/', function () {
             return ['foo' => 'bar'];
         });
 
-        $response = $this->tonis->__invoke();
+        $response = $this->app->__invoke();
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame(['application/json'], $response->getHeader('Content-Type'));
         $this->assertSame('{"foo":"bar"}', (string) $response->getBody());
@@ -23,7 +23,7 @@ class ApiTest extends \PHPUnit_Framework_TestCase
 
     public function testApiHandlesInvalidRoutes()
     {
-        $response = $this->tonis->__invoke();
+        $response = $this->app->__invoke();
 
         $this->assertSame(404, $response->getStatusCode());
         $this->assertSame(['application/json'], $response->getHeader('Content-Type'));
@@ -32,11 +32,11 @@ class ApiTest extends \PHPUnit_Framework_TestCase
 
     public function testApiHandlesDispatchExceptions()
     {
-        $this->tonis->routes()->get('/', function () {
+        $this->app->getRouter()->get('/', function () {
             throw new \RuntimeException('foobar');
         });
 
-        $response = $this->tonis->__invoke();
+        $response = $this->app->__invoke();
         $json = json_decode((string) $response->getBody(), true);
 
         $this->assertSame(500, $response->getStatusCode());
@@ -48,11 +48,11 @@ class ApiTest extends \PHPUnit_Framework_TestCase
 
     public function testApiHandlesInvalidDispatchResults()
     {
-        $this->tonis->routes()->get('/', function () {
+        $this->app->getRouter()->get('/', function () {
             return null;
         });
 
-        $response = $this->tonis->__invoke();
+        $response = $this->app->__invoke();
         $json = json_decode((string) $response->getBody(), true);
 
         $this->assertSame(500, $response->getStatusCode());
@@ -63,6 +63,6 @@ class ApiTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->tonis = (new TonisFactory)->createApi();
+        $this->app = (new AppFactory)->createApi();
     }
 }

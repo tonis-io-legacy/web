@@ -21,10 +21,9 @@ class ViewStrategyFactoryTest extends \PHPUnit_Framework_TestCase
         $pm->add(TestPackage::class);
         $pm->load();
 
-        $di = new Container;
-        $di->set(PackageManager::class, $pm);
-
-        $di['config'] = [
+        $services = new Container;
+        $services->set(PackageManager::class, $pm);
+        $services['config'] = [
             'tonis' => [
                 'view_manager' => [
                     'fallback_strategy' => new StringStrategy(),
@@ -35,7 +34,7 @@ class ViewStrategyFactoryTest extends \PHPUnit_Framework_TestCase
         ];
 
         $factory = new ViewManagerFactory();
-        $vm = $factory->__invoke($di);
+        $vm = $factory->__invoke($services);
 
         $this->assertInstanceOf(ViewManager::class, $vm);
         $this->assertSame('error', $vm->getErrorTemplate());

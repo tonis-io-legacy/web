@@ -4,7 +4,7 @@ namespace Tonis\Web;
 
 use Tonis\View\Strategy;
 
-final class TonisConfig
+final class AppConfig
 {
     /** @var array */
     private $config;

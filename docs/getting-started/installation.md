@@ -17,14 +17,14 @@ Once complete you use one of the following `index.php` to get started.
 <?php
 require __DIR__ . '/vendor/autoload.php';
 
-$tonis = (new \Tonis\Web\Factory\TonisFactory)->createWeb();
-$routes = $tonis->routes();
+$app = (new \Tonis\Web\Factory\TonisFactory)->createWeb();
+$routes = $app->getRouter();
 
 $routes->get('/hello/{name}', function ($name) {
     return sprintf('Hello %s, welcome to Tonis', $name);
 });
 
-$tonis->run();
+$app->run();
 ```
 
 As Middleware

@@ -21,8 +21,8 @@ class TwigStrategyFactoryTest extends \PHPUnit_Framework_TestCase
         $pm->add(TestPackage::class);
         $pm->load();
 
-        $di = new Container;
-        $di['config'] = [
+        $services = new Container;
+        $services['config'] = [
             'twig' => [
                 'extensions' => [
                     TestTwigExtension::class
@@ -33,11 +33,11 @@ class TwigStrategyFactoryTest extends \PHPUnit_Framework_TestCase
                 'options' => []
             ]
         ];
-        $di->set(PackageManager::class, $pm);
+        $services->set(PackageManager::class, $pm);
 
         $factory = new TwigStrategyFactory();
 
-        $twig = $factory->__invoke($di);
+        $twig = $factory->__invoke($services);
 
         $this->assertInstanceOf(TwigStrategy::class, $twig);
         $this->assertInstanceOf(\Twig_Environment::class, $twig->getTwig());

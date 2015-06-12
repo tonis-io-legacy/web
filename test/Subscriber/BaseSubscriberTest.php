@@ -2,12 +2,12 @@
 namespace Tonis\Web\Subscriber;
 
 use Tonis\Event\EventManager;
-use Tonis\Web\Factory\TonisFactory;
+use Tonis\Web\AppFactory;
 use Tonis\Web\LifecycleEvent;
 use Tonis\Web\TestAsset\NewRequestTrait;
 use Tonis\Web\TestAsset\TestSubscriber;
 use Tonis\Web\TestAsset\TestViewModelStrategy;
-use Tonis\Web\Tonis;
+use Tonis\Web\App;
 use Tonis\Router\Route;
 use Tonis\Router\RouteMatch;
 use Tonis\View\Model\StringModel;
@@ -22,8 +22,8 @@ class BaseSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     use NewRequestTrait;
 
-    /** @var Tonis */
-    private $tonis;
+    /** @var App */
+    private $app;
     /** @var BaseSubscriber */
     private $s;
 
@@ -37,12 +37,12 @@ class BaseSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->s->subscribe($events);
 
         $this->assertCount(6, $events->getListeners());
-        $this->assertCount(1, $events->getListeners(Tonis::EVENT_ROUTE));
-        $this->assertCount(1, $events->getListeners(Tonis::EVENT_ROUTE_ERROR));
-        $this->assertCount(2, $events->getListeners(Tonis::EVENT_DISPATCH));
-        $this->assertCount(1, $events->getListeners(Tonis::EVENT_DISPATCH_EXCEPTION));
-        $this->assertCount(1, $events->getListeners(Tonis::EVENT_RENDER));
-        $this->assertCount(1, $events->getListeners(Tonis::EVENT_RESPOND));
+        $this->assertCount(1, $events->getListeners(App::EVENT_ROUTE));
+        $this->assertCount(1, $events->getListeners(App::EVENT_ROUTE_ERROR));
+        $this->assertCount(2, $events->getListeners(App::EVENT_DISPATCH));
+        $this->assertCount(1, $events->getListeners(App::EVENT_DISPATCH_EXCEPTION));
+        $this->assertCount(1, $events->getListeners(App::EVENT_RENDER));
+        $this->assertCount(1, $events->getListeners(App::EVENT_RESPOND));
     }
 
     /**
@@ -50,11 +50,11 @@ class BaseSubscriberTest extends \PHPUnit_Framework_TestCase
      */
     public function testBootstrapPackageSubscribers()
     {
-        $di = $this->tonis->di();
+        $di = $this->app->getServiceContainer();
         $di['config'] = ['tonis' => ['subscribers' => [new TestSubscriber()]]];
 
         $this->s->bootstrapPackageSubscribers();
-        $this->assertNotEmpty($this->tonis->events()->getListeners());
+        $this->assertNotEmpty($this->app->getEventManager()->getListeners());
     }
 
     /**
@@ -86,7 +86,7 @@ class BaseSubscriberTest extends \PHPUnit_Framework_TestCase
      */
     public function testOnRoute()
     {
-        $this->tonis->routes()->get('/', 'foo');
+        $this->app->getRouter()->get('/', 'foo');
 
         $event = new LifecycleEvent($this->newRequest('/asdf'));
         $this->s->onRoute($event);
@@ -143,7 +143,7 @@ class BaseSubscriberTest extends \PHPUnit_Framework_TestCase
         $handler = function () {
             return 'dispatched';
         };
-        $this->tonis->di()->set('handler', $handler);
+        $this->app->getServiceContainer()->set('handler', $handler);
 
         $event = new LifecycleEvent($this->newRequest('/'));
         $event->setRouteMatch(new RouteMatch(new Route('/', 'handler')));
@@ -222,18 +222,18 @@ class BaseSubscriberTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->tonis = (new TonisFactory)->createWeb();
+        $this->app = (new AppFactory)->createWeb();
         /** @var \Tonis\Di\Container $di */
-        $di = $this->tonis->di();
-        $di->wrap(ViewManager::class, function () {
+        $services = $this->app->getServiceContainer();
+        $services->wrap(ViewManager::class, function () {
             $vm = new ViewManager(new StringStrategy());
             $vm->addStrategy(new TestViewModelStrategy());
 
             return $vm;
         });
 
-        $this->tonis->bootstrap();
+        $this->app->bootstrap();
 
-        $this->s = new BaseSubscriber($this->tonis->di());
+        $this->s = new BaseSubscriber($this->app->getServiceContainer());
     }
 }

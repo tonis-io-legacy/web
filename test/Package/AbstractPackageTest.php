@@ -2,11 +2,11 @@
 namespace Tonis\Web\Package;
 
 use Tonis\Di\Container;
-use Tonis\Web\Factory\TonisFactory;
+use Tonis\Router\Router;
+use Tonis\Web\AppFactory;
 use Tonis\Web\TestAsset\PlainPackage;
 use Tonis\Web\TestAsset\TestPackage\TestPackage;
 use Tonis\Web\TestAsset\TestPackageWithNoConfigs;
-use Tonis\Router\RouteCollection;
 
 /**
  * @coversDefaultClass \Tonis\Web\Package\AbstractPackage
@@ -61,7 +61,7 @@ class AbstractPackageTest extends \PHPUnit_Framework_TestCase
      */
     public function testBootstrap()
     {
-        $factory = new TonisFactory;
+        $factory = new AppFactory;
         $this->assertNull($this->package->bootstrap($factory->createWeb()));
     }
 
@@ -70,7 +70,7 @@ class AbstractPackageTest extends \PHPUnit_Framework_TestCase
      */
     public function testBootstrapConsole()
     {
-        $factory = new TonisFactory;
+        $factory = new AppFactory;
         $this->assertNull($this->package->bootstrapConsole($factory->createConsole([])));
     }
 
@@ -80,10 +80,10 @@ class AbstractPackageTest extends \PHPUnit_Framework_TestCase
     public function testConfigureRoutes()
     {
         $package = new PlainPackage;
-        $routes = new RouteCollection;
-        $package->configureRoutes($routes);
+        $router = new Router;
+        $package->configureRoutes($router);
 
-        $this->assertEmpty($routes->getRoutes());
+        $this->assertEmpty($router->getRouteCollection());
     }
 
     /**

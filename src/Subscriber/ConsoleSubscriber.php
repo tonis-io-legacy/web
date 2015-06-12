@@ -5,8 +5,8 @@ use Interop\Container\ContainerInterface;
 use Tonis\Event\EventManager;
 use Tonis\Event\SubscriberInterface;
 use Tonis\Web\Package\PackageInterface;
-use Tonis\Web\Tonis;
-use Tonis\Web\TonisConsole;
+use Tonis\Web\App;
+use Tonis\Web\Console;
 use Tonis\Package\PackageManager;
 
 final class ConsoleSubscriber implements SubscriberInterface
@@ -27,9 +27,9 @@ final class ConsoleSubscriber implements SubscriberInterface
      */
     public function subscribe(EventManager $events)
     {
-        $events->on(Tonis::EVENT_BOOTSTRAP, function () {
+        $events->on(App::EVENT_BOOTSTRAP, function () {
             $pm = $this->di->get(PackageManager::class);
-            $console = $this->di->get(TonisConsole::class);
+            $console = $this->di->get(Console::class);
 
             foreach ($pm->getPackages() as $package) {
                 if ($package instanceof PackageInterface) {

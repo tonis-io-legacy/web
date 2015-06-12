@@ -5,26 +5,26 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Tonis\Di\ContainerAwareInterface;
 
-class TonisConsole extends Application
+class Console extends Application
 {
-    /** @var Tonis */
-    private $tonis;
+    /** @var App */
+    private $app;
 
     /**
-     * @param Tonis $tonis
+     * @param App $app
      */
-    public function __construct(Tonis $tonis)
+    public function __construct(App $app)
     {
-        $this->tonis = $tonis;
+        $this->app = $app;
         parent::__construct();
     }
 
     /**
-     * @return Tonis
+     * @return App
      */
-    public function getTonis()
+    public function getApp()
     {
-        return $this->tonis;
+        return $this->app;
     }
 
     /**
@@ -33,7 +33,7 @@ class TonisConsole extends Application
     public function add(Command $command)
     {
         if ($command instanceof ContainerAwareInterface) {
-            $command->setDi($this->tonis->di());
+            $command->setServiceContainer($this->app->getServiceContainer());
         }
         return parent::add($command);
     }

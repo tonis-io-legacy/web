@@ -5,9 +5,9 @@ use Tonis\Web\TestAsset\TestPackage\TestPackage;
 use Tonis\Web\TestAsset\TestSubscriber;
 
 /**
- * @coversDefaultClass \Tonis\Web\TonisConfig
+ * @coversDefaultClass \Tonis\Web\AppConfig
  */
-class TonisConfigTest extends \PHPUnit_Framework_TestCase
+class AppConfigTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @covers ::__construct
@@ -21,7 +21,7 @@ class TonisConfigTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetters($key, $method, $value)
     {
-        $config = new TonisConfig([$key => $value]);
+        $config = new AppConfig([$key => $value]);
         $this->assertSame($value, $config->{$method}());
     }
 

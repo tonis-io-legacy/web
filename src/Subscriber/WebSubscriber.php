@@ -7,7 +7,7 @@ use Tonis\Event\SubscriberInterface;
 use Tonis\Web\Exception\InvalidDispatchResultException;
 use Tonis\Web\Exception\InvalidTemplateException;
 use Tonis\Web\LifecycleEvent;
-use Tonis\Web\Tonis;
+use Tonis\Web\App;
 use Tonis\Router\RouteMatch;
 use Tonis\View\Model\StringModel;
 use Tonis\View\Model\ViewModel;
@@ -34,11 +34,11 @@ final class WebSubscriber implements SubscriberInterface
      */
     public function subscribe(EventManager $events)
     {
-        $events->on(Tonis::EVENT_BOOTSTRAP, [$this, 'bootstrapViewManager']);
-        $events->on(Tonis::EVENT_ROUTE_ERROR, [$this, 'onRouteError']);
-        $events->on(Tonis::EVENT_DISPATCH, [$this, 'onDispatch']);
-        $events->on(Tonis::EVENT_DISPATCH_EXCEPTION, [$this, 'onDispatchException']);
-        $events->on(Tonis::EVENT_RENDER_EXCEPTION, [$this, 'onRenderException']);
+        $events->on(App::EVENT_BOOTSTRAP, [$this, 'bootstrapViewManager']);
+        $events->on(App::EVENT_ROUTE_ERROR, [$this, 'onRouteError']);
+        $events->on(App::EVENT_DISPATCH, [$this, 'onDispatch']);
+        $events->on(App::EVENT_DISPATCH_EXCEPTION, [$this, 'onDispatchException']);
+        $events->on(App::EVENT_RENDER_EXCEPTION, [$this, 'onRenderException']);
 
     }
 

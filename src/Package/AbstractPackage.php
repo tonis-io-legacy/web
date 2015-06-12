@@ -2,9 +2,9 @@
 namespace Tonis\Web\Package;
 
 use Interop\Container\ContainerInterface;
-use Tonis\Web\Tonis;
-use Tonis\Web\TonisConsole;
-use Tonis\Router\RouteCollection;
+use Tonis\Router\Router;
+use Tonis\Web\App;
+use Tonis\Web\Console;
 
 abstract class AbstractPackage implements PackageInterface
 {
@@ -18,21 +18,21 @@ abstract class AbstractPackage implements PackageInterface
     /**
      * {@inheritDoc}
      */
-    public function bootstrap(Tonis $tonis)
+    public function bootstrap(App $app)
     {
     }
 
     /**
      * {@inheritDoc}
      */
-    public function bootstrapConsole(TonisConsole $console)
+    public function bootstrapConsole(Console $console)
     {
     }
 
     /**
-     * @param RouteCollection $routes
+     * @param Router $router
      */
-    public function configureRoutes(RouteCollection $routes)
+    public function configureRoutes(Router $router)
     {
     }
 

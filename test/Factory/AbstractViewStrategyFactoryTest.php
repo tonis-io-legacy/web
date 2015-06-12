@@ -20,11 +20,11 @@ class AbstractViewStrategyFactoryTest extends \PHPUnit_Framework_TestCase
         $pm->add(TestPackage::class);
         $pm->load();
 
-        $di = new Container;
-        $di->set(PackageManager::class, $pm);
+        $services = new Container;
+        $services->set(PackageManager::class, $pm);
 
         $factory = new TestViewStrategyFactory();
-        $paths = $factory->createService($di);
+        $paths = $factory->createService($services);
 
         $this->assertInternalType('array', $paths);
         $this->assertCount(1, $paths);

@@ -39,12 +39,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/tonis-io/di.git",
-                "reference": "79da982e1c0f04c421a78a136fa503d3dc025cae"
+                "reference": "97e32b633475d18f3384f41acff6b1fcd0574db3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tonis-io/di/zipball/79da982e1c0f04c421a78a136fa503d3dc025cae",
-                "reference": "79da982e1c0f04c421a78a136fa503d3dc025cae",
+                "url": "https://api.github.com/repos/tonis-io/di/zipball/97e32b633475d18f3384f41acff6b1fcd0574db3",
+                "reference": "97e32b633475d18f3384f41acff6b1fcd0574db3",
                 "shasum": ""
             },
             "require": {
@@ -54,8 +54,7 @@
             "require-dev": {
                 "doctrine/annotations": "^1.2",
                 "phpunit/phpunit": "^4.0",
-                "squizlabs/php_codesniffer": "^1.0",
-                "symfony/finder": "^2.1"
+                "squizlabs/php_codesniffer": "^1.0"
             },
             "suggest": {
                 "doctrine/annotations": "~1.2, for creating components from annotations",
@@ -85,7 +84,7 @@
                 }
             ],
             "description": "A light-weight, HHVM compatible, and dependency lite DI container.",
-            "time": "2015-06-09 13:29:40"
+            "time": "2015-06-12 15:53:18"
         },
         {
             "name": "tonis/dispatcher",
@@ -141,12 +140,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/tonis-io/event.git",
-                "reference": "96b84f10aefa41bbade78bca4222e1de8413d763"
+                "reference": "74cdeca909d5d9ee92ddd3f8d1d7fbcb34f2e2fb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tonis-io/event/zipball/96b84f10aefa41bbade78bca4222e1de8413d763",
-                "reference": "96b84f10aefa41bbade78bca4222e1de8413d763",
+                "url": "https://api.github.com/repos/tonis-io/event/zipball/74cdeca909d5d9ee92ddd3f8d1d7fbcb34f2e2fb",
+                "reference": "74cdeca909d5d9ee92ddd3f8d1d7fbcb34f2e2fb",
                 "shasum": ""
             },
             "require": {
@@ -180,7 +179,7 @@
                 }
             ],
             "description": "Tonis\\Event is a light-weight, HHVM compatible, and dependency free event library.",
-            "time": "2015-06-08 14:56:35"
+            "time": "2015-06-12 15:54:19"
         },
         {
             "name": "tonis/package",
@@ -188,12 +187,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/tonis-io/package.git",
-                "reference": "72fa3f8e1221a1d46dcc94af42da9fa677f055bd"
+                "reference": "ee22838093dfedb041e636ef648d488ab2270cae"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tonis-io/package/zipball/72fa3f8e1221a1d46dcc94af42da9fa677f055bd",
-                "reference": "72fa3f8e1221a1d46dcc94af42da9fa677f055bd",
+                "url": "https://api.github.com/repos/tonis-io/package/zipball/ee22838093dfedb041e636ef648d488ab2270cae",
+                "reference": "ee22838093dfedb041e636ef648d488ab2270cae",
                 "shasum": ""
             },
             "require": {
@@ -228,7 +227,7 @@
                 }
             ],
             "description": "Spiffy\\Package is a light-weight, HHVM compatible, and dependency lite package manager.",
-            "time": "2015-06-07 20:10:50"
+            "time": "2015-06-12 15:55:55"
         },
         {
             "name": "tonis/router",
@@ -236,12 +235,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/tonis-io/router.git",
-                "reference": "bab34c58d4c7e2a2cf37fd9d07e08e53fb6a2851"
+                "reference": "48a10644359b084c8965853d39d5abf0c9182f52"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tonis-io/router/zipball/bab34c58d4c7e2a2cf37fd9d07e08e53fb6a2851",
-                "reference": "bab34c58d4c7e2a2cf37fd9d07e08e53fb6a2851",
+                "url": "https://api.github.com/repos/tonis-io/router/zipball/48a10644359b084c8965853d39d5abf0c9182f52",
+                "reference": "48a10644359b084c8965853d39d5abf0c9182f52",
                 "shasum": ""
             },
             "require": {
@@ -277,7 +276,7 @@
                 }
             ],
             "description": "Tonis\\Router is a light-weight, HHVM compatible, and dependency free router library.",
-            "time": "2015-06-10 13:25:08"
+            "time": "2015-06-12 16:56:30"
         },
         {
             "name": "tonis/view",
@@ -1220,16 +1219,16 @@
         },
         {
             "name": "phpunit/php-token-stream",
-            "version": "1.4.1",
+            "version": "1.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-token-stream.git",
-                "reference": "eab81d02569310739373308137284e0158424330"
+                "reference": "db63be1159c81df649cd0260e30249a586d4129e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-token-stream/zipball/eab81d02569310739373308137284e0158424330",
-                "reference": "eab81d02569310739373308137284e0158424330",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-token-stream/zipball/db63be1159c81df649cd0260e30249a586d4129e",
+                "reference": "db63be1159c81df649cd0260e30249a586d4129e",
                 "shasum": ""
             },
             "require": {
@@ -1265,7 +1264,7 @@
             "keywords": [
                 "tokenizer"
             ],
-            "time": "2015-04-08 04:46:07"
+            "time": "2015-06-12 07:34:24"
         },
         {
             "name": "phpunit/phpunit",

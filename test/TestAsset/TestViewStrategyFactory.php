@@ -8,11 +8,11 @@ use Tonis\Package\PackageManager;
 class TestViewStrategyFactory extends AbstractViewStrategyFactory
 {
     /**
-     * @param Container $di
+     * @param Container $services
      * @return mixed
      */
-    public function createService(Container $di)
+    public function createService(Container $services)
     {
-        return $this->getViewPaths($di->get(PackageManager::class));
+        return $this->getViewPaths($services->get(PackageManager::class));
     }
 }

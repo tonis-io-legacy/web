@@ -3,7 +3,7 @@ namespace Tonis\Web\Integration;
 
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
-use Tonis\Web\Factory\TonisFactory;
+use Tonis\Web\AppFactory;
 
 class ConsoleTest extends \PHPUnit_Framework_TestCase
 {
@@ -11,7 +11,7 @@ class ConsoleTest extends \PHPUnit_Framework_TestCase
     {
         $output = new BufferedOutput();
 
-        $console = (new TonisFactory)->createConsole();
+        $console = (new AppFactory)->createConsole();
         $console->setAutoExit(false);
         $console->run(new ArrayInput([]), $output);
 

@@ -8,13 +8,13 @@ use Tonis\Event\EventManager;
 use Tonis\Web\Exception\MissingRequiredEnvironmentException;
 use Tonis\Web\Package\PackageInterface;
 use Tonis\Package\PackageManager;
-use Tonis\Router\RouteCollection;
+use Tonis\Router\Router;
 use Tonis\Router\RouteMatch;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\Server;
 use Zend\Diactoros\ServerRequestFactory;
 
-final class Tonis
+final class App
 {
     const EVENT_BOOTSTRAP = 'bootstrap';
     const EVENT_DISPATCH = 'dispatch';
@@ -28,30 +28,30 @@ final class Tonis
     /** @var bool */
     private $bootstrapped = false;
     /** @var ContainerInterface */
-    private $di;
-    /** @var TonisConfig */
+    private $serviceContainer;
+    /** @var AppConfig */
     private $config;
     /** @var EventManager */
     private $events;
     /** @var PackageManager */
     private $packageManager;
-    /** @var RouteCollection */
-    private $routes;
+    /** @var Router */
+    private $router;
     /** @var LifecycleEvent */
     private $lifecycleEvent;
 
     public function __construct(
-        TonisConfig $config,
-        ContainerInterface $di,
+        AppConfig $config,
+        ContainerInterface $serviceContainer,
         EventManager $events,
         PackageManager $packageManager,
-        RouteCollection $routes
+        Router $router
     ) {
         $this->config = $config;
-        $this->di = $di;
+        $this->serviceContainer = $serviceContainer;
         $this->events = $events;
         $this->packageManager = $packageManager;
-        $this->routes = $routes;
+        $this->router = $router;
     }
 
     /**
@@ -110,10 +110,10 @@ final class Tonis
     {
         $this->lifecycleEvent = new LifecycleEvent($request ?: ServerRequestFactory::fromGlobals());
 
-        $this->events()->fire(self::EVENT_ROUTE, $this->lifecycleEvent);
+        $this->getEventManager()->fire(self::EVENT_ROUTE, $this->lifecycleEvent);
 
         if (!$this->lifecycleEvent->getRouteMatch() instanceof RouteMatch) {
-            $this->events()->fire(self::EVENT_ROUTE_ERROR, $this->lifecycleEvent);
+            $this->getEventManager()->fire(self::EVENT_ROUTE_ERROR, $this->lifecycleEvent);
         }
     }
 
@@ -129,7 +129,7 @@ final class Tonis
 
     public function respond()
     {
-        $this->events()->fire(self::EVENT_RESPOND, $this->lifecycleEvent);
+        $this->getEventManager()->fire(self::EVENT_RESPOND, $this->lifecycleEvent);
     }
 
     /**
@@ -143,25 +143,25 @@ final class Tonis
     /**
      * @return ContainerInterface
      */
-    public function di()
+    public function getServiceContainer()
     {
-        return $this->di;
+        return $this->serviceContainer;
     }
 
     /**
      * @return EventManager
      */
-    public function events()
+    public function getEventManager()
     {
         return $this->events;
     }
 
     /**
-     * @return RouteCollection
+     * @return Router
      */
-    public function routes()
+    public function getRouter()
     {
-        return $this->routes;
+        return $this->router;
     }
 
     /**
@@ -173,7 +173,7 @@ final class Tonis
     }
 
     /**
-     * @return TonisConfig
+     * @return AppConfig
      */
     public function getConfig()
     {
@@ -195,10 +195,10 @@ final class Tonis
     private function tryFire($event, $exceptionEvent)
     {
         try {
-            $this->events()->fire($event, $this->lifecycleEvent);
+            $this->getEventManager()->fire($event, $this->lifecycleEvent);
         } catch (\Exception $ex) {
             $this->lifecycleEvent->setException($ex);
-            $this->events()->fire($exceptionEvent, $this->lifecycleEvent);
+            $this->getEventManager()->fire($exceptionEvent, $this->lifecycleEvent);
         }
     }
 
@@ -221,7 +221,7 @@ final class Tonis
     private function bootstrapPackages()
     {
         $pm = $this->packageManager;
-        $pm->add(TonisPackage::class);
+        $pm->add(AppPackage::class);
         foreach ($this->config->getPackages() as $package) {
             $pm->add($package);
         }
@@ -229,9 +229,9 @@ final class Tonis
 
         foreach ($pm->getPackages() as $package) {
             if ($package instanceof PackageInterface) {
-                $package->configureServices($this->di);
+                $package->configureServices($this->serviceContainer);
                 $package->bootstrap($this);
-                $package->configureRoutes($this->routes);
+                $package->configureRoutes($this->router);
             }
         }
     }

@@ -1,23 +1,23 @@
 <?php
 namespace Tonis\Web\Integration;
 
-use Tonis\Web\Factory\TonisFactory;
+use Tonis\Web\App;
+use Tonis\Web\AppFactory;
 use Tonis\Web\TestAsset\TestPackage\TestPackage;
-use Tonis\Web\Tonis;
 use Tonis\View\Model\ViewModel;
 
 class WebTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var Tonis */
-    private $tonis;
+    /** @var App */
+    private $app;
 
     public function testWebLoads()
     {
-        $this->tonis->routes()->get('/', function () {
+        $this->app->getRouter()->get('/', function () {
             return ['foo' => 'bar', '$$template' => '@test-package/test'];
         });
 
-        $response = $this->tonis->__invoke();
+        $response = $this->app->__invoke();
         $body = (string) $response->getBody();
 
         $this->assertSame(200, $response->getStatusCode());
@@ -27,7 +27,7 @@ class WebTest extends \PHPUnit_Framework_TestCase
 
     public function testWebHandlesInvalidRoutes()
     {
-        $response = $this->tonis->__invoke();
+        $response = $this->app->__invoke();
         $body = (string) $response->getBody();
 
         $this->assertSame(404, $response->getStatusCode());
@@ -37,11 +37,11 @@ class WebTest extends \PHPUnit_Framework_TestCase
 
     public function testWebHandlesDispatchExceptions()
     {
-        $this->tonis->routes()->get('/', function () {
+        $this->app->getRouter()->get('/', function () {
             throw new \RuntimeException('foobar');
         });
 
-        $response = $this->tonis->__invoke();
+        $response = $this->app->__invoke();
         $body = (string) $response->getBody();
 
         $this->assertSame(500, $response->getStatusCode());
@@ -52,11 +52,11 @@ class WebTest extends \PHPUnit_Framework_TestCase
 
     public function testWebHandlesInvalidDispatchResults()
     {
-        $this->tonis->routes()->get('/', function () {
+        $this->app->getRouter()->get('/', function () {
             return null;
         });
 
-        $response = $this->tonis->__invoke();
+        $response = $this->app->__invoke();
         $body = (string) $response->getBody();
 
         $this->assertSame(500, $response->getStatusCode());
@@ -66,6 +66,6 @@ class WebTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->tonis = (new TonisFactory)->createWeb(['packages' => TestPackage::class]);
+        $this->app = (new AppFactory)->createWeb(['packages' => TestPackage::class]);
     }
 }

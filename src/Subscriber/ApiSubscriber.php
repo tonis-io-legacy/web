@@ -5,7 +5,7 @@ use Interop\Container\ContainerInterface;
 use Tonis\Event\EventManager;
 use Tonis\Event\SubscriberInterface;
 use Tonis\Web\LifecycleEvent;
-use Tonis\Web\Tonis;
+use Tonis\Web\App;
 use Tonis\Router\RouteMatch;
 use Tonis\View\Model\JsonModel;
 use Tonis\View\Model\StringModel;
@@ -31,11 +31,11 @@ final class ApiSubscriber implements SubscriberInterface
      */
     public function subscribe(EventManager $events)
     {
-        $events->on(Tonis::EVENT_BOOTSTRAP, [$this, 'bootstrapViewManager']);
-        $events->on(Tonis::EVENT_ROUTE_ERROR, [$this, 'onRouteError']);
-        $events->on(Tonis::EVENT_DISPATCH, [$this, 'onDispatch']);
-        $events->on(Tonis::EVENT_DISPATCH_EXCEPTION, [$this, 'onDispatchException']);
-        $events->on(Tonis::EVENT_RESPOND, [$this, 'onRespond']);
+        $events->on(App::EVENT_BOOTSTRAP, [$this, 'bootstrapViewManager']);
+        $events->on(App::EVENT_ROUTE_ERROR, [$this, 'onRouteError']);
+        $events->on(App::EVENT_DISPATCH, [$this, 'onDispatch']);
+        $events->on(App::EVENT_DISPATCH_EXCEPTION, [$this, 'onDispatchException']);
+        $events->on(App::EVENT_RESPOND, [$this, 'onRespond']);
     }
 
     public function bootstrapViewManager()

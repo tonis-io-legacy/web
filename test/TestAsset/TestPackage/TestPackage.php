@@ -2,8 +2,8 @@
 namespace Tonis\Web\TestAsset\TestPackage;
 
 use Interop\Container\ContainerInterface;
+use Tonis\Router\Router;
 use Tonis\Web\Package\AbstractPackage;
-use Tonis\Router\RouteCollection;
 
 class TestPackage extends AbstractPackage
 {
@@ -12,15 +12,15 @@ class TestPackage extends AbstractPackage
         return __DIR__;
     }
 
-    public function configureServices(ContainerInterface $di)
+    public function configureServices(ContainerInterface $services)
     {
-        $di->set('foo', function() {
+        $services->set('foo', function() {
             return 'bar';
         });
     }
 
-    public function configureRoutes(RouteCollection $routes)
+    public function configureRoutes(Router $router)
     {
-        $routes->get('/foo', 'handler');
+        $router->get('/foo', 'handler');
     }
 }

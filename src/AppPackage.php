@@ -10,37 +10,37 @@ use Tonis\Package\PackageManager;
 use Tonis\View\Strategy\PlatesStrategy;
 use Tonis\View\Strategy\TwigStrategy;
 
-class TonisPackage extends AbstractPackage
+class AppPackage extends AbstractPackage
 {
     /**
-     * @param Tonis $tonis
+     * @param App $app
      */
-    public function bootstrap(Tonis $tonis)
+    public function bootstrap(App $app)
     {
-        $di = $tonis->di();
-        $config = $tonis->getConfig();
-        $packageConfig = $di['config']['tonis'];
+        $services = $app->getServiceContainer();
+        $config = $app->getConfig();
+        $packageConfig = $services['config']['tonis'];
 
         $subscribers = array_merge($config->getSubscribers(), $packageConfig['subscribers']);
         foreach ($subscribers as $subscriber => $factory) {
             if (is_int($subscriber)) {
                 $subscriber = $factory;
             } else {
-                $di->set($subscriber, $factory);
+                $services->set($subscriber, $factory);
             }
 
-            $tonis->events()->subscribe(ContainerUtil::get($di, $subscriber));
+            $app->getEventManager()->subscribe(ContainerUtil::get($services, $subscriber));
         }
     }
 
     /**
      * {@inheritDoc}
      */
-    public function configureServices(ContainerInterface $di)
+    public function configureServices(ContainerInterface $services)
     {
-        $di['config'] = $di->get(PackageManager::class)->getMergedConfig();
+        $services['config'] = $services->get(PackageManager::class)->getMergedConfig();
 
-        $di->set(PlatesStrategy::class, PlatesStrategyFactory::class);
-        $di->set(TwigStrategy::class, TwigStrategyFactory::class);
+        $services->set(PlatesStrategy::class, PlatesStrategyFactory::class);
+        $services->set(TwigStrategy::class, TwigStrategyFactory::class);
     }
 }

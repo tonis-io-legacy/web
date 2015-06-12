@@ -21,19 +21,19 @@ class PlatesStrategyFactoryTest extends \PHPUnit_Framework_TestCase
         $pm->add(TestPackage::class);
         $pm->load();
 
-        $di = new Container;
-        $di['config'] = [
+        $services = new Container;
+        $services['config'] = [
             'plates' => [
                 'folders' => [
                     'foo' => __DIR__ . '/../TestAsset/TestPackage'
                 ]
             ]
         ];
-        $di->set(PackageManager::class, $pm);
+        $services->set(PackageManager::class, $pm);
 
         $factory = new PlatesStrategyFactory();
 
-        $plates = $factory->__invoke($di);
+        $plates = $factory->__invoke($services);
 
         $this->assertInstanceOf(PlatesStrategy::class, $plates);
         $this->assertInstanceOf(Engine::class, $plates->getEngine());
