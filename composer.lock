@@ -39,12 +39,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/tonis-io/di.git",
-                "reference": "97e32b633475d18f3384f41acff6b1fcd0574db3"
+                "reference": "f3116449450a3a2d3a1e972630739e8fb9046984"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tonis-io/di/zipball/97e32b633475d18f3384f41acff6b1fcd0574db3",
-                "reference": "97e32b633475d18f3384f41acff6b1fcd0574db3",
+                "url": "https://api.github.com/repos/tonis-io/di/zipball/f3116449450a3a2d3a1e972630739e8fb9046984",
+                "reference": "f3116449450a3a2d3a1e972630739e8fb9046984",
                 "shasum": ""
             },
             "require": {
@@ -84,7 +84,7 @@
                 }
             ],
             "description": "A light-weight, HHVM compatible, and dependency lite DI container.",
-            "time": "2015-06-12 15:53:18"
+            "time": "2015-06-12 18:57:13"
         },
         {
             "name": "tonis/dispatcher",
