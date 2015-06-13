@@ -1,4 +1,5 @@
 <?php
+use Tonis\Router\Plates\RouteExtension;
 use Tonis\View\Strategy\PlatesStrategy;
 
 return [
@@ -6,7 +7,11 @@ return [
         'folders' => [
             'error' => __DIR__ . '/../view/plates/error',
             'layout' => __DIR__ . '/../view/plates/layout'
-        ]
+        ],
+        'extensions' => [
+            RouteExtension::class
+        ],
+        'functions' => [],
     ],
     'twig' => [
         'options' => [

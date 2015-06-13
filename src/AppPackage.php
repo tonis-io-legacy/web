@@ -3,6 +3,8 @@ namespace Tonis\Web;
 
 use Interop\Container\ContainerInterface;
 use Tonis\Di\ContainerUtil;
+use Tonis\Router\Plates\RouteExtension;
+use Tonis\Web\Factory\PlatesRouteExtensionFactory;
 use Tonis\Web\Factory\PlatesStrategyFactory;
 use Tonis\Web\Factory\TwigStrategyFactory;
 use Tonis\Web\Package\AbstractPackage;
@@ -40,6 +42,7 @@ class AppPackage extends AbstractPackage
     {
         $services['config'] = $services->get(PackageManager::class)->getMergedConfig();
 
+        $services->set(RouteExtension::class, PlatesRouteExtensionFactory::class);
         $services->set(PlatesStrategy::class, PlatesStrategyFactory::class);
         $services->set(TwigStrategy::class, TwigStrategyFactory::class);
     }
