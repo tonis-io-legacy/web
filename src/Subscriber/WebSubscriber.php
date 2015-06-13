@@ -145,7 +145,9 @@ final class WebSubscriber implements SubscriberInterface
      */
     private function createTemplateModel(ViewModel $model, $handler)
     {
+        $action = null;
         if (is_array($handler)) {
+            $action = $handler[1];
             $handler = $handler[0];
         }
         if (is_object($handler) && !$handler instanceof \Closure) {
@@ -156,11 +158,17 @@ final class WebSubscriber implements SubscriberInterface
                 return $match[1] . '-' . $match[2];
             };
 
-            $template = preg_replace('@Action$@', '', $handler);
-            $template = preg_replace_callback('@([a-z])([A-Z])@', $replace, $template);
+            $template = preg_replace_callback('@([a-z])([A-Z])@', $replace, $handler);
             $template = strtolower($template);
             $template = '@' . str_replace('\\', '/', $template);
 
+            // strip the final suffix (-action -controller, etc).
+            $template = preg_replace('@-\w+$@', '', $template);
+
+            // replace the final part with the action if necessary
+            if ($action) {
+                $template = preg_replace('@/\w+$@', '/' . $action, $template);
+            }
             return new ViewModel($template, $model->getVariables());
         }
 
