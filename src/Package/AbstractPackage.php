@@ -5,6 +5,7 @@ use Interop\Container\ContainerInterface;
 use Tonis\Router\Router;
 use Tonis\Web\App;
 use Tonis\Web\Console;
+use Tonis\Web\Factory\DispatchableFactory;
 
 abstract class AbstractPackage implements PackageInterface
 {

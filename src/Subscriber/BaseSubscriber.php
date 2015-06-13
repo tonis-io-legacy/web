@@ -19,14 +19,14 @@ use Zend\Diactoros\Response;
 final class BaseSubscriber implements SubscriberInterface
 {
     /** @var ContainerInterface */
-    private $di;
+    private $serviceContainer;
 
     /**
-     * @param ContainerInterface $di
+     * @param ContainerInterface $serviceContainer
      */
-    public function __construct(ContainerInterface $di)
+    public function __construct(ContainerInterface $serviceContainer)
     {
-        $this->di = $di;
+        $this->serviceContainer = $serviceContainer;
     }
 
     /**
@@ -51,11 +51,11 @@ final class BaseSubscriber implements SubscriberInterface
     public function bootstrapPackageSubscribers()
     {
         /** @var App $app */
-        $app = $this->di->get(App::class);
-        $subscribers = $this->di['config']['tonis']['subscribers'];
+        $app = $this->serviceContainer->get(App::class);
+        $subscribers = $this->serviceContainer['config']['tonis']['subscribers'];
 
         foreach ($subscribers as $subscriber) {
-            $app->getEventManager()->subscribe(ContainerUtil::get($this->di, $subscriber));
+            $app->getEventManager()->subscribe(ContainerUtil::get($this->serviceContainer, $subscriber));
         }
     }
 
@@ -64,7 +64,7 @@ final class BaseSubscriber implements SubscriberInterface
      */
     public function onRoute(LifecycleEvent $event)
     {
-        $match = $this->di->get(Router::class)->match($event->getRequest());
+        $match = $this->serviceContainer->get(Router::class)->match($event->getRequest());
         if ($match instanceof RouteMatch) {
             $event->setRouteMatch($match);
         }
@@ -92,14 +92,28 @@ final class BaseSubscriber implements SubscriberInterface
             return;
         }
 
-        $dispatcher = $this->di->get(Dispatcher::class);
-        $handler = $routeMatch->getRoute()->getHandler();
+        $params = $routeMatch->getParams();
 
-        if (is_string($handler) && $this->di->has($handler)) {
-            $handler = $this->di->get($handler);
+        if (!isset($params['response'])) {
+            $params['response'] = $event->getResponse();
+        }
+        if (!isset($params['request'])) {
+            $params['request'] = $event->getRequest();
         }
 
-        $result = $dispatcher->dispatch($handler, $routeMatch->getParams());
+        /** @var Dispatcher $dispatcher */
+        $dispatcher = $this->serviceContainer->get(Dispatcher::class);
+        $handler = $routeMatch->getRoute()->getHandler();
+
+        if (is_string($handler) && $this->serviceContainer->has($handler)) {
+            $handler = $this->serviceContainer->get($handler);
+        } elseif (is_array($handler) && is_string($handler[0]) && $this->serviceContainer->has($handler[0])) {
+            $handler[0] = $this->serviceContainer->get($handler[0]);
+        } elseif ($handler instanceof ServiceFactoryInterface) {
+            $handler = $handler->createService($this->serviceContainer);
+        }
+
+        $result = $dispatcher->dispatch($handler, $params);
 
         $event->setDispatchResult($result);
     }
@@ -132,7 +146,7 @@ final class BaseSubscriber implements SubscriberInterface
             return;
         }
 
-        $vm = $this->di->get(ViewManager::class);
+        $vm = $this->serviceContainer->get(ViewManager::class);
         $event->setRenderResult($vm->render($event->getDispatchResult()));
     }
 
