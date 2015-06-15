@@ -5,6 +5,7 @@ use Tonis\Event\EventManager;
 use Tonis\Web\AppFactory;
 use Tonis\Web\LifecycleEvent;
 use Tonis\Web\TestAsset\NewRequestTrait;
+use Tonis\Web\TestAsset\TestController;
 use Tonis\Web\TestAsset\TestSubscriber;
 use Tonis\Web\TestAsset\TestViewModelStrategy;
 use Tonis\Web\App;
@@ -16,7 +17,7 @@ use Tonis\View\ViewManager;
 use Zend\Diactoros\Response;
 
 /**
- * @coversDefaultClass \Tonis\Web\Subscriber\BaseSubscriber
+ * @covers \Tonis\Web\Subscriber\BaseSubscriber
  */
 class BaseSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -27,10 +28,6 @@ class BaseSubscriberTest extends \PHPUnit_Framework_TestCase
     /** @var BaseSubscriber */
     private $s;
 
-    /**
-     * @covers ::__construct
-     * @covers ::subscribe
-     */
     public function testSubscribe()
     {
         $events = new EventManager();
@@ -45,9 +42,6 @@ class BaseSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $events->getListeners(App::EVENT_RESPOND));
     }
 
-    /**
-     * @covers ::bootstrapPackageSubscribers
-     */
     public function testBootstrapPackageSubscribers()
     {
         $di = $this->app->getServiceContainer();
@@ -57,9 +51,6 @@ class BaseSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEmpty($this->app->getEventManager()->getListeners());
     }
 
-    /**
-     * @covers ::onRender
-     */
     public function testOnRenderWithModel()
     {
         $event = new LifecycleEvent($this->newRequest('/'));
@@ -69,9 +60,6 @@ class BaseSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('testing', $event->getRenderResult());
     }
 
-    /**
-     * @covers ::onRender
-     */
     public function testOnRenderReturnsEarlyIfRenderResultIsNotNull()
     {
         $event = new LifecycleEvent($this->newRequest('/'));
@@ -81,9 +69,6 @@ class BaseSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('foo', $event->getRenderResult());
     }
 
-    /**
-     * @covers ::onRoute
-     */
     public function testOnRoute()
     {
         $this->app->getRouter()->get('/', 'foo');
@@ -97,9 +82,6 @@ class BaseSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(RouteMatch::class, $event->getRouteMatch());
     }
 
-    /**
-     * @covers ::onDispatch
-     */
     public function testOnDispatchReturnsEarlyWithResult()
     {
         $event = new LifecycleEvent($this->newRequest('/'));
@@ -108,9 +90,6 @@ class BaseSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('foo', $event->getDispatchResult());
     }
 
-    /**
-     * @covers ::onDispatch
-     */
     public function testOnDispatchReturnsEarlyWithNoRouteMatch()
     {
         $event = new LifecycleEvent($this->newRequest('/'));
@@ -119,9 +98,6 @@ class BaseSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($event->getDispatchResult());
     }
 
-    /**
-     * @covers ::onDispatch
-     */
     public function testOnDispatch()
     {
         $handler = function () {
@@ -135,9 +111,6 @@ class BaseSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('dispatched', $event->getDispatchResult());
     }
 
-    /**
-     * @covers ::onDispatch
-     */
     public function testOnDispatchHandlesServiceDispatchables()
     {
         $handler = function () {
@@ -152,8 +125,18 @@ class BaseSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('dispatched', $event->getDispatchResult());
     }
 
+    public function testOnDispatchHandlesCallableServices()
+    {
+        $this->app->getServiceContainer()->set('handler', new TestController(), true);
+
+        $event = new LifecycleEvent($this->newRequest('/'));
+        $event->setRouteMatch(new RouteMatch(new Route('/', ['handler', 'index'])));
+
+        $this->s->onDispatch($event);
+        $this->assertTrue($event->getDispatchResult());
+    }
+
     /**
-     * @covers ::onDispatchValidateResult
      * @expectedException \Tonis\Web\Exception\InvalidDispatchResultException
      */
     public function testOnDispatchValidateResult()
@@ -164,9 +147,6 @@ class BaseSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->s->onDispatchValidateResult($event);
     }
 
-    /**
-     * @covers ::onDispatchValidateResult
-     */
     public function testOnDispatchValidateResultWithValidResult()
     {
         $event = new LifecycleEvent($this->newRequest('/'));
@@ -174,9 +154,6 @@ class BaseSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->s->onDispatchValidateResult($event);
     }
 
-    /**
-     * @covers ::onRespond
-     */
     public function testOnRespond()
     {
         $response = new Response;
@@ -196,9 +173,6 @@ class BaseSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('response', (string) $response->getBody());
     }
 
-    /**
-     * @covers ::onDispatchException
-     */
     public function testOnDispatchException()
     {
         $ex = new \RuntimeException('foo');
@@ -210,9 +184,6 @@ class BaseSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(500, $event->getResponse()->getStatusCode());
     }
 
-    /**
-     * @covers ::onRouteError
-     */
     public function testOnRouteError()
     {
         $event = new LifecycleEvent($this->newRequest('/'));

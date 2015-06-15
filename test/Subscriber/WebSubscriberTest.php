@@ -9,6 +9,7 @@ use Tonis\Web\Exception\InvalidTemplateException;
 use Tonis\Web\LifecycleEvent;
 use Tonis\Web\TestAsset\NewRequestTrait;
 use Tonis\Web\TestAsset\TestAction;
+use Tonis\Web\TestAsset\TestController;
 use Tonis\Web\TestAsset\TestViewModelStrategy;
 use Tonis\Web\App;
 use Tonis\Router\Route;
@@ -20,7 +21,7 @@ use Tonis\View\Strategy\StringStrategy;
 use Tonis\View\ViewManager;
 
 /**
- * @coversDefaultClass \Tonis\Web\Subscriber\WebSubscriber
+ * @covers \Tonis\Web\Subscriber\WebSubscriber
  */
 class WebSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -33,10 +34,6 @@ class WebSubscriberTest extends \PHPUnit_Framework_TestCase
     /** @var Container */
     private $di;
 
-    /**
-     * @covers ::__construct
-     * @covers ::subscribe
-     */
     public function testSubscribe()
     {
         $events = new EventManager();
@@ -50,9 +47,6 @@ class WebSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $events->getListeners(App::EVENT_RENDER_EXCEPTION));
     }
 
-    /**
-     * @covers ::bootstrapViewManager
-     */
     public function testBootstrapViewManager()
     {
         $this->di->set(PlatesStrategy::class, new PlatesStrategy(new Engine), true);
@@ -64,14 +58,10 @@ class WebSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(PlatesStrategy::class, $this->vm->getStrategies()[2]);
     }
 
-    /**
-     * @covers ::onDispatch
-     * @covers ::createTemplateModel
-     */
     public function testOnDispatch()
     {
         $event = new LifecycleEvent($this->newRequest('/'));
-        $event->setRouteMatch(new RouteMatch(new Route('/', [new TestAction, 'run'])));
+        $event->setRouteMatch(new RouteMatch(new Route('/', TestAction::class)));
 
         $event->setDispatchResult(['foo' => 'bar']);
         $this->s->onDispatch($event);
@@ -86,10 +76,27 @@ class WebSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('foo', $event->getDispatchResult()->getString());
     }
 
-    /**
-     * @covers ::onDispatch
-     * @covers ::createTemplateModel
-     */
+    public function testOnDispatchSetsTemplate()
+    {
+        $match = new RouteMatch(new Route('foo', [TestController::class, 'index']));
+        $event = new LifecycleEvent($this->newRequest('/'));
+        $event->setRouteMatch($match);
+        $event->setDispatchResult(new ViewModel(null));
+        $this->s->onDispatch($event);
+
+        $model = $event->getDispatchResult();
+        $this->assertSame('@tonis/web/test-asset/index', $model->getTemplate());
+
+        $match = new RouteMatch(new Route('foo', new TestAction));
+        $event = new LifecycleEvent($this->newRequest('/'));
+        $event->setRouteMatch($match);
+        $event->setDispatchResult(new ViewModel(null));
+        $this->s->onDispatch($event);
+
+        $model = $event->getDispatchResult();
+        $this->assertSame('@tonis/web/test-asset/test', $model->getTemplate());
+    }
+
     public function testOnDispatchWithNoViewModel()
     {
         $event = new LifecycleEvent($this->newRequest('/'));
@@ -107,9 +114,6 @@ class WebSubscriberTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @covers ::onDispatchException
-     */
     public function testOnDispatchException()
     {
         $ex = new \RuntimeException('foo');
@@ -123,9 +127,6 @@ class WebSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('error/exception', $model->getTemplate());
     }
 
-    /**
-     * @covers ::onRouteError
-     */
     public function testOnRouteError()
     {
         $event = new LifecycleEvent($this->newRequest('/'));
@@ -136,10 +137,6 @@ class WebSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('error/404', $model->getTemplate());
     }
 
-    /**
-     * @covers ::onRenderException
-     * @covers ::createExceptionModel
-     */
     public function testOnRenderException()
     {
         $event = $this->getEvent();

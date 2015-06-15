@@ -24,6 +24,9 @@ class PlatesStrategyFactoryTest extends \PHPUnit_Framework_TestCase
         $services = new Container;
         $services['config'] = [
             'plates' => [
+                'extensions' => [
+
+                ],
                 'folders' => [
                     'foo' => __DIR__ . '/../TestAsset/TestPackage'
                 ]

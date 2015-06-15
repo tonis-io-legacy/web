@@ -104,16 +104,7 @@ final class BaseSubscriber implements SubscriberInterface
         /** @var Dispatcher $dispatcher */
         $dispatcher = $this->serviceContainer->get(Dispatcher::class);
         $handler = $routeMatch->getRoute()->getHandler();
-
-        if (is_string($handler) && $this->serviceContainer->has($handler)) {
-            $handler = $this->serviceContainer->get($handler);
-        } elseif (is_array($handler) && is_string($handler[0]) && $this->serviceContainer->has($handler[0])) {
-            $handler[0] = $this->serviceContainer->get($handler[0]);
-        } elseif ($handler instanceof ServiceFactoryInterface) {
-            $handler = $handler->createService($this->serviceContainer);
-        }
-
-        $result = $dispatcher->dispatch($handler, $params);
+        $result = $dispatcher->dispatch($this->introspectHandler($handler), $params);
 
         $event->setDispatchResult($result);
     }
@@ -150,9 +141,29 @@ final class BaseSubscriber implements SubscriberInterface
         $event->setRenderResult($vm->render($event->getDispatchResult()));
     }
 
+    /**
+     * @param LifecycleEvent $event
+     */
     public function onRespond(LifecycleEvent $event)
     {
         $response = $event->getResponse() ? $event->getResponse() : new Response;
         $response->getBody()->write($event->getRenderResult());
+    }
+
+    /**
+     * @param string $handler
+     * @return array|mixed
+     */
+    private function introspectHandler($handler)
+    {
+        if (is_string($handler) && $this->serviceContainer->has($handler)) {
+            return $this->serviceContainer->get($handler);
+        }
+        if (is_array($handler) && is_string($handler[0]) && $this->serviceContainer->has($handler[0])) {
+            $handler[0] = $this->serviceContainer->get($handler[0]);
+            return $handler;
+        }
+
+        return $handler;
     }
 }
