@@ -66,6 +66,6 @@ class WebTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->app = (new AppFactory)->createWeb(['packages' => TestPackage::class]);
+        $this->app = (new AppFactory)->createWeb(['packages' => TestPackage::class, 'debug' => true]);
     }
 }

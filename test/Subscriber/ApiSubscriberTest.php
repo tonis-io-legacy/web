@@ -4,6 +4,7 @@ namespace Tonis\Web\Subscriber;
 use Tonis\Di\Container;
 use Tonis\Event\EventManager;
 use Tonis\View\Strategy\StringStrategy;
+use Tonis\Web\AppFactory;
 use Tonis\Web\LifecycleEvent;
 use Tonis\Web\TestAsset\NewRequestTrait;
 use Tonis\Web\App;
@@ -99,6 +100,28 @@ class ApiSubscriberTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers ::onDispatchException
+     */
+    public function testOnDispatchExceptionWithDebugDisabled()
+    {
+        $di = new Container;
+        $di->set(App::class, (new AppFactory)->create(['debug' => false]), true);
+        $s = new ApiSubscriber($di);
+        
+        $ex = new \RuntimeException('foo');
+
+        $event = new LifecycleEvent($this->newRequest('/'));
+        $event->setException($ex);
+
+        $s->onDispatchException($event);
+        $data = $event->getDispatchResult()->getData();
+        $this->assertInstanceOf(JsonModel::class, $event->getDispatchResult());
+        $this->assertSame($ex->getMessage(), $data['message']);
+        $this->assertArrayNotHasKey('trace', $data);
+        $this->assertArrayNotHasKey('exception', $data);
+    }
+
+    /**
      * @covers ::onRouteError
      */
     public function testOnRouteError()
@@ -125,6 +148,7 @@ class ApiSubscriberTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->di = new Container;
+        $this->di->set(App::class, (new AppFactory)->create(['debug' => true]), true);
         $this->s = new ApiSubscriber($this->di);
     }
 }

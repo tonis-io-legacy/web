@@ -6,7 +6,6 @@ use Tonis\Event\EventManager;
 use Tonis\Event\SubscriberInterface;
 use Tonis\Web\LifecycleEvent;
 use Tonis\Web\App;
-use Tonis\Router\RouteMatch;
 use Tonis\View\Model\JsonModel;
 use Tonis\View\Model\StringModel;
 use Tonis\View\Strategy\JsonStrategy;
@@ -62,12 +61,19 @@ final class ApiSubscriber implements SubscriberInterface
      */
     public function onDispatchException(LifecycleEvent $event)
     {
-        $model = new JsonModel([
+        $vars = [
             'error' => 'An error has occurred',
-            'exception' => get_class($event->getException()),
             'message' => $event->getException()->getMessage(),
-            'trace' => $event->getException()->getTrace()
-        ]);
+        ];
+
+        /** @var App $config */
+        $app = $this->di->get(App::class);
+        if ($app->isDebugEnabled()) {
+            $vars['exception'] = get_class($event->getException());
+            $vars['trace'] = $event->getException()->getTrace();
+        }
+
+        $model = new JsonModel($vars);
         $event->setDispatchResult($model);
     }
 

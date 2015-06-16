@@ -1,5 +1,6 @@
 <p class="lead">An exception occurred during dispatching.</p>
 
+<?php if (isset($exception)) : ?>
 <h2>Additional information:</h2>
 <?php $this->insert('error::_exception', ['exception' => $exception]); ?>
 
@@ -10,3 +11,4 @@
     <?php endforeach; ?>
     <?php endif; ?>
 </ul>
+<?php endif; ?>

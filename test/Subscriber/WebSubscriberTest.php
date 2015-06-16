@@ -4,6 +4,7 @@ namespace Tonis\Web\Subscriber;
 use League\Plates\Engine;
 use Tonis\Di\Container;
 use Tonis\Event\EventManager;
+use Tonis\Web\AppFactory;
 use Tonis\Web\Exception\InvalidDispatchResultException;
 use Tonis\Web\Exception\InvalidTemplateException;
 use Tonis\Web\LifecycleEvent;
@@ -142,11 +143,32 @@ class WebSubscriberTest extends \PHPUnit_Framework_TestCase
         $event = $this->getEvent();
 
         $this->s->onRenderException($event);
-        $this->assertSame('error/exception:{"exception":null,"type":"exception","path":"\/"}', $event->getRenderResult());
+        $this->assertSame('error/exception:{"type":"exception","path":"\/","exception":null}', $event->getRenderResult());
 
         $event->setException(new InvalidDispatchResultException());
         $this->s->onRenderException($event);
-        $this->assertSame('error/exception:{"exception":"Tonis\\\\Web\\\\Exception\\\\InvalidDispatchResultException","type":"invalid-dispatch-result","path":"\/"}', $event->getRenderResult());
+        $this->assertSame('error/exception:{"type":"invalid-dispatch-result","path":"\/","exception":"Tonis\\\\Web\\\\Exception\\\\InvalidDispatchResultException"}', $event->getRenderResult());
+    }
+
+    public function testOnRenderExceptionWithDebugDisabled()
+    {
+        $vm = new ViewManager(new StringStrategy());
+        $vm->addStrategy(new TestViewModelStrategy());
+
+        $di = new Container;
+        $di->set(ViewManager::class, $vm, true);
+        $di->set(App::class, (new AppFactory)->create(['debug' => false]), true);
+
+        $s = new WebSubscriber($di);
+        $event = $this->getEvent();
+
+        $s->onRenderException($event);
+        $this->assertSame('error/exception:{"type":"exception","path":"\/"}', $event->getRenderResult());
+    }
+
+    protected function getEvent()
+    {
+        return new LifecycleEvent($this->newRequest('/'));
     }
 
     protected function setUp()
@@ -156,12 +178,8 @@ class WebSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->di = new Container;
         $this->di->set(ViewManager::class, $this->vm, true);
+        $this->di->set(App::class, (new AppFactory)->create(['debug' => true]), true);
 
         $this->s = new WebSubscriber($this->di);
-    }
-
-    protected function getEvent()
-    {
-        return new LifecycleEvent($this->newRequest('/'));
     }
 }

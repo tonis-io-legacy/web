@@ -128,14 +128,18 @@ final class WebSubscriber implements SubscriberInterface
                 break;
         }
 
-        return new ViewModel(
-            $vm->getErrorTemplate(),
-            [
-                'exception' => $event->getException(),
-                'type' => $type,
-                'path' => $event->getRequest()->getUri()->getPath()
-            ]
-        );
+        $vars = [
+            'type' => $type,
+            'path' => $event->getRequest()->getUri()->getPath(),
+        ];
+
+        /** @var App $config */
+        $app = $this->di->get(App::class);
+        if ($app->isDebugEnabled()) {
+            $vars['exception'] = $event->getException();
+        }
+
+        return new ViewModel($vm->getErrorTemplate(), $vars);
     }
 
     /**

@@ -63,6 +63,6 @@ class ApiTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->app = (new AppFactory)->createApi();
+        $this->app = (new AppFactory)->createApi(['debug' => true]);
     }
 }
