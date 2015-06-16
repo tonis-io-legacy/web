@@ -66,7 +66,7 @@ final class ApiSubscriber implements SubscriberInterface
             'error' => 'An error has occurred',
             'exception' => get_class($event->getException()),
             'message' => $event->getException()->getMessage(),
-            'trace' => $event->getException()->getTrace()
+            'trace' => getenv('TONIS_DEBUG') ? $event->getException()->getTrace() : '',
         ]);
         $event->setDispatchResult($model);
     }

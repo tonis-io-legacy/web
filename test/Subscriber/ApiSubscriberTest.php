@@ -91,11 +91,21 @@ class ApiSubscriberTest extends \PHPUnit_Framework_TestCase
         $event = new LifecycleEvent($this->newRequest('/'));
         $event->setException($ex);
 
+		putenv('TONIS_DEBUG=true');
+
         $this->s->onDispatchException($event);
         $this->assertInstanceOf(JsonModel::class, $event->getDispatchResult());
         $this->assertSame($ex->getMessage(), $event->getDispatchResult()->getData()['message']);
         $this->assertSame(get_class($ex), $event->getDispatchResult()->getData()['exception']);
         $this->assertSame($ex->getTrace(), $event->getDispatchResult()->getData()['trace']);
+
+		putenv('TONIS_DEBUG');
+
+        $this->s->onDispatchException($event);
+        $this->assertInstanceOf(JsonModel::class, $event->getDispatchResult());
+        $this->assertSame($ex->getMessage(), $event->getDispatchResult()->getData()['message']);
+        $this->assertSame(get_class($ex), $event->getDispatchResult()->getData()['exception']);
+        $this->assertSame('', $event->getDispatchResult()->getData()['trace']);
     }
 
     /**
